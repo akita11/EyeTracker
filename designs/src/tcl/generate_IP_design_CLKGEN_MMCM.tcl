@@ -23,7 +23,8 @@ set_property -dict [list CONFIG.USE_MIN_POWER {true} CONFIG.RESET_TYPE {ACTIVE_L
              CONFIG.MMCM_DIVCLK_DIVIDE {2} CONFIG.MMCM_CLKFBOUT_MULT_F {24.125} CONFIG.MMCM_CLKIN1_PERIOD {20.0} \
              CONFIG.MMCM_CLKOUT0_DIVIDE_F {24.125} CONFIG.MMCM_CLKOUT0_DUTY_CYCLE {0.5} \
              CONFIG.CLKOUT1_JITTER {437.668} CONFIG.CLKOUT1_PHASE_ERROR {333.440}] [get_ips CLKGEN_MMCM]
-generate_target {instantiation_template} [get_files c:/work/EyeTracker/designs/FPGA/project_1/project_1.srcs/sources_1/ip/CLKGEN_MMCM/CLKGEN_MMCM.xci]generate_target all [get_files  c:/work/EyeTracker/designs/FPGA/project_1/project_1.srcs/sources_1/ip/CLKGEN_MMCM/CLKGEN_MMCM.xci]
+generate_target {instantiation_template} [get_files c:/work/EyeTracker/designs/FPGA/project_1/project_1.srcs/sources_1/ip/CLKGEN_MMCM/CLKGEN_MMCM.xci]
+generate_target all [get_files  c:/work/EyeTracker/designs/FPGA/project_1/project_1.srcs/sources_1/ip/CLKGEN_MMCM/CLKGEN_MMCM.xci]
 export_ip_user_files -of_objects [get_files c:/work/EyeTracker/designs/FPGA/project_1/project_1.srcs/sources_1/ip/CLKGEN_MMCM/CLKGEN_MMCM.xci] \
                      -no_script -sync -force -quiet
 create_ip_run [get_files -of_objects [get_fileset sources_1] c:/work/EyeTracker/designs/FPGA/project_1/project_1.srcs/sources_1/ip/CLKGEN_MMCM/CLKGEN_MMCM.xci]
