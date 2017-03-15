@@ -20,13 +20,13 @@ set_property -dict [list CONFIG.Memory_Type {True_Dual_Port_RAM} \
              CONFIG.Write_Width_B {640} CONFIG.Read_Width_B {640} CONFIG.Operating_Mode_B {NO_CHANGE} CONFIG.Enable_B {Use_ENB_Pin} \
              CONFIG.Register_PortA_Output_of_Memory_Primitives {true} CONFIG.Register_PortB_Output_of_Memory_Primitives {true} \
              CONFIG.Port_B_Clock {100} CONFIG.Port_B_Write_Rate {50} CONFIG.Port_B_Enable_Rate {100}] [get_ips MEM]
-generate_target {instantiation_template} [get_files c:/work/EyeTracker/designs/FPGA/project_1/project_1.srcs/sources_1/ip/MEM/MEM.xci]
+#generate_target {instantiation_template} [get_files c:/work/EyeTracker/designs/FPGA/project_1/project_1.srcs/sources_1/ip/MEM/MEM.xci]
 generate_target all [get_files  c:/work/EyeTracker/designs/FPGA/project_1/project_1.srcs/sources_1/ip/MEM/MEM.xci]
-catch { config_ip_cache -export [get_ips -all MEM] }
+#catch { config_ip_cache -export [get_ips -all MEM] }
 export_ip_user_files -of_objects [get_files c:/work/EyeTracker/designs/FPGA/project_1/project_1.srcs/sources_1/ip/MEM/MEM.xci] \
                      -no_script -sync -force -quiet
 create_ip_run [get_files -of_objects [get_fileset sources_1] c:/work/EyeTracker/designs/FPGA/project_1/project_1.srcs/sources_1/ip/MEM/MEM.xci]
-launch_runs -jobs 2 MEM_synth_1
+#launch_runs -jobs 2 MEM_synth_1
 export_simulation -of_objects [get_files c:/work/EyeTracker/designs/FPGA/project_1/project_1.srcs/sources_1/ip/MEM/MEM.xci] \
                   -directory C:/work/EyeTracker/designs/FPGA/project_1/project_1.ip_user_files/sim_scripts \
                   -ip_user_files_dir C:/work/EyeTracker/designs/FPGA/project_1/project_1.ip_user_files \
