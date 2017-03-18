@@ -55,7 +55,7 @@ module  SIM_TOP();
     TOP #( .PIXEL_WIDTH(PIXEL_WIDTH), .ADDR_WIDTH(9), .PIX_HACT(640) )    m_TOP(
         .CLK(clk), .RST_N(resetn),
         .UART_RXD(1'b0), .UART_TXD(),
-        .JP(jp_set),
+        .JP(jp_set), .DUMMY0(1'b1), .DUMMY1(1'b1)
         .CCLK(cclk), .FVAL(fval), .DVAL(dval), .LVAL(lval), .DATA_L(data_l), .DATA_R(data_r),
         .VGA_CLK(vga_clk), .VGA_VSYNC(vga_vsync), .VGA_HSYNC(vga_hsync), .VGA_R(vga_r), .VGA_G(vga_g), .VGA_B(vga_b) 
         );

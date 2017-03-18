@@ -25,6 +25,9 @@ module TOP #(
     input   wire                        UART_RXD,
     output  wire                        UART_TXD,
     //
+    input   wire                        DUMMY0,
+    input   wire                        DUMMY1,
+    //
     input   wire    [JP_WIDTH -1: 0]    JP,
     //
     input   wire                        CCLK,
@@ -202,5 +205,9 @@ module TOP #(
 
     // UART (temporal)
     CYCLE_DELAY #( .DATA_WIDTH(1), .DELAY(1) )    m_UART( .CLK(CLK), .RST_N(RST_N), .iD(UART_RXD), .oD(UART_TXD) );
+
+    // DUMMY pin
+    DFF #( .DATA_WIDTH(1) ) m_DUMMY0( .CLK(CLK), .RST_N(RST_N), .iD(DUMMY0), .oD() );
+    DFF #( .DATA_WIDTH(1) ) m_DUMMY1( .CLK(CLK), .RST_N(RST_N), .iD(DUMMY1), .oD() );
 
 endmodule
