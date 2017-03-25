@@ -154,6 +154,9 @@ module TOP #(
     MEM m_MEMB5( .clka(CCLK   ), .addra(cl_row    ), .dina(memin_5), .ena( mem_sel_sync_cclk), .wea(web), 
                  .clkb(VGA_CLK), .addrb(tmg_vcount), .dinb('h0    ), .enb(1'b1              ), .web(1'b0), .doutb(memout_5b) );    
 
+    // 
+    COUNT_HIGH_BIT #( .BIT_WIDTH(32) )  m_COUNT_HIGH_BIT ( .iBIT(memin_0[31:0]), .oCOUNT() );
+
     // for Meta-stable 
     CYCLE_DELAY #( .DATA_WIDTH(1), .DELAY(2) )    m_MEM_SEL_DLY2( .CLK(CCLK), .RST_N(RST_N), .iD(mem_sel), .oD(mem_sel_sync_cclk) );
 

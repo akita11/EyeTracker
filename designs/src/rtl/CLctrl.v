@@ -44,14 +44,21 @@ module CLctrl #(
     output  reg     [MDATA_WIDTH -1: 0]     oMEMIN_5    // for Row VGA out
 );
 
+    //
+    reg                                     next_state, state;
+
     // 
     reg     [ADDR_WIDTH -1: 0]              next_col, col;
     reg     [ADDR_WIDTH -1: 0]              next_row, row;
 
     // 
+    reg     [ADDR_WIDTH -1: 0]              next_calc_row, calc_row;
+
+    // 
     integer                                 i;
 
     //
+//    assign  oCL_ROW = (flag_calc_sum==1'b1) ? calc_row: row;
     assign  oCL_ROW = row;
 
     // オリジナルアルゴリズム
@@ -67,7 +74,7 @@ module CLctrl #(
     DET_EDGE m_DET_DVAL_EDGE( .CLK(CCLK), .RST_N(RST_N), .iS(iDVAL), .oRISE(rise_dval), .oFALL(fall_dval) );
     DET_EDGE m_DET_FVAL_EDGE( .CLK(CCLK), .RST_N(RST_N), .iS(iFVAL), .oRISE(rise_fval), .oFALL(fall_fval) );
 
-    // 
+    // for Write Access
     always @(*) begin
         if (rise_fval) begin
             next_col <= 'h0;
@@ -87,7 +94,7 @@ module CLctrl #(
         end
     end
 
-    // 
+    // for Write Access
     always @(posedge CCLK or negedge RST_N) begin
         if (!RST_N) begin
             col <= 'h0;
@@ -97,6 +104,36 @@ module CLctrl #(
             row <= next_row;
         end
     end
+
+    // for Read and Calc Access
+/*
+    always @(*) begin
+        case (state)
+            IDLE_STATE: begin
+                            if (rise_fval) begin
+                                next_state <= CALC_Y_DIR;
+                                // 
+                                next_
+                            end else begin
+                                next_state <~ state;
+                            end
+                        end
+            CALC_Y_DIR: begin
+                        end
+            CALC_X_DIR: begin
+                        end
+            CALC_SUM:   begin
+                        end
+            CALC_DIV:   begin
+                        end
+            OUT_RESULT: begin
+                        end
+            default:    begin
+                            next_state <= IDEL_STATE;
+                        end
+        endcase
+    end
+*/
 
     //
     always @(posedge CCLK or negedge RST_N) begin
