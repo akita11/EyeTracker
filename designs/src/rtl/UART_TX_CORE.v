@@ -17,7 +17,6 @@
 module UART_TX_CORE (
     input   wire                                CLK,
     input   wire                                RST_N,
-    //
     // 
     input   wire                                iSEVEN_BIT,         // Low = 7bit,        High = 8bit
     input   wire                                iPARITY_EN,         // Low = Non Parity,  High = Parity Enable
