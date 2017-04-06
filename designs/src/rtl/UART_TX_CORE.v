@@ -14,11 +14,13 @@
 
 `timescale  1ns/1ps
 
-module UART_TX_CORE (
+module UART_TX_CORE #(
+    parameter   OVER_SAMPLING = 4
+) (
     input   wire                                CLK,
     input   wire                                RST_N,
     // 
-    input   wire                                iSEVEN_BIT,         // Low = 7bit,        High = 8bit
+    input   wire                                iSEVEN_BIT,         // Low = 8bit,        High = 7bit
     input   wire                                iPARITY_EN,         // Low = Non Parity,  High = Parity Enable
     input   wire                                iODD_PARITY,        // Low = Even Parity, High = Odd Parity
     input   wire                                iSTOP_BIT,          // Low = 1bit,        High = 2bit
@@ -46,6 +48,7 @@ module UART_TX_CORE (
     //
     reg     [STATE_WIDTH -1: 0]                 next_state, state;
     reg     [COUNTER_WIDTH -1: 0]               next_wait_count, wait_count;
+    reg     [$clog2(OVER_SAMPLING): 0]          next_hold_count, hold_count;
     reg                                         next_com_out_en, com_out_en;
     reg     [DATA_WIDTH -1 : 0]                 next_out_data, out_data;
 
@@ -63,6 +66,7 @@ module UART_TX_CORE (
                                 next_state      <= START_BIT;
                                 //
                                 next_wait_count <= 'h0;
+                                next_hold_count <= (OVER_SAMPLING - 'h1);
                                 //
                                 next_com_out_en <= 1'b1;
                                 next_out_data   <= 8'hFF;
@@ -70,6 +74,7 @@ module UART_TX_CORE (
                                 next_state      <= state;
                                 // 
                                 next_wait_count <= wait_count;
+                                next_hold_count <= hold_count;
                                 //
                                 next_com_out_en <= 1'b0;
                                 next_out_data   <= out_data;
@@ -79,65 +84,104 @@ module UART_TX_CORE (
                             next_state      <= OUT_DATA;
                             //
                             next_wait_count <= (iSEVEN_BIT) ? ('h7 - 'h1): ('h8 - 'h1);
+                            next_hold_count <= (OVER_SAMPLING - 'h1);
                             // 
                             next_com_out_en <= 1'b1;
                             next_out_data   <= iDATA;
                         end
             OUT_DATA:   begin
-                            if (wait_count == 'h0) begin
-                                if (iPARITY_EN == 1'b1) begin
-                                    next_state      <= OUT_PARITY;
-                                    //
-                                    next_wait_count <= 'h0;
+                            if (hold_count == 'h0) begin
+                                next_hold_count <= (OVER_SAMPLING - 'h1);
+                                //
+                                if (wait_count == 'h0) begin
                                     //
                                     next_com_out_en <= 1'b1;
-                                    next_out_data   <= (iSEVEN_BIT) ? ^iDATA[6:0] ^ iODD_PARITY: ^iDATA[7:0] ^ iODD_PARITY;
+                                    // 
+                                    if (iPARITY_EN == 1'b1) begin
+                                        next_state      <= OUT_PARITY;
+                                        //
+                                        next_wait_count <= 'h0;
+                                        //
+                                        next_com_out_en <= 1'b1;
+                                        next_out_data   <= (iSEVEN_BIT) ? ^iDATA[6:0] ^ iODD_PARITY: ^iDATA[7:0] ^ iODD_PARITY;
+                                    end else begin
+                                        next_state      <= STOP_BIT;
+                                        //
+                                        next_wait_count <= (iSTOP_BIT) ? 'h2 - 'h1: 'h1 - 'h1;
+                                        //
+                                        next_out_data   <= 'hFF;
+                                    end
                                 end else begin
-                                    next_state      <= STOP_BIT;
-                                    //
-                                    next_wait_count <= (iSTOP_BIT) ? 'h2 - 'h1: 'h1 - 'h1;
+                                    next_state      <= state;
+                                    // 
+                                    next_wait_count <= wait_count - 'h1;
                                     //
                                     next_com_out_en <= 1'b1;
-                                    next_out_data   <= 'hFF;
+                                    next_out_data   <= {1'b0, out_data[7:1] };
                                 end
                             end else begin
                                 next_state      <= state;
                                 // 
-                                next_wait_count <= wait_count - 'h1;
+                                next_wait_count <= wait_count;
+                                next_hold_count <= hold_count - 'h1;
                                 //
-                                next_com_out_en <= 1'b1;
-                                next_out_data   <= {1'b0, out_data[7:1] };
+                                next_com_out_en <= com_out_en;
+                                next_out_data   <= out_data;
                             end
                         end
             OUT_PARITY: begin
-                            next_state      <= STOP_BIT;
-                            //
-                            next_wait_count <= (iSTOP_BIT) ? 'h2 - 'h1: 'h1 - 'h1;
-                            //
-                            next_com_out_en <= 1'b1;
-                            next_out_data   <= 'hFF;
-                        end
-            STOP_BIT:   begin
-                            if (wait_count == 'h0) begin
-                                next_state      <= IDLE_STATE;
-                                // 
-                                next_wait_count <= 'h0;
+                            if (hold_count == 'h0) begin
+                                next_state      <= STOP_BIT;
                                 //
-                                next_com_out_en <= 1'b0;
+                                next_wait_count <= (iSTOP_BIT) ? 'h2 - 'h1: 'h1 - 'h1;
+                                next_hold_count <= hold_count;
+                                //
+                                next_com_out_en <= 1'b1;
                                 next_out_data   <= 'hFF;
                             end else begin
                                 next_state      <= state;
-                                // 
-                                next_wait_count <= wait_count - 'h1;
                                 //
-                                next_com_out_en <= 1'b0;
-                                next_out_data   <= 'hFF;
+                                next_wait_count <= wait_count;
+                                next_hold_count <= (OVER_SAMPLING - 'h1);
+                                //
+                                next_com_out_en <= com_out_en;
+                                next_out_data   <= out_data;
+                            end
+                        end
+            STOP_BIT:   begin
+                            if (hold_count == 'h0) begin
+                                if (wait_count == 'h0) begin
+                                    next_state      <= IDLE_STATE;
+                                    // 
+                                    next_wait_count <= 'h0;
+                                    next_hold_count <= hold_count;
+                                    //
+                                    next_com_out_en <= 1'b0;
+                                    next_out_data   <= 'hFF;
+                                end else begin
+                                    next_state      <= state;
+                                    // 
+                                    next_wait_count <= wait_count - 'h1;
+                                    next_hold_count <= hold_count;
+                                    //
+                                    next_com_out_en <= 1'b0;
+                                    next_out_data   <= 'hFF;
+                                end
+                            end else begin
+                                next_state      <= state;
+                                //
+                                next_wait_count <= wait_count;
+                                next_hold_count <= hold_count - 'h1;
+                                //
+                                next_com_out_en <= com_out_en;
+                                next_out_data   <= out_data;
                             end
                         end
             default:    begin
                             next_state      <= IDLE_STATE;
                             // 
                             next_wait_count <= 'h0;
+                            next_hold_count <= 'h0;
                             //
                             next_com_out_en <= 1'b0;
                             next_out_data   <= 'hFF;
@@ -151,6 +195,7 @@ module UART_TX_CORE (
             state      <= IDLE_STATE;
             //
             wait_count <= 'h0;
+            hold_count <= 'h0;
             //
             com_out_en <= 1'b0;
             out_data   <= 'hFF;
@@ -158,6 +203,7 @@ module UART_TX_CORE (
             state      <= next_state;
             //
             wait_count <= next_wait_count;
+            hold_count <= next_hold_count;
             //
             com_out_en <= next_com_out_en;
             out_data   <= next_out_data;
