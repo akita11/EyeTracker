@@ -129,12 +129,16 @@ module  SIM_TOP();
         $finish;
     end
 
-    always #(`CLOCK_PERIOD/2) begin
-        clk <=  ~clk;
+    always begin
+        clk = 1'b1;
+        #(`CLOCK_PERIOD/2)  clk = 1'b0;
+        #(`CLOCK_PERIOD/2);
     end
 
-    always #(`CCLOCK_PERIOD/2) begin
-        cclk <=  ~cclk;
+    always begin
+        cclk = 1'b1;
+        #(`CCLOCK_PERIOD/2) cclk = 1'b0;
+        #(`CCLOCK_PERIOD/2);
     end
 
 endmodule
