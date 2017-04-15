@@ -95,7 +95,7 @@ module CALC_GRAVITY_Y #(
         genvar                                      i;
         //
         for (i=0; i< MDATA_WIDTH; i=i+1) begin: inst_loop
-            SUM_UNIT #( .FACTOR_WIDTH(10), .IDATA_WIDTH(1), .ODATA_WIDTH(18) ) m_SUM_UNIT(
+            SUM_UNIT #( .FACTOR_WIDTH($clog2(MDATA_WIDTH)), .IDATA_WIDTH(1), .ODATA_WIDTH(SUM_S_WIDTH) ) m_SUM_UNIT(
                 .CLK(CCLK), .RST_N(RST_N), 
                 //
                 .iCLR(clear), .iDATA_EN(iDATA_EN), .iFACTOR(i), .iD(iMEMIN[i]), 
@@ -183,19 +183,19 @@ module CALC_GRAVITY_Y #(
                             end
                         end
             CALC_GRAV:  begin
-                            next_state     <= IDLE_STATE;
+                            next_state     <= OUT_UART_S;
                             // 
-                            next_counter   <= 'h0;
+                            next_counter   <= counter;
                             // 
-                            next_clear     <= 1'b1;
+                            next_clear     <= clear;
                             //
-                            next_select_en <= 1'b0;
+                            next_select_en <= select_en;
                             // 
                             next_addr      <= 'h0;
                             //
-                            next_sum_s     <= 'h0;
-                            next_sum_sx    <= 'h0;
-                            next_sum_sy    <= 'h0;
+                            next_sum_s     <= sum_s;
+                            next_sum_sx    <= sum_sx;
+                            next_sum_sy    <= sum_sy;
                         end
             OUT_UART_S: begin
                             next_state     <= IDLE_STATE;
@@ -293,6 +293,7 @@ module CALC_GRAVITY_Y #(
         end
     end
 
+/*
     DIV_28_20_SX    m_DIV_28_20_SX  (
             .aclk(CCLK), .aclken(1'b1), .aresetn(RST_N),
             .s_axis_divisor_tvalid(1'b1), .s_axis_divisor_tready(),
@@ -312,5 +313,6 @@ module CALC_GRAVITY_Y #(
             .m_axis_dout_tvalid(),
             .m_axis_dout_tdata(div_sum_sx_sum_s)
             );
+*/
 
 endmodule

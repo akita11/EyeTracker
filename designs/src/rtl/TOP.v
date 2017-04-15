@@ -19,7 +19,7 @@ module TOP #(
     parameter   ADDR_WIDTH              =  10,
     parameter   PIX_HACT                = 640
 ) (
-    input   wire                        CLK,
+    input   wire                        CLK,                // 50MHz
     input   wire                        RST_N,
     //
     input   wire                        UART_RXD,
@@ -104,6 +104,9 @@ module TOP #(
     wire    [PIXEL_WIDTH -1: 0]         out_pixel_r0;
     wire    [PIXEL_WIDTH -1: 0]         out_pixel_g0;
     wire    [PIXEL_WIDTH -1: 0]         out_pixel_b0;
+
+    //
+    wire                                clk_uart_x16;
 
     // Reset Signal
     wire                                cclk_rst_n;
@@ -232,12 +235,18 @@ module TOP #(
     // Clock Control
     CLK25M  m_CLK25M ( .CLK(CLK), .RST_N(RST_N), .CLKOUT(VGA_CLK) );
 
+    //            =>      x16  / 50MHz / 27 
+    // 115200 bps => 1843.2KHz / 1851.851KHz
+    CLK_DIVIDER #( .DIVIDE(27) )    m_CLK_UART( .CLK(CLK), .RST_N(RST_N), .oDIV_CLK(clk_uart_x16) );
+
     // Reset Control
     ASYNC_SYNC_RST  m_CCLK_RST_N    ( .CLK(CCLK   ), .RST_N(RST_N), .SYNC_RST_N(cclk_rst_n   ) );
     ASYNC_SYNC_RST  m_VGA_CLK_RST_N ( .CLK(VGA_CLK), .RST_N(RST_N), .SYNC_RST_N(vga_clk_rst_n) );
 
     // UART (temporal)
     CYCLE_DELAY #( .DATA_WIDTH(1), .DELAY(1) )    m_UART( .CLK(CLK), .RST_N(RST_N), .iD(UART_RXD), .oD(UART_TXD) );
+
+
 
     // DUMMY pin
     DFF #( .DATA_WIDTH(1) ) m_DUMMY0( .CLK(CLK), .RST_N(RST_N), .iD(DUMMY0), .oD() );
