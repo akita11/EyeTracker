@@ -17,24 +17,38 @@
 module COUNT_HIGH_BIT #(
     parameter   BIT_WIDTH   = 32
 ) (
-    input   wire    [(1<<BIT_WIDTH) -1: 0]  iBIT,
-    output  wire    [BIT_WIDTH: 0]          oCOUNT
+    input   wire    [BIT_WIDTH -1: 0]               iBIT,
+    output  wire    [$clog2(BIT_WIDTH): 0]          oCOUNT
 );
 
-    localparam  TOTAL_WIDTH = 1 << BIT_WIDTH;
-    localparam  HALF_WIDTH  = 1 << (BIT_WIDTH - 1);
+    reg     [$clog2(BIT_WIDTH): 0]                  sum;
 
-    wire    [BIT_WIDTH   -1: 0]             count_upper_side;
-    wire    [BIT_WIDTH   -1: 0]             count_lower_side;
+/*
+    localparam  UPPER_WIDTH = BIT_WIDTH >> 1;
+    localparam  LOWER_WIDTH = BIT_WIDTH - UPPER_WIDTH;
+
+    wire    [$clog2(BIT_WIDTH): 0]                  count_upper_side;
+    wire    [$clog2(BIT_WIDTH): 0]                  count_lower_side;
 
     if (BIT_WIDTH == 0) begin
         assign  oCOUNT = iBIT;
     end else begin
         //
-        COUNT_HIGH_BIT #( .BIT_WIDTH(BIT_WIDTH-1) ) m_COUNT_UPPER_SIDE( .iBIT(iBIT[TOTAL_WIDTH -1: HALF_WIDTH]), .oCOUNT(count_upper_side) );
-        COUNT_HIGH_BIT #( .BIT_WIDTH(BIT_WIDTH-1) ) m_COUNT_LOWER_SIDE( .iBIT(iBIT[HALF_WIDTH  -1:          0]), .oCOUNT(count_lower_side) );
+        COUNT_HIGH_BIT #( .BIT_WIDTH(UPPER_WIDTH) ) m_COUNT_UPPER_SIDE( .iBIT(iBIT[BIT_WIDTH   -1: LOWER_WIDTH]), .oCOUNT(count_upper_side) );
+        COUNT_HIGH_BIT #( .BIT_WIDTH(LOWER_WIDTH) ) m_COUNT_LOWER_SIDE( .iBIT(iBIT[LOWER_WIDTH -1:           0]), .oCOUNT(count_lower_side) );
         //
         assign  oCOUNT = count_upper_side + count_lower_side;
     end
+*/
+
+    integer                                         i;
+
+    always @(*) begin
+        sum = 0;
+        for(i=0;i<BIT_WIDTH;i=i+1)
+        sum = sum + iBIT[i];
+    end
+ 
+    assign oCOUNT = sum;
 
 endmodule

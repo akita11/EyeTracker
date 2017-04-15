@@ -55,7 +55,13 @@ module TOP #(
     wire    [PIXEL_WIDTH -1: 0]         cmr_data_l;
     wire    [PIXEL_WIDTH -1: 0]         cmr_data_r;
 
+    wire                                grav_sel_en;
+
+    wire    [ADDR_WIDTH -1: 0]          cmr_addr;
+
     wire    [ADDR_WIDTH -1: 0]          cl_row;
+
+    wire    [ADDR_WIDTH -1: 0]          grav_addr;
 
     wire    [PIX_HACT -1: 0]            memin_0;
     wire    [PIX_HACT -1: 0]            memin_1;    // for Raw Video out
@@ -63,6 +69,8 @@ module TOP #(
     wire    [PIX_HACT -1: 0]            memin_3;    // for Raw Video out
     wire    [PIX_HACT -1: 0]            memin_4;    // for Raw Video out
     wire    [PIX_HACT -1: 0]            memin_5;    // for Raw Video out
+
+    wire    [PIX_HACT -1: 0]            memout_cx, memout_ca, memout_cb;
 
     wire    [PIX_HACT -1: 0]            memout_0x, memout_0a, memout_0b;
     wire    [PIX_HACT -1: 0]            memout_1x, memout_1a, memout_1b;    //  for Raw Video out
@@ -117,7 +125,24 @@ module TOP #(
                                                 .oMEMIN_0(memin_0), .oMEMIN_1(memin_1), .oMEMIN_2(memin_2), 
                                                 .oMEMIN_3(memin_3), .oMEMIN_4(memin_4), .oMEMIN_5(memin_5)
     );
-    
+
+    // Calc gravity
+    CALC_GRAVITY_Y #( .ADDR_WIDTH(11), .MDATA_WIDTH(640), .MAX_Y_ADDR(480), .PIXEL_WIDTH(8) ) 
+                                                m_CALC_GRAVITY_Y ( .CCLK(CCLK), .RST_N(cclk_rst_n),
+                                                //
+                                                .iTHRESHOLD(8'h01),
+                                                //
+                                                .iFVAL(~cmr_fval),
+                                                .iDATA_L(cmr_data_l), .iDATA_R(cmr_data_r),
+                                                // 
+                                                .iDATA_EN(memout_cx_en),
+                                                .iMEMIN  (memout_cx),
+                                                .oADDR   (grav_addr),
+                                                // 
+                                                .oSELECT_EN(grav_sel_en)
+    );
+
+
     // Memory Controller
     MEMOUTSEL       #( .DATA_WIDTH(640) )   m_MEMOUTSEL0(.iMEMOUT_0A(memout_0a), .iMEMOUT_0B(memout_0b), .iMEM_SEL(mem_sel), .oMEMOUT_0X(memout_0x));
     MEMOUTSEL       #( .DATA_WIDTH(640) )   m_MEMOUTSEL1(.iMEMOUT_0A(memout_1a), .iMEMOUT_0B(memout_1b), .iMEM_SEL(mem_sel), .oMEMOUT_0X(memout_1x));
@@ -125,12 +150,20 @@ module TOP #(
     MEMOUTSEL       #( .DATA_WIDTH(640) )   m_MEMOUTSEL3(.iMEMOUT_0A(memout_3a), .iMEMOUT_0B(memout_3b), .iMEM_SEL(mem_sel), .oMEMOUT_0X(memout_3x));
     MEMOUTSEL       #( .DATA_WIDTH(640) )   m_MEMOUTSEL4(.iMEMOUT_0A(memout_4a), .iMEMOUT_0B(memout_4b), .iMEM_SEL(mem_sel), .oMEMOUT_0X(memout_4x));
     MEMOUTSEL       #( .DATA_WIDTH(640) )   m_MEMOUTSEL5(.iMEMOUT_0A(memout_5a), .iMEMOUT_0B(memout_5b), .iMEM_SEL(mem_sel), .oMEMOUT_0X(memout_5x));
+    // 
+    CYCLE_DELAY #( .DATA_WIDTH(1), .DELAY(1) )  m_MEM_DATA_EN_DELAY(.CLK(CCLK), .RST_N(RST_N), .iD(grav_sel_en), .oD(memout_cx_en) );
+
+    //
+    assign  cmr_addr  = (grav_sel_en      ) ? grav_addr: cl_row;
+    assign  memout_cx = (mem_sel_sync_cclk) ? memout_ca: memout_cb;
 
     // Dual Port SRAMÇ…ÇÕ1 word = 1lineï™ÇÃÉfÅ[É^ÇèëÇ´çûÇﬁ
-    MEM m_MEMA0( .clka(CCLK   ), .addra(cl_row    ), .dina(memin_0), .ena(~mem_sel_sync_cclk), .wea(wea ), 
+    MEM m_MEMA0( .clka(CCLK   ), .addra(cmr_addr  ), .dina(memin_0), .ena(~mem_sel_sync_cclk), .wea(wea ), .douta(memout_ca),
                  .clkb(VGA_CLK), .addrb(tmg_vcount), .dinb('h0    ), .enb(1'b1              ), .web(1'b0), .doutb(memout_0a) );    
-    MEM m_MEMB0( .clka(CCLK   ), .addra(cl_row    ), .dina(memin_0), .ena( mem_sel_sync_cclk), .wea(web ), 
+    MEM m_MEMB0( .clka(CCLK   ), .addra(cmr_addr  ), .dina(memin_0), .ena( mem_sel_sync_cclk), .wea(web ), .douta(memout_cb),
                  .clkb(VGA_CLK), .addrb(tmg_vcount), .dinb('h0    ), .enb(1'b1              ), .web(1'b0), .doutb(memout_0b) );    
+
+    // Multi Frame Controller
 
     // for Raw Video out
     MEM m_MEMA1( .clka(CCLK   ), .addra(cl_row    ), .dina(memin_1), .ena(~mem_sel_sync_cclk), .wea(wea), 
@@ -153,9 +186,6 @@ module TOP #(
                  .clkb(VGA_CLK), .addrb(tmg_vcount), .dinb('h0    ), .enb(1'b1              ), .web(1'b0), .doutb(memout_5a) );    
     MEM m_MEMB5( .clka(CCLK   ), .addra(cl_row    ), .dina(memin_5), .ena( mem_sel_sync_cclk), .wea(web), 
                  .clkb(VGA_CLK), .addrb(tmg_vcount), .dinb('h0    ), .enb(1'b1              ), .web(1'b0), .doutb(memout_5b) );    
-
-    // 
-    COUNT_HIGH_BIT #( .BIT_WIDTH(32) )  m_COUNT_HIGH_BIT ( .iBIT(memin_0[31:0]), .oCOUNT() );
 
     // for Meta-stable 
     CYCLE_DELAY #( .DATA_WIDTH(1), .DELAY(2) )    m_MEM_SEL_DLY2( .CLK(CCLK), .RST_N(RST_N), .iD(mem_sel), .oD(mem_sel_sync_cclk) );
