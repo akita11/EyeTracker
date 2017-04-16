@@ -34,23 +34,29 @@ module CALC_GRAVITY_Y #(
     input   wire    [MDATA_WIDTH -1: 0]     iMEMIN,
     output  wire    [ADDR_WIDTH -1: 0]      oADDR,
     //
-    output  wire                            oSELECT_EN
+    output  wire                            oSELECT_EN,
+    //
+    input   wire                            iBUSY,
+    //
+    output  wire    [SUM_S_WIDTH -1: 0]     oSUM_S,
+    output  wire    [SUM_SX_WIDTH -1: 0]    oSUM_SX,
+    output  wire    [SUM_SY_WIDTH -1: 0]    oSUM_SY
 );
 
     //
-    localparam      STATE_WIDTH             = 4;
     localparam      SUM_S_WIDTH             = 20;
     localparam      SUM_SX_WIDTH            = 28;
     localparam      SUM_SY_WIDTH            = 28;
 
+    //
+    localparam      STATE_WIDTH             = 4;
     // 
     localparam      IDLE_STATE              = 4'b0000,
                     CALC_Y_DIR              = 4'b0001,
                     CALC_X_DIR              = 4'b0010,
                     CALC_GRAV               = 4'b0011,
-                    OUT_UART_S              = 4'b0100,
-                    OUT_UART_SX             = 4'b0101,
-                    OUT_UART_SY             = 4'b0110;
+                    PRE_WAIT                = 4'b0100,
+                    WAIT_OUTPUT             = 4'b0101;
 
     //
     wire    [$clog2(MDATA_WIDTH): 0]        count_val;
@@ -74,18 +80,16 @@ module CALC_GRAVITY_Y #(
     assign  oSELECT_EN = select_en;
     assign  oADDR = addr;
 
-    // sum_s    <= 
-    // sum_sx   <= 
-    // sum_sy   <= 
-    // sum_x_s  <= 
-    // sum_x_sx <= 
-    // sum_x_sy <= 
+    assign  oSUM_S  = sum_s;
+    assign  oSUM_SX = sum_sx;
+    assign  oSUM_SY = sum_sy;
 
     assign  flag_l = (iDATA_L > iTHRESHOLD) ? 1'b1: 1'b0;
     assign  flag_r = (iDATA_R > iTHRESHOLD) ? 1'b1: 1'b0;
 
     //
     DET_EDGE m_DET_FVAL_EDGE( .CLK(CCLK), .RST_N(RST_N), .iS(iFVAL), .oRISE(rise_fval), .oFALL(fall_fval) );
+    DET_EDGE m_DET_BUSY_EDGE( .CLK(CCLK), .RST_N(RST_N), .iS(iBUSY), .oRISE(rise_busy), .oFALL(fall_busy) );
 
     // 
     COUNT_HIGH_BIT #( .BIT_WIDTH(MDATA_WIDTH) ) m_COUNT_HIGH_BIT    ( .iBIT(iMEMIN), .oCOUNT(count_val) );
@@ -183,7 +187,7 @@ module CALC_GRAVITY_Y #(
                             end
                         end
             CALC_GRAV:  begin
-                            next_state     <= OUT_UART_S;
+                            next_state     <= PRE_WAIT;
                             // 
                             next_counter   <= counter;
                             // 
@@ -197,50 +201,57 @@ module CALC_GRAVITY_Y #(
                             next_sum_sx    <= sum_sx;
                             next_sum_sy    <= sum_sy;
                         end
-            OUT_UART_S: begin
-                            next_state     <= IDLE_STATE;
+            PRE_WAIT:   begin
                             // 
-                            next_counter   <= 'h0;
+                            next_counter   <= counter;
                             // 
-                            next_clear     <= 1'b1;
+                            next_clear     <= clear;
                             //
-                            next_select_en <= 1'b0;
+                            next_select_en <= select_en;
                             // 
-                            next_addr      <= 'h0;
+                            next_addr      <= addr;
                             //
-                            next_sum_s     <= 'h0;
-                            next_sum_sx    <= 'h0;
-                            next_sum_sy    <= 'h0;
+                            next_sum_s     <= sum_s;
+                            next_sum_sx    <= sum_sx;
+                            next_sum_sy    <= sum_sy;
+                            //
+                            if (rise_busy) begin
+                                next_state     <= state;
+                            end else begin
+                                next_state     <= state;
+                            end
                         end
-            OUT_UART_SX:begin
-                            next_state     <= IDLE_STATE;
-                            // 
-                            next_counter   <= 'h0;
-                            // 
-                            next_clear     <= 1'b1;
+            WAIT_OUTPUT:begin
+                            if (fall_busy) begin
+                                next_state     <= IDLE_STATE;
+                                // 
+                                next_counter   <= 'h0;
+                                // 
+                                next_clear     <= 1'b1;
+                                //
+                                next_select_en <= 1'b0;
+                                // 
+                                next_addr      <= 'h0;
+                                //
+                                next_sum_s     <= 'h0;
+                                next_sum_sx    <= 'h0;
+                                next_sum_sy    <= 'h0;
+                            end else begin
+                                next_state     <= state;
+                                // 
+                                next_counter   <= counter;
+                                // 
+                                next_clear     <= clear;
+                                //
+                                next_select_en <= select_en;
+                                // 
+                                next_addr      <= addr;
+                                //
+                                next_sum_s     <= sum_s;
+                                next_sum_sx    <= sum_sx;
+                                next_sum_sy    <= sum_sy;
                             //
-                            next_select_en <= 1'b0;
-                            // 
-                            next_addr      <= 'h0;
-                            //
-                            next_sum_s     <= 'h0;
-                            next_sum_sx    <= 'h0;
-                            next_sum_sy    <= 'h0;
-                        end
-            OUT_UART_SY:begin
-                            next_state     <= IDLE_STATE;
-                            // 
-                            next_counter   <= 'h0;
-                            // 
-                            next_clear     <= 1'b1;
-                            //
-                            next_select_en <= 1'b0;
-                            // 
-                            next_addr      <= 'h0;
-                            //
-                            next_sum_s     <= 'h0;
-                            next_sum_sx    <= 'h0;
-                            next_sum_sy    <= 'h0;
+                            end
                         end
             default:    begin
                             next_state     <= IDLE_STATE;

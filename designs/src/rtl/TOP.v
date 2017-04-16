@@ -47,6 +47,11 @@ module TOP #(
     // parameter
     parameter   JP_WIDTH                = 8;
 
+    //
+    parameter   SUM_S_WIDTH             = 20;
+    parameter   SUM_SX_WIDTH            = 28;
+    parameter   SUM_SY_WIDTH            = 28;
+
     // for internal signals
     wire                                cmr_lval;
     wire                                cmr_fval;
@@ -106,6 +111,11 @@ module TOP #(
     wire    [PIXEL_WIDTH -1: 0]         out_pixel_b0;
 
     //
+    wire    [SUM_S_WIDTH -1: 0]         sum_s;
+    wire    [SUM_SX_WIDTH -1: 0]        sum_sx;
+    wire    [SUM_SY_WIDTH -1: 0]        sum_sy;
+
+    //
     wire                                clk_uart_x16;
 
     // Reset Signal
@@ -142,7 +152,13 @@ module TOP #(
                                                 .iMEMIN  (memout_cx),
                                                 .oADDR   (grav_addr),
                                                 // 
-                                                .oSELECT_EN(grav_sel_en)
+                                                .oSELECT_EN(grav_sel_en),
+                                                //
+                                                .iBUSY(busy),
+                                                //
+                                                .oSUM_S (sum_s ),
+                                                .oSUM_SX(sum_sx),
+                                                .oSUM_SY(sum_sy)
     );
 
 
@@ -244,8 +260,48 @@ module TOP #(
     ASYNC_SYNC_RST  m_VGA_CLK_RST_N ( .CLK(VGA_CLK), .RST_N(RST_N), .SYNC_RST_N(vga_clk_rst_n) );
 
     // UART (temporal)
-    CYCLE_DELAY #( .DATA_WIDTH(1), .DELAY(1) )    m_UART( .CLK(CLK), .RST_N(RST_N), .iD(UART_RXD), .oD(UART_TXD) );
+    UART_TX_CORE #( .OVER_SAMPLING(16) )    m_UART_TX_CORE( .CLK(clk_uart_x16), .RST_N(RST_N), 
+                .iSEVEN_BIT(1'b0),         // Low = 8bit,        High = 7bit
+                .iPARITY_EN(1'b0),         // Low = Non Parity,  High = Parity Enable
+                .iODD_PARITY(1'b0),        // Low = Even Parity, High = Odd Parity
+                .iSTOP_BIT(1'b0),          // Low = 1bit,        High = 2bit
+                //
+                .iDE(uart_de),
+                .iDATA(uart_data),
+                //
+                .oUART_TX_BUSY(tx_busy),
+                .oUART_TX(UART_TXD)
+    );
 
+    UART_RX_CORE #( .OVER_SAMPLING(16) )    m_UART_RX_CORE ( .CLK(clk_uart_x16), .RST_N(RST_N),
+                .iSEVEN_BIT(1'b0),         // Low = 8bit,        High = 7bit
+                .iPARITY_EN(1'b0),         // Low = Non Parity,  High = Parity Enable
+                .iODD_PARITY(1'b0),        // Low = Even Parity, High = Odd Parity
+                .iSTOP_BIT(1'b0),          // Low = 1bit,        High = 2bit
+                //
+                .iUART_RX(UART_RXD),
+                //
+                .oRETRY(),
+                .oPARITY_ERROR(),
+                //
+                .oDE(),
+                .oDATA()
+    );
+
+    UART_IF m_UART_IF( .CLK(clk_uart_x16), .RST_N(RST_N),
+                .iSUM_S (sum_s ),
+                .iSUM_SX(sum_sy),
+                .iSUM_SY(sum_sx),
+                //
+                .iTRIG(TRIG),
+                //
+                .iUART_TX_BUSY(tx_busy),
+                //
+                .oBUSY(busy),
+                //
+                .oDE(uart_de),
+                .oDATA(uart_data)
+    );
 
 
     // DUMMY pin
