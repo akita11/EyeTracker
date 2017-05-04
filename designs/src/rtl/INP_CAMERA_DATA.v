@@ -21,15 +21,19 @@ module INP_CAMERA_DATA #(
     input   wire                            CLK,
     input   wire                            RST_N,
     //
+    input   wire                            iLVAL_POL,
+    input   wire                            iFVAL_POL,
+    input   wire                            iDVAL_POL,
+    //
     input   wire                            iLVAL,
     input   wire                            iFVAL,
     input   wire                            iDVAL,
     input   wire    [PIXEL_WIDTH -1: 0]     iDATA_L,
     input   wire    [PIXEL_WIDTH -1: 0]     iDATA_R,
     //
-    output  wire                            oLVAL,
-    output  wire                            oFVAL,
-    output  wire                            oDVAL,
+    output  wire                            oVSYNC,
+    output  wire                            oHSYNC,
+    output  wire                            oDE,
     output  wire    [PIXEL_WIDTH -1: 0]     oDATA_L,
     output  wire    [PIXEL_WIDTH -1: 0]     oDATA_R
 );
@@ -42,9 +46,9 @@ module INP_CAMERA_DATA #(
     reg             [PIXEL_WIDTH -1: 0]     data_r;
 
     // 
-    assign  oLVAL  = lval;
-    assign  oFVAL  = fval;
-    assign  oDVAL   = dval;
+    assign  oVSYNC  = fval ^ iFVAL_POL;
+    assign  oHSYNC  = lval ^ iLVAL_POL;
+    assign  oDE     = (fval & lval & dval ) ^ iDVAL_POL;
     assign  oDATA_L = data_l;
     assign  oDATA_R = data_r;
 
