@@ -23,9 +23,9 @@ module CLctrl #(
     input   wire                            CCLK,
     input   wire                            RST_N,
     //
-    input   wire                            iFVAL,
-    input   wire                            iDVAL,
-    input   wire                            iLVAL,
+    input   wire                            iVSYNC,
+    input   wire                            iHSYNC,
+    input   wire                            iDE,
     input   wire    [PIXEL_WIDTH -1: 0]     iDATA_L,
     input   wire    [PIXEL_WIDTH -1: 0]     iDATA_R,
     //
@@ -71,21 +71,21 @@ module CLctrl #(
     // MEMIN_x[col  ]  DATA_L[8 - x] (x => 1 to 5)
     // MEMIN_x[col+1]  DATA_R[8 - x] (x => 1 to 5)
 
-    DET_EDGE m_DET_DVAL_EDGE( .CLK(CCLK), .RST_N(RST_N), .iS(iDVAL), .oRISE(rise_dval), .oFALL(fall_dval) );
-    DET_EDGE m_DET_FVAL_EDGE( .CLK(CCLK), .RST_N(RST_N), .iS(iFVAL), .oRISE(rise_fval), .oFALL(fall_fval) );
+    DET_EDGE m_DET_DVAL_EDGE( .CLK(CCLK), .RST_N(RST_N), .iS(iDE   ), .oRISE(rise_de   ), .oFALL(fall_de   ) );
+    DET_EDGE m_DET_FVAL_EDGE( .CLK(CCLK), .RST_N(RST_N), .iS(iVSYNC), .oRISE(rise_vsync), .oFALL(fall_vsync) );
 
     // for Write Access
     always @(*) begin
-        if (rise_fval) begin
+        if (rise_vsync) begin
             next_col <= 'h0;
             next_row <= 'h0;
-        end else if (rise_dval) begin
+        end else if (rise_de) begin
             next_col <= 'h0;
             next_row <= row;
-        end else if (fall_dval) begin
+        end else if (fall_de) begin
             next_col <= 'h0;
             next_row <= row + 'h1;
-        end else if (iDVAL) begin
+        end else if (iDE) begin
             next_col <= col + 'h2;
             next_row <= row;
         end else begin
