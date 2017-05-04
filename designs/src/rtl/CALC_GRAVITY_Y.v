@@ -26,7 +26,7 @@ module CALC_GRAVITY_Y #(
     //
     input   wire    [PIXEL_WIDTH -1: 0]     iTHRESHOLD,
     //
-    input   wire                            iFVAL,
+    input   wire                            iVSYNC,
     input   wire    [PIXEL_WIDTH -1: 0]     iDATA_L,
     input   wire    [PIXEL_WIDTH -1: 0]     iDATA_R,
     //
@@ -38,9 +38,13 @@ module CALC_GRAVITY_Y #(
     //
     input   wire                            iBUSY,
     //
+    output  wire                            oSTART_TRIG,
+    //
     output  wire    [SUM_S_WIDTH -1: 0]     oSUM_S,
     output  wire    [SUM_SX_WIDTH -1: 0]    oSUM_SX,
-    output  wire    [SUM_SY_WIDTH -1: 0]    oSUM_SY
+    output  wire    [SUM_SY_WIDTH -1: 0]    oSUM_SY,
+    // Debug
+    output  wire    [STATE_WIDTH -1: 0]     oSTATE
 );
 
     //
@@ -68,10 +72,11 @@ module CALC_GRAVITY_Y #(
 
     // 
     reg     [STATE_WIDTH -1: 0]             next_state, state;
-    reg     [$clog2(MDATA_WIDTH): 0]        next_counter, counter;
+    reg     [$clog2(MDATA_WIDTH) + 3: 0]    next_counter, counter;
     reg                                     next_clear, clear;
     reg                                     next_select_en, select_en;
     reg     [ADDR_WIDTH -1: 0]              next_addr, addr;
+    reg                                     next_s_trig, s_trig;
     reg     [SUM_S_WIDTH -1 :0]             next_sum_s, sum_s;
     reg     [SUM_SX_WIDTH -1 :0]            next_sum_sx, sum_sx;
     reg     [SUM_SY_WIDTH -1 :0]            next_sum_sy, sum_sy;
@@ -80,16 +85,22 @@ module CALC_GRAVITY_Y #(
     assign  oSELECT_EN = select_en;
     assign  oADDR = addr;
 
+    assign  oSTART_TRIG = s_trig;
+
     assign  oSUM_S  = sum_s;
     assign  oSUM_SX = sum_sx;
     assign  oSUM_SY = sum_sy;
 
+    //
     assign  flag_l = (iDATA_L > iTHRESHOLD) ? 1'b1: 1'b0;
     assign  flag_r = (iDATA_R > iTHRESHOLD) ? 1'b1: 1'b0;
 
+    // for Debug
+    assign  oSTATE  = state;
+
     //
-    DET_EDGE m_DET_FVAL_EDGE( .CLK(CCLK), .RST_N(RST_N), .iS(iFVAL), .oRISE(rise_fval), .oFALL(fall_fval) );
-    DET_EDGE m_DET_BUSY_EDGE( .CLK(CCLK), .RST_N(RST_N), .iS(iBUSY), .oRISE(rise_busy), .oFALL(fall_busy) );
+    DET_EDGE m_DET_VSYNC_EDGE( .CLK(CCLK), .RST_N(RST_N), .iS(iVSYNC), .oRISE(rise_vsync), .oFALL(fall_vsync) );
+    DET_EDGE m_DET_BUSY_EDGE ( .CLK(CCLK), .RST_N(RST_N), .iS(iBUSY ), .oRISE(rise_busy ), .oFALL(fall_busy ) );
 
     // 
     COUNT_HIGH_BIT #( .BIT_WIDTH(MDATA_WIDTH) ) m_COUNT_HIGH_BIT    ( .iBIT(iMEMIN), .oCOUNT(count_val) );
@@ -117,11 +128,13 @@ module CALC_GRAVITY_Y #(
                             //
                             next_addr      <= 'h0;
                             //
+                            next_s_trig    <= 1'b0;
+                            //
                             next_sum_s     <= 'h0;
                             next_sum_sx    <= 'h0;
                             next_sum_sy    <= 'h0;
                             // 
-                            if (rise_fval) begin
+                            if (rise_vsync) begin
                                 next_state     <= CALC_Y_DIR;
                                 // 
                                 next_clear     <= 1'b0;
@@ -135,6 +148,8 @@ module CALC_GRAVITY_Y #(
                         end
             CALC_Y_DIR: begin
                             next_clear     <= clear;
+                            //
+                            next_s_trig    <= 1'b0;
                             //
                             if (addr==MAX_Y_ADDR) begin         // 
                                 next_state     <= CALC_X_DIR;
@@ -175,7 +190,9 @@ module CALC_GRAVITY_Y #(
                             if (counter=='h0) begin 
                                 next_state <= CALC_GRAV;
                                 // 
-                                next_counter   <= 'h0;
+                                next_counter   <= 'h1FF;
+                                //
+                                next_s_trig    <= 1'b1;
                                 //
                                 next_sum_sx    <= sum_sx + pe[counter];
                             end else begin
@@ -183,13 +200,12 @@ module CALC_GRAVITY_Y #(
                                 //
                                 next_counter   <= counter - 'h1;
                                 //
+                                next_s_trig    <= 1'b0;
+                                //
                                 next_sum_sx    <= sum_sx + pe[counter];
                             end
                         end
             CALC_GRAV:  begin
-                            next_state     <= PRE_WAIT;
-                            // 
-                            next_counter   <= counter;
                             // 
                             next_clear     <= clear;
                             //
@@ -200,10 +216,22 @@ module CALC_GRAVITY_Y #(
                             next_sum_s     <= sum_s;
                             next_sum_sx    <= sum_sx;
                             next_sum_sy    <= sum_sy;
+                            //
+                            if (counter == 'h0) begin
+                                next_state     <= PRE_WAIT;
+                                // 
+                                next_counter   <= 'h1FF;
+                                //
+                                next_s_trig    <= 1'b0;
+                            end else begin
+                                next_state     <= state;
+                                // 
+                                next_counter   <= counter - 'h1;
+                                //
+                                next_s_trig    <= s_trig;
+                            end
                         end
             PRE_WAIT:   begin
-                            // 
-                            next_counter   <= counter;
                             // 
                             next_clear     <= clear;
                             //
@@ -211,18 +239,44 @@ module CALC_GRAVITY_Y #(
                             // 
                             next_addr      <= addr;
                             //
+                            next_s_trig    <= 1'b0;
+                            //
                             next_sum_s     <= sum_s;
                             next_sum_sx    <= sum_sx;
                             next_sum_sy    <= sum_sy;
                             //
                             if (rise_busy) begin
-                                next_state     <= state;
+                                next_state     <= WAIT_OUTPUT;
+                                // 
+                                next_counter   <= counter;
+                            end else if (counter=='h0) begin
+                                next_state     <= WAIT_OUTPUT;
+                                // 
+                                next_counter   <= 'hFFF;
                             end else begin
                                 next_state     <= state;
+                                // 
+                                next_counter   <= counter - 'h1;
                             end
                         end
             WAIT_OUTPUT:begin
+                            //
+                            next_s_trig    <= 1'b0;
                             if (fall_busy) begin
+                                next_state     <= IDLE_STATE;
+                                // 
+                                next_counter   <= 'h0;
+                                // 
+                                next_clear     <= 1'b1;
+                                //
+                                next_select_en <= 1'b0;
+                                // 
+                                next_addr      <= 'h0;
+                                //
+                                next_sum_s     <= 'h0;
+                                next_sum_sx    <= 'h0;
+                                next_sum_sy    <= 'h0;
+                            end else if (counter=='h0) begin
                                 next_state     <= IDLE_STATE;
                                 // 
                                 next_counter   <= 'h0;
@@ -239,7 +293,7 @@ module CALC_GRAVITY_Y #(
                             end else begin
                                 next_state     <= state;
                                 // 
-                                next_counter   <= counter;
+                                next_counter   <= counter - 'h1;
                                 // 
                                 next_clear     <= clear;
                                 //
@@ -264,6 +318,8 @@ module CALC_GRAVITY_Y #(
                             // 
                             next_addr      <= 'h0;
                             //
+                            next_s_trig    <= 1'b0;
+                            //
                             next_sum_s     <= 'h0;
                             next_sum_sx    <= 'h0;
                             next_sum_sy    <= 'h0;
@@ -284,6 +340,8 @@ module CALC_GRAVITY_Y #(
             // 
             addr      <= 'h0;
             //
+            s_trig    <= 1'b0;
+            //
             sum_s     <= 'h0;
             sum_sx    <= 'h0;
             sum_sy    <= 'h0;
@@ -297,6 +355,8 @@ module CALC_GRAVITY_Y #(
             select_en <= next_select_en;
             // 
             addr      <= next_addr;
+            //
+            s_trig    <= next_s_trig;
             //
             sum_s     <= next_sum_s;
             sum_sx    <= next_sum_sx;
