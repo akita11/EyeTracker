@@ -129,21 +129,24 @@ module CALC_GRAVITY_Y #(
                             next_addr      <= 'h0;
                             //
                             next_s_trig    <= 1'b0;
-                            //
-                            next_sum_s     <= 'h0;
-                            next_sum_sx    <= 'h0;
-                            next_sum_sy    <= 'h0;
-                            // 
                             if (rise_vsync) begin
                                 next_state     <= CALC_Y_DIR;
                                 // 
                                 next_clear     <= 1'b0;
                                 // 
                                 next_select_en <= 1'b1;
+                                //
+                                next_sum_s     <= 'h0;
+                                next_sum_sx    <= 'h0;
+                                next_sum_sy    <= 'h0;
                             end else begin
                                 next_state     <= state;
                                 // 
                                 next_select_en <= 1'b0;
+                                //
+                                next_sum_s     <= sum_s;
+                                next_sum_sx    <= sum_sx;
+                                next_sum_sy    <= sum_sy;
                             end
                         end
             CALC_Y_DIR: begin
@@ -262,6 +265,11 @@ module CALC_GRAVITY_Y #(
             WAIT_OUTPUT:begin
                             //
                             next_s_trig    <= 1'b0;
+                            //
+                            next_sum_s     <= sum_s;
+                            next_sum_sx    <= sum_sx;
+                            next_sum_sy    <= sum_sy;
+                            //
                             if (fall_busy) begin
                                 next_state     <= IDLE_STATE;
                                 // 
@@ -272,10 +280,6 @@ module CALC_GRAVITY_Y #(
                                 next_select_en <= 1'b0;
                                 // 
                                 next_addr      <= 'h0;
-                                //
-                                next_sum_s     <= 'h0;
-                                next_sum_sx    <= 'h0;
-                                next_sum_sy    <= 'h0;
                             end else if (counter=='h0) begin
                                 next_state     <= IDLE_STATE;
                                 // 
@@ -286,10 +290,6 @@ module CALC_GRAVITY_Y #(
                                 next_select_en <= 1'b0;
                                 // 
                                 next_addr      <= 'h0;
-                                //
-                                next_sum_s     <= 'h0;
-                                next_sum_sx    <= 'h0;
-                                next_sum_sy    <= 'h0;
                             end else begin
                                 next_state     <= state;
                                 // 
@@ -300,10 +300,6 @@ module CALC_GRAVITY_Y #(
                                 next_select_en <= select_en;
                                 // 
                                 next_addr      <= addr;
-                                //
-                                next_sum_s     <= sum_s;
-                                next_sum_sx    <= sum_sx;
-                                next_sum_sy    <= sum_sy;
                             //
                             end
                         end
