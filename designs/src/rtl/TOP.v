@@ -52,10 +52,13 @@ module TOP #(
     parameter   SUM_SX_WIDTH            = 28;
     parameter   SUM_SY_WIDTH            = 28;
 
+    //
+    parameter   DATA_WIDTH              = 8;
+
     // for internal signals
-    wire                                cmr_lval;
-    wire                                cmr_fval;
-    wire                                cmr_dval;
+    wire                                cmr_vsync;
+    wire                                cmr_hsync;
+    wire                                cmr_de;
     
     wire    [PIXEL_WIDTH -1: 0]         cmr_data_l;
     wire    [PIXEL_WIDTH -1: 0]         cmr_data_r;
@@ -115,8 +118,13 @@ module TOP #(
     wire    [SUM_SX_WIDTH -1: 0]        sum_sx;
     wire    [SUM_SY_WIDTH -1: 0]        sum_sy;
 
+    wire    [4 -1: 0]                   calc_state;
+
     //
     wire                                clk_uart_x16;
+
+    //
+    wire    [DATA_WIDTH -1: 0]          uart_data;
 
     // Reset Signal
     wire                                cclk_rst_n;
@@ -124,15 +132,16 @@ module TOP #(
 
     // Instance
     INP_CAMERA_DATA  #( .PIXEL_WIDTH(PIXEL_WIDTH) )    m_INP_CAMERA_DATA (.CLK(CCLK), .RST_N(RST_N), 
+                                                .iLVAL_POL(1'b1), .iFVAL_POL(1'b1), .iDVAL_POL(1'b0), 
                                                 .iLVAL(LVAL), .iFVAL(FVAL), .iDVAL(DVAL), .iDATA_L(DATA_L), .iDATA_R(DATA_R),
-                                                .oLVAL(cmr_lval), .oFVAL(cmr_fval), .oDVAL(cmr_dval), .oDATA_L(cmr_data_l), .oDATA_R(cmr_data_r)
+                                                .oVSYNC(cmr_vsync), .oHSYNC(cmr_hsync), .oDE(cmr_de), .oDATA_L(cmr_data_l), .oDATA_R(cmr_data_r)
     );
 
 
     CLctrl #( .ADDR_WIDTH(ADDR_WIDTH), .MDATA_WIDTH(640), .PIXEL_WIDTH(PIXEL_WIDTH) ) m_CLctrl ( .CCLK(CCLK), .RST_N(cclk_rst_n),
-                                                .iFVAL(cmr_fval), .iDVAL(cmr_dval), .iLVAL(cmr_lval), .iDATA_L(cmr_data_l), .iDATA_R(cmr_data_r),
+                                                .iVSYNC(cmr_vsync), .iHSYNC(cmr_hsync), .iDE(cmr_de), .iDATA_L(cmr_data_l), .iDATA_R(cmr_data_r),
                                                 //
-                                                .iVGAout_mode(1'b1), .iMEM_SEL(mem_sel_sync_cclk), .iTHRESHOLD(JP),
+                                                .iVGAout_mode(1'b0), .iMEM_SEL(mem_sel_sync_cclk), .iTHRESHOLD(8'h01 /*JP*/),
                                                //
                                                 .oWEA(wea), .oWEB(web), .oCL_ROW(cl_row),
                                                 .oMEMIN_0(memin_0), .oMEMIN_1(memin_1), .oMEMIN_2(memin_2), 
@@ -145,7 +154,7 @@ module TOP #(
                                                 //
                                                 .iTHRESHOLD(8'h01),
                                                 //
-                                                .iFVAL(~cmr_fval),
+                                                .iVSYNC(cmr_vsync),
                                                 .iDATA_L(cmr_data_l), .iDATA_R(cmr_data_r),
                                                 // 
                                                 .iDATA_EN(memout_cx_en),
@@ -156,9 +165,13 @@ module TOP #(
                                                 //
                                                 .iBUSY(busy),
                                                 //
+                                                .oSTART_TRIG(start_trig),
+                                                //
                                                 .oSUM_S (sum_s ),
                                                 .oSUM_SX(sum_sx),
-                                                .oSUM_SY(sum_sy)
+                                                .oSUM_SY(sum_sy),
+                                                // Debug
+                                                .oSTATE(calc_state)
     );
 
 
@@ -212,7 +225,7 @@ module TOP #(
     // Video Timing Controller
     TMG_CTRL #( .PARAM_WIDTH(10) ) m_TMG_CTRL ( .CLK(VGA_CLK), .RST_N(vga_clk_rst_n), 
                                    .iHTOTAL(800), .iHACT(640), .iHS_WIDTH(96), .iHS_BP(48), .iHS_POL(1'b1),
-                                   .iVTOTAL(521), .iVACT(480), .iVS_WIDTH( 2), .iVS_BP(29), .iVS_POL(1'b1),
+                                   .iVTOTAL(525), .iVACT(480), .iVS_WIDTH( 2), .iVS_BP(33), .iVS_POL(1'b1),
                                    .oHSYNC(tmg_hsync), .oVSYNC(tmg_vsync), .oDE(tmg_de), .oFIELD(mem_sel), 
                                    .oHCOUNT(tmg_hcount), .oVCOUNT(tmg_vcount)
     );
@@ -261,7 +274,7 @@ module TOP #(
 
     // UART (temporal)
     UART_TX_CORE #( .OVER_SAMPLING(16) )    m_UART_TX_CORE( .CLK(clk_uart_x16), .RST_N(RST_N), 
-                .iSEVEN_BIT(1'b0),         // Low = 8bit,        High = 7bit
+                .iSEVEN_BIT(1'b1),         // Low = 8bit,        High = 7bit
                 .iPARITY_EN(1'b0),         // Low = Non Parity,  High = Parity Enable
                 .iODD_PARITY(1'b0),        // Low = Even Parity, High = Odd Parity
                 .iSTOP_BIT(1'b0),          // Low = 1bit,        High = 2bit
@@ -274,7 +287,7 @@ module TOP #(
     );
 
     UART_RX_CORE #( .OVER_SAMPLING(16) )    m_UART_RX_CORE ( .CLK(clk_uart_x16), .RST_N(RST_N),
-                .iSEVEN_BIT(1'b0),         // Low = 8bit,        High = 7bit
+                .iSEVEN_BIT(1'b1),         // Low = 8bit,        High = 7bit
                 .iPARITY_EN(1'b0),         // Low = Non Parity,  High = Parity Enable
                 .iODD_PARITY(1'b0),        // Low = Even Parity, High = Odd Parity
                 .iSTOP_BIT(1'b0),          // Low = 1bit,        High = 2bit
@@ -293,7 +306,7 @@ module TOP #(
                 .iSUM_SX(sum_sy),
                 .iSUM_SY(sum_sx),
                 //
-                .iTRIG(TRIG),
+                .iTRIG(start_trig),
                 //
                 .iUART_TX_BUSY(tx_busy),
                 //
@@ -307,5 +320,39 @@ module TOP #(
     // DUMMY pin
     DFF #( .DATA_WIDTH(1) ) m_DUMMY0( .CLK(CLK), .RST_N(RST_N), .iD(DUMMY0), .oD() );
     DFF #( .DATA_WIDTH(1) ) m_DUMMY1( .CLK(CLK), .RST_N(RST_N), .iD(DUMMY1), .oD() );
+
+    // ILA
+/*
+    ILA m_ILA(
+        .clk(VGA_CLK),
+        //
+        .probe0(FVAL),
+        .probe1(LVAL),
+        .probe2(DVAL),
+        .probe3(DATA_L),
+        .probe4(DATA_R),
+        .probe5(pixel_vsync),
+        .probe6(pixel_hsync),
+        .probe7(pixel_de),
+        .probe8(cmr_vsync),
+        .probe9(cmr_hsync),
+        .probe10(cmr_de),
+        .probe11(memout_cx_en),
+        .probe12(grav_sel_en),
+        .probe13(busy),
+        .probe14(UART_TXD),
+        .probe15(calc_state),
+        .probe16(VGA_VSYNC),
+        .probe17(VGA_HSYNC),
+        .probe18(VGA_R),
+        .probe19(clk_uart_x16),
+        .probe20(start_trig),
+        .probe21(uart_de),
+        .probe22(uart_data),
+        .probe23(tx_busy),
+        .probe24(sum_s),
+        .probe25(sum_sy)
+    );
+*/
 
 endmodule
