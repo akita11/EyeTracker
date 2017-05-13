@@ -30,7 +30,7 @@ module CONV_ASCII_UNIT (
         if (!RST_N) begin
             oD <= "0";
         end else if (iD > 9) begin
-            oD <= "A" + iD;
+            oD <= "A" + iD - 'hA;
         end else begin
             oD <= "0" + iD;
         end
