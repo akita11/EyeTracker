@@ -121,7 +121,7 @@ module TOP #(
     wire    [4 -1: 0]                   calc_state;
 
     //
-    wire                                clk_uart_x16;
+    wire                                clk_uart_x8;
 
     //
     wire    [DATA_WIDTH -1: 0]          uart_data;
@@ -141,8 +141,8 @@ module TOP #(
     CLctrl #( .ADDR_WIDTH(ADDR_WIDTH), .MDATA_WIDTH(640), .PIXEL_WIDTH(PIXEL_WIDTH) ) m_CLctrl ( .CCLK(CCLK), .RST_N(cclk_rst_n),
                                                 .iVSYNC(cmr_vsync), .iHSYNC(cmr_hsync), .iDE(cmr_de), .iDATA_L(cmr_data_l), .iDATA_R(cmr_data_r),
                                                 //
-                                                .iVGAout_mode(1'b0), .iMEM_SEL(mem_sel_sync_cclk), .iTHRESHOLD(8'h01 /*JP*/),
-                                               //
+                                                .iVGAout_mode(1'b1 /*1'b0*/), .iMEM_SEL(mem_sel_sync_cclk), .iTHRESHOLD(/*8'h01*/ JP),
+                                                //
                                                 .oWEA(wea), .oWEB(web), .oCL_ROW(cl_row),
                                                 .oMEMIN_0(memin_0), .oMEMIN_1(memin_1), .oMEMIN_2(memin_2), 
                                                 .oMEMIN_3(memin_3), .oMEMIN_4(memin_4), .oMEMIN_5(memin_5)
@@ -194,8 +194,6 @@ module TOP #(
                  .clkb(VGA_CLK), .addrb(tmg_vcount), .dinb('h0    ), .enb(1'b1              ), .web(1'b0), .doutb(memout_0a) );    
     MEM m_MEMB0( .clka(CCLK   ), .addra(cmr_addr  ), .dina(memin_0), .ena( mem_sel_sync_cclk), .wea(web ), .douta(memout_cb),
                  .clkb(VGA_CLK), .addrb(tmg_vcount), .dinb('h0    ), .enb(1'b1              ), .web(1'b0), .doutb(memout_0b) );    
-
-    // Multi Frame Controller
 
     // for Raw Video out
     MEM m_MEMA1( .clka(CCLK   ), .addra(cl_row    ), .dina(memin_1), .ena(~mem_sel_sync_cclk), .wea(wea), 
@@ -264,16 +262,16 @@ module TOP #(
     // Clock Control
     CLK25M  m_CLK25M ( .CLK(CLK), .RST_N(RST_N), .CLKOUT(VGA_CLK) );
 
-    //            =>      x16  / 50MHz / 27 
-    // 115200 bps => 1843.2KHz / 1851.851KHz
-    CLK_DIVIDER #( .DIVIDE(27) )    m_CLK_UART( .CLK(CLK), .RST_N(RST_N), .oDIV_CLK(clk_uart_x16) );
+    //            =>       x8  / 50MHz / 27 
+    // 230400 bps => 1843.2KHz / 1801.851KHz
+    CLK_DIVIDER #( .DIVIDE(27) )    m_CLK_UART( .CLK(CLK), .RST_N(RST_N), .oDIV_CLK(clk_uart_x8) );
 
     // Reset Control
     ASYNC_SYNC_RST  m_CCLK_RST_N    ( .CLK(CCLK   ), .RST_N(RST_N), .SYNC_RST_N(cclk_rst_n   ) );
     ASYNC_SYNC_RST  m_VGA_CLK_RST_N ( .CLK(VGA_CLK), .RST_N(RST_N), .SYNC_RST_N(vga_clk_rst_n) );
 
     // UART (temporal)
-    UART_TX_CORE #( .OVER_SAMPLING(16) )    m_UART_TX_CORE( .CLK(clk_uart_x16), .RST_N(RST_N), 
+    UART_TX_CORE #( .OVER_SAMPLING(16) )    m_UART_TX_CORE( .CLK(clk_uart_x8), .RST_N(RST_N), 
                 .iSEVEN_BIT(1'b1),         // Low = 8bit,        High = 7bit
                 .iPARITY_EN(1'b0),         // Low = Non Parity,  High = Parity Enable
                 .iODD_PARITY(1'b0),        // Low = Even Parity, High = Odd Parity
@@ -286,7 +284,7 @@ module TOP #(
                 .oUART_TX(UART_TXD)
     );
 
-    UART_RX_CORE #( .OVER_SAMPLING(16) )    m_UART_RX_CORE ( .CLK(clk_uart_x16), .RST_N(RST_N),
+    UART_RX_CORE #( .OVER_SAMPLING(8) )    m_UART_RX_CORE ( .CLK(clk_uart_x8), .RST_N(RST_N),
                 .iSEVEN_BIT(1'b1),         // Low = 8bit,        High = 7bit
                 .iPARITY_EN(1'b0),         // Low = Non Parity,  High = Parity Enable
                 .iODD_PARITY(1'b0),        // Low = Even Parity, High = Odd Parity
@@ -301,7 +299,7 @@ module TOP #(
                 .oDATA()
     );
 
-    UART_IF m_UART_IF( .CLK(clk_uart_x16), .RST_N(RST_N),
+    UART_IF m_UART_IF( .CLK(clk_uart_x8), .RST_N(RST_N),
                 .iSUM_S (sum_s ),
                 .iSUM_SX(sum_sy),
                 .iSUM_SY(sum_sx),
@@ -322,7 +320,7 @@ module TOP #(
     DFF #( .DATA_WIDTH(1) ) m_DUMMY1( .CLK(CLK), .RST_N(RST_N), .iD(DUMMY1), .oD() );
 
     // ILA
-/*
+
     ILA m_ILA(
         .clk(VGA_CLK),
         //
@@ -345,14 +343,14 @@ module TOP #(
         .probe16(VGA_VSYNC),
         .probe17(VGA_HSYNC),
         .probe18(VGA_R),
-        .probe19(clk_uart_x16),
+        .probe19(clk_uart_x8),
         .probe20(start_trig),
         .probe21(uart_de),
         .probe22(uart_data),
-        .probe23(tx_busy),
-        .probe24(sum_s),
-        .probe25(sum_sy)
+        .probe23(tx_busy) /*,*/
+//        .probe24(sum_s),
+//        .probe25(sum_sy)
     );
-*/
+
 
 endmodule
