@@ -43,7 +43,10 @@ module UART_IF #(
                     WAIT_SX                     = 4'b0110,
                     PRE_SY                      = 4'b0111,
                     OUT_SY                      = 4'b1000,
-                    WAIT_SY                     = 4'b1001;
+                    WAIT_SY                     = 4'b1001,
+                    PRE_LF                      = 4'b1010,
+                    OUT_LF                      = 4'b1011,
+                    WAIT_LF                     = 4'b1100;
 
     //
     localparam      STATE_WIDTH                 = 4;
@@ -284,6 +287,76 @@ module UART_IF #(
                             end
                         end
             WAIT_SY:    begin
+                            if (iUART_TX_BUSY) begin
+                                next_state      <= state;
+                                //
+                                next_wait_count <= wait_count;
+                                //
+                                next_com_out_en <= 1'b0;
+                                next_out_data   <= out_data;
+                                //
+                                next_hold_data  <= hold_data;
+                                //
+                                next_busy       <= 1'b1;
+                            end else begin
+                                if (wait_count == 'h0) begin
+                                    next_state      <= PRE_LF;
+                                    //
+                                    next_wait_count <= 'h0;
+                                    //
+                                    next_com_out_en <= 1'b0;
+                                    next_out_data   <= 'hFF;
+                                    //
+                                    next_hold_data  <= 8'h0A;
+                                    //
+                                    next_busy       <= 1'b1;
+                                end else begin
+                                    next_state      <= OUT_SY;
+                                    //
+                                    next_wait_count <= wait_count - 'h1;
+                                    //
+                                    next_com_out_en <= 1'b1;
+                                    next_out_data   <= hold_data[HOLD_DATA_WIDTH - 1: HOLD_DATA_WIDTH - 1 - 7];
+                                    //
+                                    next_hold_data  <= { hold_data[HOLD_DATA_WIDTH - 1 - 8: 0], 8'h0 };
+                                    //
+                                    next_busy       <= 1'b1;
+                                end
+                            end
+                        end
+            PRE_LF:     begin
+                            next_state      <= OUT_LF;
+                            //
+                            next_wait_count <= 'h1 - 'h1;
+                            //
+                            next_com_out_en <= 1'b1;
+                            next_out_data   <= hold_data[HOLD_DATA_WIDTH - 1: HOLD_DATA_WIDTH -1 - 7];
+                            //
+                            next_hold_data  <= { hold_data[HOLD_DATA_WIDTH - 1 - 8: 0], 8'h0 };
+                            //
+                            next_busy       <= 1'b1;
+                        end
+            OUT_LF:     begin
+                            //
+                            next_wait_count <= wait_count;
+                            //
+                            next_out_data   <= out_data;
+                            //
+                            next_hold_data  <= hold_data;
+                            //
+                            next_busy       <= 1'b1;
+                            //
+                            if (rise_busy) begin
+                                next_state      <= WAIT_SY;
+                                //
+                                next_com_out_en <= 1'b0;
+                            end else begin
+                                next_state      <= state;
+                                //
+                                next_com_out_en <= 1'b1;
+                            end
+                        end
+            WAIT_LF:    begin
                             if (iUART_TX_BUSY) begin
                                 next_state      <= state;
                                 //
