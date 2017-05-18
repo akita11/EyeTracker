@@ -142,8 +142,8 @@ module CLctrl #(
         end else begin
             for (i=0; i<MDATA_WIDTH;i=i+2) begin
                 if (col == i) begin
-                    oMEMIN_0[i  ] <= (iDATA_L>iTHRESHOLD) ? 1'b1: oMEMIN_0[i  ];
-                    oMEMIN_0[i+1] <= (iDATA_R>iTHRESHOLD) ? 1'b1: oMEMIN_0[i+1];
+                    oMEMIN_0[i  ] <= (iVGAout_mode) ? oMEMIN_0[i  ]: ((iDATA_L>iTHRESHOLD) ? 1'b1: oMEMIN_0[i  ]);
+                    oMEMIN_0[i+1] <= (iVGAout_mode) ? oMEMIN_0[i+1]: ((iDATA_R>iTHRESHOLD) ? 1'b1: oMEMIN_0[i+1]);
                 end else begin
                     oMEMIN_0[i  ] <= oMEMIN_0[i  ];
                     oMEMIN_0[i+1] <= oMEMIN_0[i+1];
