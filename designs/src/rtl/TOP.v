@@ -130,6 +130,12 @@ module TOP #(
     wire                                cclk_rst_n;
     wire                                vga_clk_rst_n;
 
+    wire                        VGA_VSYNCn;
+    wire                        VGA_HSYNCn;
+    assign VGA_VSYNC = ~VGA_VSYNCn;
+    assign VGA_HSYNC = ~VGA_HSYNCn;
+
+
     // Instance
     INP_CAMERA_DATA  #( .PIXEL_WIDTH(PIXEL_WIDTH) )    m_INP_CAMERA_DATA (.CLK(CCLK), .RST_N(RST_N), 
                                                 .iLVAL_POL(1'b1), .iFVAL_POL(1'b1), .iDVAL_POL(1'b0), 
@@ -142,7 +148,6 @@ module TOP #(
                                                 .iVSYNC(cmr_vsync), .iHSYNC(cmr_hsync), .iDE(cmr_de), .iDATA_L(cmr_data_l), .iDATA_R(cmr_data_r),
                                                 //
                                                 .iVGAout_mode(1'b1 /*1'b0*/), .iMEM_SEL(mem_sel_sync_cclk), .iTHRESHOLD(/*8'h01*/ JP),
-                                                //
                                                 .oWEA(wea), .oWEB(web), .oCL_ROW(cl_row),
                                                 .oMEMIN_0(memin_0), .oMEMIN_1(memin_1), .oMEMIN_2(memin_2), 
                                                 .oMEMIN_3(memin_3), .oMEMIN_4(memin_4), .oMEMIN_5(memin_5)
@@ -238,6 +243,8 @@ module TOP #(
                                     .iMEMOUT_3(memout_3x), .iMEMOUT_4(memout_4x), .iMEMOUT_5(memout_5x),
                                     //
                                     .iVGAout_mode(1'b1),
+                                    // iVGAout_mode:1=raw, 0=digitized
+                                    //
                                     //
                                     .iPOINT_X('h100), .iPOINT_Y('h100),
                                     //
@@ -256,7 +263,7 @@ module TOP #(
     //
     OUT_VIDEO_DATA #( .PIXEL_WIDTH(PIXEL_WIDTH) ) m_OUT_VIDEO_DATA(.CLK(VGA_CLK), .RST_N(RST_N), 
                                      .iHSYNC(pixel_hsync), .iVSYNC(pixel_vsync), .iDE(pixel_de), .iR0(pixel_r0), .iG0(pixel_g0), .iB0(pixel_b0),
-                                     .oHSYNC(VGA_HSYNC), .oVSYNC(VGA_VSYNC), .oDE(), .oR0(VGA_R), .oG0(VGA_G), .oB0(VGA_B)
+                                     .oHSYNC(VGA_HSYNCn), .oVSYNC(VGA_VSYNCn), .oDE(), .oR0(VGA_R), .oG0(VGA_G), .oB0(VGA_B)
     );
 
     // Clock Control
