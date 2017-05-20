@@ -163,10 +163,7 @@ module TOP #(
     CALC_GRAVITY_Y #( .ADDR_WIDTH(11), .MDATA_WIDTH(640), .MAX_Y_ADDR(480), .PIXEL_WIDTH(8) ) 
                                                 m_CALC_GRAVITY_Y ( .CCLK(CCLK), .RST_N(cclk_rst_n),
                                                 //
-                                                .iTHRESHOLD(threshold),
-                                                //
                                                 .iVSYNC(cmr_vsync),
-                                                .iDATA_L(cmr_data_l), .iDATA_R(cmr_data_r),
                                                 // 
                                                 .iDATA_EN(memout_cx_en),
                                                 .iMEMIN  (memout_cx),

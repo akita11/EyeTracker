@@ -24,11 +24,7 @@ module CALC_GRAVITY_Y #(
     input   wire                            CCLK,
     input   wire                            RST_N,
     //
-    input   wire    [PIXEL_WIDTH -1: 0]     iTHRESHOLD,
-    //
     input   wire                            iVSYNC,
-    input   wire    [PIXEL_WIDTH -1: 0]     iDATA_L,
-    input   wire    [PIXEL_WIDTH -1: 0]     iDATA_R,
     //
     input   wire                            iDATA_EN,
     input   wire    [MDATA_WIDTH -1: 0]     iMEMIN,
@@ -90,10 +86,6 @@ module CALC_GRAVITY_Y #(
     assign  oSUM_S  = sum_s;
     assign  oSUM_SX = sum_sx;
     assign  oSUM_SY = sum_sy;
-
-    //
-    assign  flag_l = (iDATA_L > iTHRESHOLD) ? 1'b1: 1'b0;
-    assign  flag_r = (iDATA_R > iTHRESHOLD) ? 1'b1: 1'b0;
 
     // for Debug
     assign  oSTATE  = state;
