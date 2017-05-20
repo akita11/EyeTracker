@@ -130,10 +130,16 @@ module TOP #(
     wire                                cclk_rst_n;
     wire                                vga_clk_rst_n;
 
-    wire                        VGA_VSYNCn;
-    wire                        VGA_HSYNCn;
-    assign VGA_VSYNC = ~VGA_VSYNCn;
-    assign VGA_HSYNC = ~VGA_HSYNCn;
+    //
+    wire    [PIXEL_WIDTH -1: 0]         threshold;
+    wire                                vgaout_mode;
+
+
+    // 
+//    assign  threshold = 8'h01;
+    assign  threshold = JP;
+    // vgaout_mode:1=raw, 0=digitized
+    assign  vgaout_mode = 1'b1;
 
 
     // Instance
@@ -147,7 +153,7 @@ module TOP #(
     CLctrl #( .ADDR_WIDTH(ADDR_WIDTH), .MDATA_WIDTH(640), .PIXEL_WIDTH(PIXEL_WIDTH) ) m_CLctrl ( .CCLK(CCLK), .RST_N(cclk_rst_n),
                                                 .iVSYNC(cmr_vsync), .iHSYNC(cmr_hsync), .iDE(cmr_de), .iDATA_L(cmr_data_l), .iDATA_R(cmr_data_r),
                                                 //
-                                                .iVGAout_mode(1'b1 /*1'b0*/), .iMEM_SEL(mem_sel_sync_cclk), .iTHRESHOLD(/*8'h01*/ JP),
+                                                .iVGAout_mode(vgaout_mode), .iMEM_SEL(mem_sel_sync_cclk), .iTHRESHOLD(threshold),
                                                 .oWEA(wea), .oWEB(web), .oCL_ROW(cl_row),
                                                 .oMEMIN_0(memin_0), .oMEMIN_1(memin_1), .oMEMIN_2(memin_2), 
                                                 .oMEMIN_3(memin_3), .oMEMIN_4(memin_4), .oMEMIN_5(memin_5)
@@ -157,7 +163,7 @@ module TOP #(
     CALC_GRAVITY_Y #( .ADDR_WIDTH(11), .MDATA_WIDTH(640), .MAX_Y_ADDR(480), .PIXEL_WIDTH(8) ) 
                                                 m_CALC_GRAVITY_Y ( .CCLK(CCLK), .RST_N(cclk_rst_n),
                                                 //
-                                                .iTHRESHOLD(8'h01),
+                                                .iTHRESHOLD(threshold),
                                                 //
                                                 .iVSYNC(cmr_vsync),
                                                 .iDATA_L(cmr_data_l), .iDATA_R(cmr_data_r),
@@ -242,7 +248,7 @@ module TOP #(
                                     .iMEMOUT_0(memout_0x), .iMEMOUT_1(memout_1x), .iMEMOUT_2(memout_2x),
                                     .iMEMOUT_3(memout_3x), .iMEMOUT_4(memout_4x), .iMEMOUT_5(memout_5x),
                                     //
-                                    .iVGAout_mode(1'b1),
+                                    .iVGAout_mode(vgaout_mode),
                                     // iVGAout_mode:1=raw, 0=digitized
                                     //
                                     //
@@ -262,8 +268,9 @@ module TOP #(
 
     //
     OUT_VIDEO_DATA #( .PIXEL_WIDTH(PIXEL_WIDTH) ) m_OUT_VIDEO_DATA(.CLK(VGA_CLK), .RST_N(RST_N), 
-                                     .iHSYNC(pixel_hsync), .iVSYNC(pixel_vsync), .iDE(pixel_de), .iR0(pixel_r0), .iG0(pixel_g0), .iB0(pixel_b0),
-                                     .oHSYNC(VGA_HSYNCn), .oVSYNC(VGA_VSYNCn), .oDE(), .oR0(VGA_R), .oG0(VGA_G), .oB0(VGA_B)
+                                     .iVSYNC_POL(1'b1), .iHSYNC_POL(1'b1),
+                                     .iVSYNC(pixel_vsync), .iHSYNC(pixel_hsync), .iDE(pixel_de), .iR0(pixel_r0), .iG0(pixel_g0), .iB0(pixel_b0),
+                                     .oVSYNC(VGA_VSYNC), .oHSYNC(VGA_HSYNC), .oDE(), .oR0(VGA_R), .oG0(VGA_G), .oB0(VGA_B)
     );
 
     // Clock Control
