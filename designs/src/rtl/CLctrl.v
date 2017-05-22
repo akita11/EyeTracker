@@ -105,36 +105,6 @@ module CLctrl #(
         end
     end
 
-    // for Read and Calc Access
-/*
-    always @(*) begin
-        case (state)
-            IDLE_STATE: begin
-                            if (rise_fval) begin
-                                next_state <= CALC_Y_DIR;
-                                // 
-                                next_
-                            end else begin
-                                next_state <~ state;
-                            end
-                        end
-            CALC_Y_DIR: begin
-                        end
-            CALC_X_DIR: begin
-                        end
-            CALC_SUM:   begin
-                        end
-            CALC_DIV:   begin
-                        end
-            OUT_RESULT: begin
-                        end
-            default:    begin
-                            next_state <= IDEL_STATE;
-                        end
-        endcase
-    end
-*/
-
     //
     always @(posedge CCLK or negedge RST_N) begin
         if (!RST_N) begin
@@ -142,8 +112,8 @@ module CLctrl #(
         end else begin
             for (i=0; i<MDATA_WIDTH;i=i+2) begin
                 if (col == i) begin
-                    oMEMIN_0[i  ] <= (iVGAout_mode) ? oMEMIN_0[i  ]: ((iDATA_L>iTHRESHOLD) ? 1'b1: oMEMIN_0[i  ]);
-                    oMEMIN_0[i+1] <= (iVGAout_mode) ? oMEMIN_0[i+1]: ((iDATA_R>iTHRESHOLD) ? 1'b1: oMEMIN_0[i+1]);
+                    oMEMIN_0[i  ] <= (iDATA_L>iTHRESHOLD) ? 1'b1: oMEMIN_0[i  ];
+                    oMEMIN_0[i+1] <= (iDATA_R>iTHRESHOLD) ? 1'b1: oMEMIN_0[i+1];
                 end else begin
                     oMEMIN_0[i  ] <= oMEMIN_0[i  ];
                     oMEMIN_0[i+1] <= oMEMIN_0[i+1];

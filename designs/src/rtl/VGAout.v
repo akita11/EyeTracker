@@ -78,7 +78,9 @@ module VGAout #(
     assign sel_memout_4 = iMEMOUT_4[iH_ADDR];
     assign sel_memout_5 = iMEMOUT_5[iH_ADDR];
 
-    assign  mem_dat = (iVGAout_mode==1'b0) ? {sel_memout_0, sel_memout_0, 6'b000000}: {sel_memout_1, sel_memout_2, sel_memout_3, sel_memout_4, sel_memout_5, 3'b000};
+    assign  mem_dat = (iVGAout_mode==1'b0) ? {sel_memout_0, sel_memout_0, 6'b000000}: 
+                                             {sel_memout_1, sel_memout_2, sel_memout_3, sel_memout_4, sel_memout_5, 3'b000};
+//                                             {sel_memout_1, sel_memout_2, sel_memout_3, sel_memout_4, sel_memout_5, sel_memout_6, sel_memout_7, sel_memout_8};
 
     //
     CYCLE_DELAY #( .DATA_WIDTH(1), .DELAY(1) ) m_CYCLE_DELAY_HSYNC( .CLK(VCLK), .RST_N(RST_N), .iD(iHSYNC), .oD(oVGA_HSYNC) );
@@ -126,28 +128,32 @@ module VGAout #(
 
     // 
     always @(*) begin
-        casex ({iDE, video_exist, edge_area_en, h_area_en, v_area_en})
+        casex ({iDE, iVGAout_mode, video_exist, edge_area_en, h_area_en, v_area_en})
             // iDE => High
-                // EXIST_VIDEO => Yes
-                    // Location => Edge or iPOINT_X/iPOINT_Y ÅÖ Å}1
-                    'b1_1_1_xx, // 
-                    'b1_1_0_11: // 
-                        video_load_en <= 1'b0;
-                    'b1_1_0_00, // 
-                    'b1_1_0_01, // 
-                    'b1_1_0_10: // 
-                        video_load_en <= 1'b1;
-                // EXIST_VIDEO => No
-                    // Location => Edge or iPOINT_X/iPOINT_Y ÅÖ Å}1
-                    'b1_0_1_xx, // 
-                    'b1_0_0_11: // 
-                        video_load_en <= 1'b1;
-                    'b1_0_0_00, // 
-                    'b1_0_0_01, // 
-                    'b1_0_0_10: // 
-                        video_load_en <= 1'b0;
+                // iVGAout_mode => Low
+                    // EXIST_VIDEO => Yes
+                        // Location => Edge or iPOINT_X/iPOINT_Y ÅÖ Å}1
+                        'b1_0_1_1_xx, // 
+                        'b1_0_1_0_11: // 
+                            video_load_en <= 1'b0;
+                        'b1_0_1_0_00, // 
+                        'b1_0_1_0_01, // 
+                        'b1_0_1_0_10: // 
+                            video_load_en <= 1'b1;
+                    // EXIST_VIDEO => No
+                        // Location => Edge or iPOINT_X/iPOINT_Y ÅÖ Å}1
+                        'b1_0_0_1_xx, // 
+                        'b1_0_0_0_11: // 
+                            video_load_en <= 1'b1;
+                        'b1_0_0_0_00, // 
+                        'b1_0_0_0_01, // 
+                        'b1_0_0_0_10: // 
+                            video_load_en <= 1'b0;
+                // iVGAout_mode => High
+                'b1_1_x_x_xx:
+                    video_load_en <= 1'b1;
             // iDE => Low
-            'b0_x_x_:
+            'b0_x_x_x_xx:
                 video_load_en <= 1'b0;
         endcase
     end
