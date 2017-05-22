@@ -106,8 +106,8 @@ set_property PACKAGE_PIN E17  [get_ports CLK]
 set_property PACKAGE_PIN K17  [get_ports RST_N]
 
 #
-set_property PACKAGE_PIN U17  [get_ports UART_TXD]
-set_property PACKAGE_PIN W16  [get_ports UART_RXD]
+set_property PACKAGE_PIN U17  [get_ports UART_RXD]
+set_property PACKAGE_PIN W16  [get_ports UART_TXD]
 
 #
 set_property PACKAGE_PIN AA18 [get_ports [list JP[0]]]
