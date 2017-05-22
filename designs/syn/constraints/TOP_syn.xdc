@@ -30,7 +30,11 @@ set_clock_uncertainty -setup 0.300 [get_clocks CCLK]
 set_clock_uncertainty -hold  0.100 [get_clocks CCLK]
 
 # /* ----- VCLK ----- */
-create_generated_clock -name VGA_CLK -source [get_pins m_CLK25M/m_CLKGEN_MMCM/inst/mmcm_adv_inst/CLKOUT0] \
+#create_clock -name VGA_CLK -period 40.000 -waveform "0 20.000" [get_pins m_CLK25M/m_CLKGEN_MMCM/inst/mmcm_adv_inst/CLKOUT0]
+#set_clock_uncertainty -setup 0.300 [get_clocks VGA_CLK]
+#set_clock_uncertainty -hold  0.100 [get_clocks VGA_CLK]
+#
+create_generated_clock -name OUT_VGA_CLK -source [get_pins m_CLK25M/m_CLKGEN_MMCM/inst/mmcm_adv_inst/CLKOUT0] \
     -divide_by 1 -add \
     -master_clock [get_clocks clk_out1_CLKGEN_MMCM] [get_ports VGA_CLK]
 
@@ -38,7 +42,7 @@ create_generated_clock -name VGA_CLK -source [get_pins m_CLK25M/m_CLKGEN_MMCM/in
 set_clock_groups -asynchronous \
     -group [get_clocks [list CLK]] \
     -group [get_clocks [list CCLK]] \
-    -group [get_clocks [list VGA_CLK]]
+    -group [get_clocks [list OUT_VGA_CLK]]
 
 # /* ----- set false path ----- */
 set_false_path -from [get_ports [list [JP[*]]]
@@ -57,5 +61,5 @@ set_input_delay -add -clock [get_clocks CCLK] -min  3 [get_ports [list DATA_R[*]
 #    Output delay
 #      Max : 5[ns]
 #      Min : 2[ns]
-set_output_delay -add -clock [get_clocks VGA_CLK] -max 5 [get_ports [list VGA_R[*] VGA_G[*] VGA_B[*] VGA_HSYNC VGA_VSYNC]]
-set_output_delay -add -clock [get_clocks VGA_CLK] -min 2 [get_ports [list VGA_R[*] VGA_G[*] VGA_B[*] VGA_HSYNC VGA_VSYNC]]
+set_output_delay -add -clock [get_clocks OUT_VGA_CLK] -max 5 [get_ports [list VGA_R[*] VGA_G[*] VGA_B[*] VGA_HSYNC VGA_VSYNC]]
+set_output_delay -add -clock [get_clocks OUT_VGA_CLK] -min 2 [get_ports [list VGA_R[*] VGA_G[*] VGA_B[*] VGA_HSYNC VGA_VSYNC]]
