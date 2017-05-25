@@ -347,7 +347,7 @@ module UART_IF #(
                             next_busy       <= 1'b1;
                             //
                             if (rise_busy) begin
-                                next_state      <= WAIT_SY;
+                                next_state      <= WAIT_LF;
                                 //
                                 next_com_out_en <= 1'b0;
                             end else begin
