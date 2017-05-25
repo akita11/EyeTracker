@@ -230,8 +230,8 @@ module TOP #(
 
     // Video Timing Controller
     TMG_CTRL #( .PARAM_WIDTH(10) ) m_TMG_CTRL ( .CLK(VGA_CLK), .RST_N(vga_clk_rst_n), 
-                                   .iHTOTAL(800), .iHACT(640), .iHS_WIDTH(96), .iHS_BP(48), .iHS_POL(1'b1),
-                                   .iVTOTAL(525), .iVACT(480), .iVS_WIDTH( 2), .iVS_BP(33), .iVS_POL(1'b1),
+                                   .iHTOTAL(800), .iHACT(640), .iHS_WIDTH(96), .iHS_BP(48),
+                                   .iVTOTAL(525), .iVACT(480), .iVS_WIDTH( 2), .iVS_BP(33),
                                    .oHSYNC(tmg_hsync), .oVSYNC(tmg_vsync), .oDE(tmg_de), .oFIELD(mem_sel), 
                                    .oHCOUNT(tmg_hcount), .oVCOUNT(tmg_vcount)
     );
@@ -265,7 +265,7 @@ module TOP #(
 
     //
     OUT_VIDEO_DATA #( .PIXEL_WIDTH(PIXEL_WIDTH) ) m_OUT_VIDEO_DATA(.CLK(VGA_CLK), .RST_N(RST_N), 
-                                     .iVSYNC_POL(1'b1), .iHSYNC_POL(1'b1),
+                                     .iVSYNC_POL(1'b0), .iHSYNC_POL(1'b0),
                                      .iVSYNC(pixel_vsync), .iHSYNC(pixel_hsync), .iDE(pixel_de), .iR0(pixel_r0), .iG0(pixel_g0), .iB0(pixel_b0),
                                      .oVSYNC(VGA_VSYNC), .oHSYNC(VGA_HSYNC), .oDE(), .oR0(VGA_R), .oG0(VGA_G), .oB0(VGA_B)
     );
