@@ -25,13 +25,11 @@ module TMG_CTRL #(
     input   wire    [PARAM_WIDTH -1: 0]     iHACT,
     input   wire    [PARAM_WIDTH -1: 0]     iHS_WIDTH,
     input   wire    [PARAM_WIDTH -1: 0]     iHS_BP,
-    input   wire                            iHS_POL,
     //
     input   wire    [PARAM_WIDTH -1: 0]     iVTOTAL,
     input   wire    [PARAM_WIDTH -1: 0]     iVACT,
     input   wire    [PARAM_WIDTH -1: 0]     iVS_WIDTH,
     input   wire    [PARAM_WIDTH -1: 0]     iVS_BP,
-    input   wire                            iVS_POL,
     //
     output  wire                            oHSYNC,
     output  wire                            oVSYNC,
@@ -52,8 +50,8 @@ module TMG_CTRL #(
     reg     [PARAM_WIDTH -1: 0]             next_vcount, vcount;
 
     // 
-    assign  oHSYNC = (iHS_POL) ? ~hsync: hsync;
-    assign  oVSYNC = (iVS_POL) ? ~vsync: vsync;
+    assign  oHSYNC = hsync;
+    assign  oVSYNC = vsync;
     assign  oDE    = hde & vde;
     assign  oFIELD = field;
 
