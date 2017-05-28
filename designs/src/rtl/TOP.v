@@ -160,7 +160,7 @@ module TOP #(
     );
 
     // Calc gravity
-    CALC_GRAVITY_Y #( .ADDR_WIDTH(11), .MDATA_WIDTH(640), .MAX_Y_ADDR(480), .PIXEL_WIDTH(8) ) 
+    CALC_GRAVITY_Y #( .ADDR_WIDTH(10), .MDATA_WIDTH(640), .MAX_Y_ADDR(480), .PIXEL_WIDTH(8) ) 
                                                 m_CALC_GRAVITY_Y ( .CCLK(CCLK), .RST_N(cclk_rst_n),
                                                 //
                                                 .iVSYNC(cmr_vsync),
@@ -282,7 +282,7 @@ module TOP #(
     ASYNC_SYNC_RST  m_VGA_CLK_RST_N ( .CLK(VGA_CLK), .RST_N(RST_N), .SYNC_RST_N(vga_clk_rst_n) );
 
     // UART (temporal)
-    UART_TX_CORE #( .OVER_SAMPLING(16) )    m_UART_TX_CORE( .CLK(clk_uart_x8), .RST_N(RST_N), 
+    UART_TX_CORE #( .OVER_SAMPLING(8) )    m_UART_TX_CORE( .CLK(clk_uart_x8), .RST_N(RST_N), 
                 .iSEVEN_BIT(1'b1),         // Low = 8bit,        High = 7bit
                 .iPARITY_EN(1'b0),         // Low = Non Parity,  High = Parity Enable
                 .iODD_PARITY(1'b0),        // Low = Even Parity, High = Odd Parity
