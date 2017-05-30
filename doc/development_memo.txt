@@ -1,0 +1,12 @@
+・
+S = ∑x∑yPxy = ∑x (∑yPxy)
+SX = ∑x∑y x・Pxy = ∑x(∑y x・Pxy)
+SY = ∑x∑y y・Pxy = ∑x(∑y y・Pxy)
+
+sum_s  = 
+sum_sx = 
+sum_sy = 
+
+x_s  = 
+x_sx = 
+x_sy = 

@@ -43,7 +43,6 @@ module TOP #(
     output  wire    [PIXEL_WIDTH -1: 0] VGA_R,
     output  wire    [PIXEL_WIDTH -1: 0] VGA_G,
     output  wire    [PIXEL_WIDTH -1: 0] VGA_B
-    ,input   wire                        VGAOUT_MODE
 );
     // parameter
     parameter   JP_WIDTH                = 8;
@@ -120,6 +119,7 @@ module TOP #(
     wire    [SUM_SY_WIDTH -1: 0]        sum_sy;
 
     wire    [4 -1: 0]                   calc_state;
+    wire    [4 -1: 0]                   uart_if_state;
 
     //
     wire                                clk_uart_x8;
@@ -135,14 +135,16 @@ module TOP #(
     wire    [PIXEL_WIDTH -1: 0]         threshold;
     wire                                vgaout_mode;
 
+    //
+    wire                                video_load_en;
+    wire    [PIXEL_WIDTH -1: 0]         mem_dat;
+
 
     // 
 //    assign  threshold = 8'h01;
     assign  threshold = JP;
     // vgaout_mode:1=raw, 0=digitized
-//    assign  vgaout_mode = 1'b0;
-//    assign  vgaout_mode = 1'b1;
-    assign  vgaout_mode = VGAOUT_MODE;
+    assign  vgaout_mode = 1'b1;
 
 
     // Instance
@@ -163,7 +165,7 @@ module TOP #(
     );
 
     // Calc gravity
-    CALC_GRAVITY_Y #( .ADDR_WIDTH(10), .MDATA_WIDTH(640), .MAX_Y_ADDR(480), .PIXEL_WIDTH(8) ) 
+    CALC_GRAVITY_Y #( .ADDR_WIDTH(11), .MDATA_WIDTH(640), .MAX_Y_ADDR(480), .PIXEL_WIDTH(8) ) 
                                                 m_CALC_GRAVITY_Y ( .CCLK(CCLK), .RST_N(cclk_rst_n),
                                                 //
                                                 .iVSYNC(cmr_vsync),
@@ -255,7 +257,10 @@ module TOP #(
                                     .iPOINT_X('h100), .iPOINT_Y('h100),
                                     //
                                     .oVGA_HSYNC(pixel_hsync), .oVGA_VSYNC(pixel_vsync), .oVGA_DE(pixel_de),
-                                    .oVGA_R(pixel_r0), .oVGA_G(pixel_g0), .oVGA_B(pixel_b0)
+                                    .oVGA_R(pixel_r0), .oVGA_G(pixel_g0), .oVGA_B(pixel_b0),
+                                    //
+                                    .video_load_en(video_load_en),
+                                    .mem_dat(mem_dat)
     );
 
     // for high fanout issue
@@ -285,7 +290,7 @@ module TOP #(
     ASYNC_SYNC_RST  m_VGA_CLK_RST_N ( .CLK(VGA_CLK), .RST_N(RST_N), .SYNC_RST_N(vga_clk_rst_n) );
 
     // UART (temporal)
-    UART_TX_CORE #( .OVER_SAMPLING(8) )    m_UART_TX_CORE( .CLK(clk_uart_x8), .RST_N(RST_N), 
+    UART_TX_CORE #( .OVER_SAMPLING(16) )    m_UART_TX_CORE( .CLK(clk_uart_x8), .RST_N(RST_N), 
                 .iSEVEN_BIT(1'b1),         // Low = 8bit,        High = 7bit
                 .iPARITY_EN(1'b0),         // Low = Non Parity,  High = Parity Enable
                 .iODD_PARITY(1'b0),        // Low = Even Parity, High = Odd Parity
@@ -325,7 +330,9 @@ module TOP #(
                 .oBUSY(busy),
                 //
                 .oDE(uart_de),
-                .oDATA(uart_data)
+                .oDATA(uart_data),
+                //
+                .oSTATE(uart_if_state)
     );
 
 
@@ -341,44 +348,30 @@ module TOP #(
         .probe0(FVAL),
         .probe1(LVAL),
         .probe2(DVAL),
-        .probe3(DATA_L),
-        .probe4(DATA_R),
-        .probe5(pixel_vsync),
-        .probe6(pixel_hsync),
-        .probe7(pixel_de),
-        .probe8(cmr_vsync),
-        .probe9(cmr_hsync),
-        .probe10(cmr_de),
+        .probe3(grav_addr /*cmr_data_l*/ /*DATA_L*/),
+        .probe4(cl_row /*cmr_data_r*/ /*DATA_R*/),
+        .probe5(grav_sel_en /*memin_0*/),
+        .probe6(memin_1),
+        .probe7(memin_2),
+        .probe8(/*wea*/ cmr_vsync),
+        .probe9(mem_sel /*cmr_hsync*/),
+        .probe10(tmg_vsync /*cmr_de*/),
         .probe11(memout_cx_en),
-        .probe12(grav_sel_en),
-        .probe13(busy),
+        .probe12(/*video_load_en*/ grav_sel_en),
+        .probe13(/*tmg_hsync*/ busy),
         .probe14(UART_TXD),
-        .probe15(calc_state),
+        .probe15(uart_if_state /*calc_state*/),
         .probe16(VGA_VSYNC),
         .probe17(VGA_HSYNC),
-        .probe18(VGA_R),
-        .probe19(sum_s[0]),
-        .probe20(sum_s[1]),
-        .probe21(sum_s[2]),
-        .probe22(threshold[7:0]),
-        .probe23(sum_s[3])
-/*
-        .probe19(clk_uart_x8),
-        .probe20(start_trig),
-        .probe21(uart_de),
-        .probe22(uart_data),
-        .probe23(tx_busy)
-*/
+        .probe18(/*mem_dat*/ VGA_R),
+        .probe19(/*tmg_de*/ clk_uart_x8),
+        .probe20(/*cmr_vsync*/ start_trig),
+        .probe21(cmr_hsync /*uart_de*/),
+        .probe22(/*VGA_R*/ uart_data),
+        .probe23(/*cmr_de*/ tx_busy) /*,*/
 //        .probe24(sum_s),
 //        .probe25(sum_sy)
-/*
-.probe18(sum_s[7:0]),
-.probe19(sum_s[8]),
-.probe20(sum_s[9]),
-.probe21(sum_s[10]),
-.probe22(sum_s[18:11]),
-.probe23(sum_s[19])
-*/
-);
+    );
+
 
 endmodule

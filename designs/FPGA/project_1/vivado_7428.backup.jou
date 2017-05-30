@@ -1,0 +1,12 @@
+#-----------------------------------------------------------
+# Vivado v2017.1 (64-bit)
+# SW Build 1846317 on Fri Apr 14 18:55:03 MDT 2017
+# IP Build 1846188 on Fri Apr 14 20:52:08 MDT 2017
+# Start of session at: Sun May 21 07:48:23 2017
+# Process ID: 7428
+# Current directory: C:/work/EyeTracker/designs/FPGA/project_1
+# Command line: vivado.exe -gui_launcher_event rodinguilauncherevent10608 C:\work\EyeTracker\designs\FPGA\project_1\project_1.xpr
+# Log file: C:/work/EyeTracker/designs/FPGA/project_1/vivado.log
+# Journal file: C:/work/EyeTracker/designs/FPGA/project_1\vivado.jou
+#-----------------------------------------------------------
+start_gui

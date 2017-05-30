@@ -41,7 +41,10 @@ module CLctrl #(
     output  reg     [MDATA_WIDTH -1: 0]     oMEMIN_2,   // for Row VGA out
     output  reg     [MDATA_WIDTH -1: 0]     oMEMIN_3,   // for Row VGA out
     output  reg     [MDATA_WIDTH -1: 0]     oMEMIN_4,   // for Row VGA out
-    output  reg     [MDATA_WIDTH -1: 0]     oMEMIN_5    // for Row VGA out
+    output  reg     [MDATA_WIDTH -1: 0]     oMEMIN_5,   // for Row VGA out
+    output  reg     [MDATA_WIDTH -1: 0]     oMEMIN_6//,   // for Row VGA out
+//    output  reg     [MDATA_WIDTH -1: 0]     oMEMIN_7,   // for Row VGA out
+//    output  reg     [MDATA_WIDTH -1: 0]     oMEMIN_8    // for Row VGA out
 );
 
     //
@@ -112,8 +115,8 @@ module CLctrl #(
         end else begin
             for (i=0; i<MDATA_WIDTH;i=i+2) begin
                 if (col == i) begin
-                    oMEMIN_0[i  ] <= (iDATA_L<iTHRESHOLD) ? 1'b1: oMEMIN_0[i  ]; // flag=1 for dark pixel
-                    oMEMIN_0[i+1] <= (iDATA_R<iTHRESHOLD) ? 1'b1: oMEMIN_0[i+1]; // flag=1 for dark pixel
+                    oMEMIN_0[i  ] <= (iDATA_L>iTHRESHOLD) ? 1'b1: oMEMIN_0[i  ];
+                    oMEMIN_0[i+1] <= (iDATA_R>iTHRESHOLD) ? 1'b1: oMEMIN_0[i+1];
                 end else begin
                     oMEMIN_0[i  ] <= oMEMIN_0[i  ];
                     oMEMIN_0[i+1] <= oMEMIN_0[i+1];
@@ -130,6 +133,9 @@ module CLctrl #(
             oMEMIN_3 <= 'h0;
             oMEMIN_4 <= 'h0;
             oMEMIN_5 <= 'h0;
+            oMEMIN_6 <= 'h0;
+//            oMEMIN_7 <= 'h0;
+//            oMEMIN_8 <= 'h0;
         end else begin
             for (i=0; i<MDATA_WIDTH; i=i+2) begin
                 if (col == i) begin
@@ -143,6 +149,12 @@ module CLctrl #(
                     oMEMIN_4[i+1] <= iDATA_R[4];
                     oMEMIN_5[i  ] <= iDATA_L[3];
                     oMEMIN_5[i+1] <= iDATA_R[3];
+                    oMEMIN_6[i  ] <= iDATA_L[2];
+                    oMEMIN_6[i+1] <= iDATA_R[2];
+//                    oMEMIN_7[i  ] <= iDATA_L[1];
+//                    oMEMIN_7[i+1] <= iDATA_R[1];
+//                    oMEMIN_8[i  ] <= iDATA_L[0];
+//                    oMEMIN_8[i+1] <= iDATA_R[0];
                 end else begin
                     oMEMIN_1[i  ] <= oMEMIN_1[i  ]; // for Row VGA out
                     oMEMIN_1[i+1] <= oMEMIN_1[i+1]; // for Row VGA out
@@ -154,6 +166,12 @@ module CLctrl #(
                     oMEMIN_4[i+1] <= oMEMIN_4[i+1]; // for Row VGA out
                     oMEMIN_5[i  ] <= oMEMIN_5[i  ]; // for Row VGA out
                     oMEMIN_5[i+1] <= oMEMIN_5[i+1]; // for Row VGA out
+                    oMEMIN_6[i  ] <= oMEMIN_6[i  ]; // for Row VGA out
+                    oMEMIN_6[i+1] <= oMEMIN_6[i+1]; // for Row VGA out
+//                    oMEMIN_7[i  ] <= oMEMIN_7[i  ]; // for Row VGA out
+//                    oMEMIN_7[i+1] <= oMEMIN_7[i+1]; // for Row VGA out
+//                    oMEMIN_8[i  ] <= oMEMIN_8[i  ]; // for Row VGA out
+//                    oMEMIN_8[i+1] <= oMEMIN_8[i+1]; // for Row VGA out
                 end
             end
         end
