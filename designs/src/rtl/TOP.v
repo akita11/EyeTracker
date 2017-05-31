@@ -60,6 +60,7 @@ module TOP #(
     wire                                cmr_vsync;
     wire                                cmr_hsync;
     wire                                cmr_de;
+    wire                                cmr_field;
     
     wire    [PIXEL_WIDTH -1: 0]         cmr_data_l;
     wire    [PIXEL_WIDTH -1: 0]         cmr_data_r;
@@ -149,7 +150,8 @@ module TOP #(
     INP_CAMERA_DATA  #( .PIXEL_WIDTH(PIXEL_WIDTH) )    m_INP_CAMERA_DATA (.CLK(CCLK), .RST_N(RST_N), 
                                                 .iLVAL_POL(1'b1), .iFVAL_POL(1'b1), .iDVAL_POL(1'b0), 
                                                 .iLVAL(LVAL), .iFVAL(FVAL), .iDVAL(DVAL), .iDATA_L(DATA_L), .iDATA_R(DATA_R),
-                                                .oVSYNC(cmr_vsync), .oHSYNC(cmr_hsync), .oDE(cmr_de), .oDATA_L(cmr_data_l), .oDATA_R(cmr_data_r)
+                                                .oVSYNC(cmr_vsync), .oHSYNC(cmr_hsync), .oDE(cmr_de), .oFIELD(cmr_field), 
+                                                .oDATA_L(cmr_data_l), .oDATA_R(cmr_data_r)
     );
 
 
@@ -201,9 +203,9 @@ module TOP #(
     assign  memout_cx = (mem_sel_sync_cclk) ? memout_ca: memout_cb;
 
     // Dual Port SRAMÇ…ÇÕ1 word = 1lineï™ÇÃÉfÅ[É^ÇèëÇ´çûÇﬁ
-    MEM m_MEMA0( .clka(CCLK   ), .addra(cmr_addr  ), .dina(memin_0), .ena(~mem_sel_sync_cclk), .wea(wea ), .douta(memout_ca),
+    MEM m_MEMA0( .clka(CCLK   ), .addra(cmr_addr  ), .dina(memin_0), .ena(~cmr_field        ), .wea(wea ), .douta(memout_ca),
                  .clkb(VGA_CLK), .addrb(tmg_vcount), .dinb('h0    ), .enb(1'b1              ), .web(1'b0), .doutb(memout_0a) );    
-    MEM m_MEMB0( .clka(CCLK   ), .addra(cmr_addr  ), .dina(memin_0), .ena( mem_sel_sync_cclk), .wea(web ), .douta(memout_cb),
+    MEM m_MEMB0( .clka(CCLK   ), .addra(cmr_addr  ), .dina(memin_0), .ena( cmr_field        ), .wea(web ), .douta(memout_cb),
                  .clkb(VGA_CLK), .addrb(tmg_vcount), .dinb('h0    ), .enb(1'b1              ), .web(1'b0), .doutb(memout_0b) );    
 
     // for Raw Video out

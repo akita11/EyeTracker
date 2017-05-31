@@ -34,6 +34,7 @@ module INP_CAMERA_DATA #(
     output  wire                            oVSYNC,
     output  wire                            oHSYNC,
     output  wire                            oDE,
+    output  wire                            oFIELD,
     output  wire    [PIXEL_WIDTH -1: 0]     oDATA_L,
     output  wire    [PIXEL_WIDTH -1: 0]     oDATA_R
 );
@@ -42,15 +43,24 @@ module INP_CAMERA_DATA #(
     reg                                     lval;
     reg                                     fval;
     reg                                     dval;
+    reg                                     field;
     reg             [PIXEL_WIDTH -1: 0]     data_l;
     reg             [PIXEL_WIDTH -1: 0]     data_r;
+
+    wire                                    rise_vsync;
+    wire                                    fall_vsync;
 
     // 
     assign  oVSYNC  = fval ^ iFVAL_POL;
     assign  oHSYNC  = lval ^ iLVAL_POL;
     assign  oDE     = (fval & lval & dval ) ^ iDVAL_POL;
+    assign  oFIELD  = field;
     assign  oDATA_L = data_l;
     assign  oDATA_R = data_r;
+
+    //
+    DET_EDGE m_DET_VSYNC_EDGE( .CLK(CCLK), .RST_N(RST_N), .iS(iFVAL ^ iFVAL_POL), .oRISE(rise_vsync), .oFALL(fall_vsync) );
+    
 
     //
     always @(posedge CLK or negedge RST_N) begin
@@ -68,5 +78,15 @@ module INP_CAMERA_DATA #(
             data_r <= iDATA_R;
         end
     end
+
+    //
+    always @(posedge CLK or negedge RST_N) begin
+        if (!RST_N) begin
+            field <= 1'b0;
+        end else if (rise_vsync) begin
+            field <= ~field;
+        end else begin
+            field <= field;
+        end
 
 endmodule
