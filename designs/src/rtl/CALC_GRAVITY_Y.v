@@ -26,6 +26,9 @@ module CALC_GRAVITY_Y #(
     //
     input   wire                            iVSYNC,
     //
+    input   wire    [ADDR_WIDTH -1: 0]      iHSIZE,
+    input   wire    [ADDR_WIDTH -1: 0]      iVSIZE,
+    //
     input   wire                            iDATA_EN,
     input   wire    [MDATA_WIDTH -1: 0]     iMEMIN,
     output  wire    [ADDR_WIDTH -1: 0]      oADDR,
@@ -146,10 +149,10 @@ module CALC_GRAVITY_Y #(
                             //
                             next_s_trig    <= 1'b0;
                             //
-                            if (addr==MAX_Y_ADDR) begin         // 
+                            if (addr==iVSIZE) begin         // 
                                 next_state     <= CALC_X_DIR;
                                 // 
-                                next_counter   <= MDATA_WIDTH - 'h1;
+                                next_counter   <= iHSIZE - 'h1;
                                 //
                                 next_select_en <= select_en;
                                 // 
