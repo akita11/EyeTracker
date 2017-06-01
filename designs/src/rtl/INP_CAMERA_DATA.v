@@ -59,7 +59,7 @@ module INP_CAMERA_DATA #(
     assign  oDATA_R = data_r;
 
     //
-    DET_EDGE m_DET_VSYNC_EDGE( .CLK(CCLK), .RST_N(RST_N), .iS(iFVAL ^ iFVAL_POL), .oRISE(rise_vsync), .oFALL(fall_vsync) );
+    DET_EDGE m_DET_VSYNC_EDGE( .CLK(CLK), .RST_N(RST_N), .iS(iFVAL ^ iFVAL_POL), .oRISE(rise_vsync), .oFALL(fall_vsync) );
     
 
     //
@@ -88,5 +88,6 @@ module INP_CAMERA_DATA #(
         end else begin
             field <= field;
         end
+    end
 
 endmodule
