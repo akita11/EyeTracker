@@ -69,6 +69,9 @@ module TOP #(
 
     wire    [ADDR_WIDTH -1: 0]          cmr_addr;
 
+    wire    [ADDR_WIDTH -1: 0]          cmr_hsize;
+    wire    [ADDR_WIDTH -1: 0]          cmr_vsize;
+
     wire    [ADDR_WIDTH -1: 0]          cl_row;
 
     wire    [ADDR_WIDTH -1: 0]          grav_addr;
@@ -161,7 +164,8 @@ module TOP #(
                                                 .iVGAout_mode(vgaout_mode), .iMEM_SEL(mem_sel_sync_cclk), .iTHRESHOLD(threshold),
                                                 .oWEA(wea), .oWEB(web), .oCL_ROW(cl_row),
                                                 .oMEMIN_0(memin_0), .oMEMIN_1(memin_1), .oMEMIN_2(memin_2), 
-                                                .oMEMIN_3(memin_3), .oMEMIN_4(memin_4), .oMEMIN_5(memin_5)
+                                                .oMEMIN_3(memin_3), .oMEMIN_4(memin_4), .oMEMIN_5(memin_5), 
+                                                .oHSIZE(cmr_hsize), .oVSIZE(cmr_vsize)
     );
 
     // Calc gravity
@@ -169,6 +173,9 @@ module TOP #(
                                                 m_CALC_GRAVITY_Y ( .CCLK(CCLK), .RST_N(cclk_rst_n),
                                                 //
                                                 .iVSYNC(cmr_vsync),
+                                                //
+                                                .iHSIZE(cmr_hsize),
+                                                .iVSIZE(cmr_vsize),
                                                 // 
                                                 .iDATA_EN(memout_cx_en),
                                                 .iMEMIN  (memout_cx),
