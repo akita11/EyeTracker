@@ -64,8 +64,8 @@ module CLctrl #(
     // オリジナルアルゴリズム
     // CL_ROWはY方向
     // colは2づつ増える
-    // DATA_Lが閾値を超えたらMEMIN_0[col  ]を1にする
-    // DATA_Rが閾値を超えたらMEMIN_0[col+1]を1にする
+    // DATA_Lが閾値を超えたらMEMIN_0[col  ]を1にする←間違い。DATA_Lが閾値を下回ったらMEMIN_0[col  ]を1にする。それ以外は0にする
+    // DATA_Rが閾値を超えたらMEMIN_0[col+1]を1にする←間違い。DATA_Rが閾値を下回ったらMEMIN_0[col+1]を1にする。それ以外は0にする
     // MEM_SELが1のときはWEBに書き込み、0のときはWEAに書き込む
     // それ以外は
     // MEMIN_x[col  ]  DATA_L[8 - x] (x => 1 to 5)
@@ -112,8 +112,8 @@ module CLctrl #(
         end else begin
             for (i=0; i<MDATA_WIDTH;i=i+2) begin
                 if (col == i) begin
-                    oMEMIN_0[i  ] <= (iDATA_L<iTHRESHOLD) ? 1'b1: oMEMIN_0[i  ]; // flag=1 for dark pixel
-                    oMEMIN_0[i+1] <= (iDATA_R<iTHRESHOLD) ? 1'b1: oMEMIN_0[i+1]; // flag=1 for dark pixel
+                    oMEMIN_0[i  ] <= (iDATA_L<iTHRESHOLD) ? 1'b1: 1'b0; // flag=1 for dark pixel
+                    oMEMIN_0[i+1] <= (iDATA_R<iTHRESHOLD) ? 1'b1: 1'b0; // flag=1 for dark pixel
                 end else begin
                     oMEMIN_0[i  ] <= oMEMIN_0[i  ];
                     oMEMIN_0[i+1] <= oMEMIN_0[i+1];
