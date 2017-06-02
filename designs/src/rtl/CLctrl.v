@@ -194,9 +194,9 @@ module CLctrl #(
             oWEB <= 1'b0;
         end else if (iMEM_SEL) begin
             oWEA <= 1'b0;
-            oWEB <= 1'b1;
+            oWEB <= 1'b1 & iDE;
         end else begin
-            oWEA <= 1'b1;
+            oWEA <= 1'b1 & iDE;
             oWEB <= 1'b0;
         end
     end
