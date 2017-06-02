@@ -50,10 +50,19 @@ module INP_CAMERA_DATA #(
     wire                                    rise_vsync;
     wire                                    fall_vsync;
 
+    wire                                    hsync;
+    wire                                    vsync;
+    wire                                    de;
+
+    //
+    assign  vsync = fval ^ iFVAL_POL;
+    assign  hsync = lval ^ iLVAL_POL;
+    assign  de    = (fval & lval & dval ) ^ iDVAL_POL;
+
     // 
-    assign  oVSYNC  = fval ^ iFVAL_POL;
-    assign  oHSYNC  = lval ^ iLVAL_POL;
-    assign  oDE     = (fval & lval & dval ) ^ iDVAL_POL;
+    assign  oVSYNC  = vsync;
+    assign  oHSYNC  = hsync & ~vsync;
+    assign  oDE     = de;
     assign  oFIELD  = field;
     assign  oDATA_L = data_l;
     assign  oDATA_R = data_r;
