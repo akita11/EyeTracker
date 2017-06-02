@@ -68,6 +68,8 @@ module TOP #(
     wire                                grav_sel_en;
 
     wire    [ADDR_WIDTH -1: 0]          cmr_addr;
+    wire                                cmr_wea;
+    wire                                cmr_web;
 
     wire    [ADDR_WIDTH -1: 0]          cmr_hsize;
     wire    [ADDR_WIDTH -1: 0]          cmr_vsize;
@@ -207,35 +209,37 @@ module TOP #(
 
     //
     assign  cmr_addr  = (grav_sel_en      ) ? grav_addr: cl_row;
+    assign  cmr_wea   = (grav_sel_en      ) ? 1'b0     : wea;
+    assign  cmr_web   = (grav_sel_en      ) ? 1'b0     : web;
     assign  memout_cx = (mem_sel_sync_cclk) ? memout_ca: memout_cb;
 
     // Dual Port SRAMÇ…ÇÕ1 word = 1lineï™ÇÃÉfÅ[É^ÇèëÇ´çûÇﬁ
-    MEM m_MEMA0( .clka(CCLK   ), .addra(cmr_addr  ), .dina(memin_0), .ena(~cmr_field        ), .wea(wea ), .douta(memout_ca),
-                 .clkb(VGA_CLK), .addrb(tmg_vcount), .dinb('h0    ), .enb(1'b1              ), .web(1'b0), .doutb(memout_0a) );    
-    MEM m_MEMB0( .clka(CCLK   ), .addra(cmr_addr  ), .dina(memin_0), .ena( cmr_field        ), .wea(web ), .douta(memout_cb),
-                 .clkb(VGA_CLK), .addrb(tmg_vcount), .dinb('h0    ), .enb(1'b1              ), .web(1'b0), .doutb(memout_0b) );    
+    MEM m_MEMA0( .clka(CCLK   ), .addra(cmr_addr  ), .dina(memin_0), .ena(~cmr_field        ), .wea(cmr_wea), .douta(memout_ca),
+                 .clkb(VGA_CLK), .addrb(tmg_vcount), .dinb('h0    ), .enb(1'b1              ), .web(1'b0   ), .doutb(memout_0a) );    
+    MEM m_MEMB0( .clka(CCLK   ), .addra(cmr_addr  ), .dina(memin_0), .ena( cmr_field        ), .wea(cmr_web), .douta(memout_cb),
+                 .clkb(VGA_CLK), .addrb(tmg_vcount), .dinb('h0    ), .enb(1'b1              ), .web(1'b0   ), .doutb(memout_0b) );    
 
     // for Raw Video out
-    MEM m_MEMA1( .clka(CCLK   ), .addra(cl_row    ), .dina(memin_1), .ena(~cmr_field        ), .wea(wea), 
-                 .clkb(VGA_CLK), .addrb(tmg_vcount), .dinb('h0    ), .enb(1'b1              ), .web(1'b0), .doutb(memout_1a) );    
-    MEM m_MEMB1( .clka(CCLK   ), .addra(cl_row    ), .dina(memin_1), .ena( cmr_field        ), .wea(web), 
-                 .clkb(VGA_CLK), .addrb(tmg_vcount), .dinb('h0    ), .enb(1'b1              ), .web(1'b0), .doutb(memout_1b) );    
-    MEM m_MEMA2( .clka(CCLK   ), .addra(cl_row    ), .dina(memin_2), .ena(~cmr_field        ), .wea(wea), 
-                 .clkb(VGA_CLK), .addrb(tmg_vcount), .dinb('h0    ), .enb(1'b1              ), .web(1'b0), .doutb(memout_2a) );    
-    MEM m_MEMB2( .clka(CCLK   ), .addra(cl_row    ), .dina(memin_2), .ena( cmr_field        ), .wea(web), 
-                 .clkb(VGA_CLK), .addrb(tmg_vcount), .dinb('h0    ), .enb(1'b1              ), .web(1'b0), .doutb(memout_2b) );    
-    MEM m_MEMA3( .clka(CCLK   ), .addra(cl_row    ), .dina(memin_3), .ena(~cmr_field        ), .wea(wea), 
-                 .clkb(VGA_CLK), .addrb(tmg_vcount), .dinb('h0    ), .enb(1'b1              ), .web(1'b0), .doutb(memout_3a) );    
-    MEM m_MEMB3( .clka(CCLK   ), .addra(cl_row    ), .dina(memin_3), .ena( cmr_field        ), .wea(web), 
-                 .clkb(VGA_CLK), .addrb(tmg_vcount), .dinb('h0    ), .enb(1'b1              ), .web(1'b0), .doutb(memout_3b) );    
-    MEM m_MEMA4( .clka(CCLK   ), .addra(cl_row    ), .dina(memin_4), .ena(~cmr_field        ), .wea(wea), 
-                 .clkb(VGA_CLK), .addrb(tmg_vcount), .dinb('h0    ), .enb(1'b1              ), .web(1'b0), .doutb(memout_4a) );    
-    MEM m_MEMB4( .clka(CCLK   ), .addra(cl_row    ), .dina(memin_4), .ena( cmr_field        ), .wea(web), 
-                 .clkb(VGA_CLK), .addrb(tmg_vcount), .dinb('h0    ), .enb(1'b1              ), .web(1'b0), .doutb(memout_4b) );    
-    MEM m_MEMA5( .clka(CCLK   ), .addra(cl_row    ), .dina(memin_5), .ena(~cmr_field        ), .wea(wea), 
-                 .clkb(VGA_CLK), .addrb(tmg_vcount), .dinb('h0    ), .enb(1'b1              ), .web(1'b0), .doutb(memout_5a) );    
-    MEM m_MEMB5( .clka(CCLK   ), .addra(cl_row    ), .dina(memin_5), .ena( cmr_field        ), .wea(web), 
-                 .clkb(VGA_CLK), .addrb(tmg_vcount), .dinb('h0    ), .enb(1'b1              ), .web(1'b0), .doutb(memout_5b) );    
+    MEM m_MEMA1( .clka(CCLK   ), .addra(cl_row    ), .dina(memin_1), .ena(~cmr_field        ), .wea(cmr_wea), 
+                 .clkb(VGA_CLK), .addrb(tmg_vcount), .dinb('h0    ), .enb(1'b1              ), .web(1'b0   ), .doutb(memout_1a) );    
+    MEM m_MEMB1( .clka(CCLK   ), .addra(cl_row    ), .dina(memin_1), .ena( cmr_field        ), .wea(cmr_web), 
+                 .clkb(VGA_CLK), .addrb(tmg_vcount), .dinb('h0    ), .enb(1'b1              ), .web(1'b0   ), .doutb(memout_1b) );    
+    MEM m_MEMA2( .clka(CCLK   ), .addra(cl_row    ), .dina(memin_2), .ena(~cmr_field        ), .wea(cmr_wea), 
+                 .clkb(VGA_CLK), .addrb(tmg_vcount), .dinb('h0    ), .enb(1'b1              ), .web(1'b0   ), .doutb(memout_2a) );    
+    MEM m_MEMB2( .clka(CCLK   ), .addra(cl_row    ), .dina(memin_2), .ena( cmr_field        ), .wea(cmr_web), 
+                 .clkb(VGA_CLK), .addrb(tmg_vcount), .dinb('h0    ), .enb(1'b1              ), .web(1'b0   ), .doutb(memout_2b) );    
+    MEM m_MEMA3( .clka(CCLK   ), .addra(cl_row    ), .dina(memin_3), .ena(~cmr_field        ), .wea(cmr_wea), 
+                 .clkb(VGA_CLK), .addrb(tmg_vcount), .dinb('h0    ), .enb(1'b1              ), .web(1'b0   ), .doutb(memout_3a) );    
+    MEM m_MEMB3( .clka(CCLK   ), .addra(cl_row    ), .dina(memin_3), .ena( cmr_field        ), .wea(cmr_web), 
+                 .clkb(VGA_CLK), .addrb(tmg_vcount), .dinb('h0    ), .enb(1'b1              ), .web(1'b0   ), .doutb(memout_3b) );    
+    MEM m_MEMA4( .clka(CCLK   ), .addra(cl_row    ), .dina(memin_4), .ena(~cmr_field        ), .wea(cmr_wea), 
+                 .clkb(VGA_CLK), .addrb(tmg_vcount), .dinb('h0    ), .enb(1'b1              ), .web(1'b0   ), .doutb(memout_4a) );    
+    MEM m_MEMB4( .clka(CCLK   ), .addra(cl_row    ), .dina(memin_4), .ena( cmr_field        ), .wea(cmr_web), 
+                 .clkb(VGA_CLK), .addrb(tmg_vcount), .dinb('h0    ), .enb(1'b1              ), .web(1'b0   ), .doutb(memout_4b) );    
+    MEM m_MEMA5( .clka(CCLK   ), .addra(cl_row    ), .dina(memin_5), .ena(~cmr_field        ), .wea(cmr_wea), 
+                 .clkb(VGA_CLK), .addrb(tmg_vcount), .dinb('h0    ), .enb(1'b1              ), .web(1'b0   ), .doutb(memout_5a) );    
+    MEM m_MEMB5( .clka(CCLK   ), .addra(cl_row    ), .dina(memin_5), .ena( cmr_field        ), .wea(cmr_web), 
+                 .clkb(VGA_CLK), .addrb(tmg_vcount), .dinb('h0    ), .enb(1'b1              ), .web(1'b0   ), .doutb(memout_5b) );    
 
     // for Meta-stable 
     CYCLE_DELAY #( .DATA_WIDTH(1), .DELAY(2) )    m_MEM_SEL_DLY2( .CLK(CCLK), .RST_N(RST_N), .iD(mem_sel), .oD(mem_sel_sync_cclk) );
@@ -360,7 +364,7 @@ module TOP #(
         .probe10(cmr_de),
         .probe11(memout_cx_en),
         .probe12(grav_sel_en),
-        .probe13(busy),
+        .probe13(cmr_field/*busy*/),
         .probe14(UART_TXD),
         .probe15(calc_state),
         .probe16(VGA_VSYNC),
@@ -368,9 +372,9 @@ module TOP #(
         .probe18(VGA_R),
         .probe19(sum_s[0]),
         .probe20(sum_s[1]),
-        .probe21(sum_s[2]),
-        .probe22(threshold[7:0]),
-        .probe23(sum_s[3])
+        .probe21(cmr_addr[9] /*sum_s[2]*/),
+        .probe22(cmr_addr[7:0] /*threshold[7:0]*/),
+        .probe23(cmr_addr[8] /*sum_s[3]*/)
 /*
         .probe19(clk_uart_x8),
         .probe20(start_trig),
