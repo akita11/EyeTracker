@@ -92,7 +92,7 @@ module INP_CAMERA_DATA #(
     always @(posedge CLK or negedge RST_N) begin
         if (!RST_N) begin
             field <= 1'b0;
-        end else if (rise_vsync) begin
+        end else if (fall_vsync) begin
             field <= ~field;
         end else begin
             field <= field;
