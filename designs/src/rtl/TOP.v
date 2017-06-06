@@ -203,7 +203,8 @@ module TOP #(
     MEMOUTSEL       #( .DATA_WIDTH(640) )   m_MEMOUTSEL2(.iMEMOUT_0A(memout_2a), .iMEMOUT_0B(memout_2b), .iMEM_SEL(mem_sel), .oMEMOUT_0X(memout_2x));
     MEMOUTSEL       #( .DATA_WIDTH(640) )   m_MEMOUTSEL3(.iMEMOUT_0A(memout_3a), .iMEMOUT_0B(memout_3b), .iMEM_SEL(mem_sel), .oMEMOUT_0X(memout_3x));
     MEMOUTSEL       #( .DATA_WIDTH(640) )   m_MEMOUTSEL4(.iMEMOUT_0A(memout_4a), .iMEMOUT_0B(memout_4b), .iMEM_SEL(mem_sel), .oMEMOUT_0X(memout_4x));
-    MEMOUTSEL       #( .DATA_WIDTH(640) )   m_MEMOUTSEL5(.iMEMOUT_0A(memout_5a), .iMEMOUT_0B(memout_5b), .iMEM_SEL(mem_sel), .oMEMOUT_0X(memout_5x));
+    MEMOUTSEL       #( .DATA_WIDTH(640) )   m_MEMOUTSEL5(.iMEMOUT_0A('h0      ), .iMEMOUT_0B('h0      ), .iMEM_SEL(mem_sel), .oMEMOUT_0X(memout_5x));
+//    MEMOUTSEL       #( .DATA_WIDTH(640) )   m_MEMOUTSEL5(.iMEMOUT_0A(memout_5a), .iMEMOUT_0B(memout_5b), .iMEM_SEL(mem_sel), .oMEMOUT_0X(memout_5x));
     // 
     CYCLE_DELAY #( .DATA_WIDTH(1), .DELAY(1) )  m_MEM_DATA_EN_DELAY(.CLK(CCLK), .RST_N(RST_N), .iD(grav_sel_en), .oD(memout_cx_en) );
 
@@ -213,10 +214,16 @@ module TOP #(
     assign  cmr_web   = (grav_sel_en      ) ? 1'b0     : web;
     assign  memout_cx = (cmr_field==1'b0  ) ? memout_ca: memout_cb;
 
+    // Dual Port SRAMには1 word = 1line分のデータを書き込む for GRAV_CALC
+    MEM m_MEMCA( .clka(CCLK   ), .addra(cmr_addr  ), .dina(memin_0), .ena(~cmr_field        ), .wea(cmr_wea), .douta(memout_ca),
+                 .clkb(1'b0   ), .addrb('h0       ), .dinb('h0    ), .enb(1'b0              ), .web(1'b0   ), .doutb(         ) );    
+    MEM m_MEMCB( .clka(CCLK   ), .addra(cmr_addr  ), .dina(memin_0), .ena( cmr_field        ), .wea(cmr_wea), .douta(memout_cb),
+                 .clkb(1'b0   ), .addrb('h0       ), .dinb('h0    ), .enb(1'b0              ), .web(1'b0   ), .doutb(         ) );    
+
     // Dual Port SRAMには1 word = 1line分のデータを書き込む
-    MEM m_MEMA0( .clka(CCLK   ), .addra(cmr_addr  ), .dina(memin_0), .ena(~cmr_field        ), .wea(cmr_wea), .douta(memout_ca),
+    MEM m_MEMA0( .clka(CCLK   ), .addra(cmr_addr  ), .dina(memin_0), .ena(~cmr_field        ), .wea(cmr_wea), .douta(         ),
                  .clkb(VGA_CLK), .addrb(tmg_vcount), .dinb('h0    ), .enb(1'b1              ), .web(1'b0   ), .doutb(memout_0a) );    
-    MEM m_MEMB0( .clka(CCLK   ), .addra(cmr_addr  ), .dina(memin_0), .ena( cmr_field        ), .wea(cmr_web), .douta(memout_cb),
+    MEM m_MEMB0( .clka(CCLK   ), .addra(cmr_addr  ), .dina(memin_0), .ena( cmr_field        ), .wea(cmr_web), .douta(         ),
                  .clkb(VGA_CLK), .addrb(tmg_vcount), .dinb('h0    ), .enb(1'b1              ), .web(1'b0   ), .doutb(memout_0b) );    
 
     // for Raw Video out
@@ -236,10 +243,10 @@ module TOP #(
                  .clkb(VGA_CLK), .addrb(tmg_vcount), .dinb('h0    ), .enb(1'b1              ), .web(1'b0   ), .doutb(memout_4a) );    
     MEM m_MEMB4( .clka(CCLK   ), .addra(cl_row    ), .dina(memin_4), .ena( cmr_field        ), .wea(cmr_web), 
                  .clkb(VGA_CLK), .addrb(tmg_vcount), .dinb('h0    ), .enb(1'b1              ), .web(1'b0   ), .doutb(memout_4b) );    
-    MEM m_MEMA5( .clka(CCLK   ), .addra(cl_row    ), .dina(memin_5), .ena(~cmr_field        ), .wea(cmr_wea), 
-                 .clkb(VGA_CLK), .addrb(tmg_vcount), .dinb('h0    ), .enb(1'b1              ), .web(1'b0   ), .doutb(memout_5a) );    
-    MEM m_MEMB5( .clka(CCLK   ), .addra(cl_row    ), .dina(memin_5), .ena( cmr_field        ), .wea(cmr_web), 
-                 .clkb(VGA_CLK), .addrb(tmg_vcount), .dinb('h0    ), .enb(1'b1              ), .web(1'b0   ), .doutb(memout_5b) );    
+//    MEM m_MEMA5( .clka(CCLK   ), .addra(cl_row    ), .dina(memin_5), .ena(~cmr_field        ), .wea(cmr_wea), 
+//                 .clkb(VGA_CLK), .addrb(tmg_vcount), .dinb('h0    ), .enb(1'b1              ), .web(1'b0   ), .doutb(memout_5a) );    
+//    MEM m_MEMB5( .clka(CCLK   ), .addra(cl_row    ), .dina(memin_5), .ena( cmr_field        ), .wea(cmr_web), 
+//                 .clkb(VGA_CLK), .addrb(tmg_vcount), .dinb('h0    ), .enb(1'b1              ), .web(1'b0   ), .doutb(memout_5b) );    
 
     // for Meta-stable 
     CYCLE_DELAY #( .DATA_WIDTH(1), .DELAY(2) )    m_MEM_SEL_DLY2( .CLK(CCLK), .RST_N(RST_N), .iD(mem_sel), .oD(mem_sel_sync_cclk) );
@@ -358,11 +365,11 @@ module TOP #(
         .probe4(DATA_R),
         .probe5(pixel_vsync),
         .probe6(pixel_hsync),
-        .probe7(pixel_de),
+        .probe7(start_trig/*pixel_de*/),
         .probe8(cmr_vsync),
         .probe9(cmr_hsync),
         .probe10(cmr_de),
-        .probe11(memout_cx_en),
+        .probe11(mem_sel /*memout_cx_en*/),
         .probe12(grav_sel_en),
         .probe13(cmr_field/*busy*/),
         .probe14(UART_TXD),
