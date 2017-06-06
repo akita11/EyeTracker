@@ -163,7 +163,7 @@ module TOP #(
     CLctrl #( .ADDR_WIDTH(ADDR_WIDTH), .MDATA_WIDTH(640), .PIXEL_WIDTH(PIXEL_WIDTH) ) m_CLctrl ( .CCLK(CCLK), .RST_N(cclk_rst_n),
                                                 .iVSYNC(cmr_vsync), .iHSYNC(cmr_hsync), .iDE(cmr_de), .iDATA_L(cmr_data_l), .iDATA_R(cmr_data_r),
                                                 //
-                                                .iVGAout_mode(vgaout_mode), .iMEM_SEL(mem_sel_sync_cclk), .iTHRESHOLD(threshold),
+                                                .iVGAout_mode(vgaout_mode), .iMEM_SEL(cmr_field), .iTHRESHOLD(threshold),
                                                 .oWEA(wea), .oWEB(web), .oCL_ROW(cl_row),
                                                 .oMEMIN_0(memin_0), .oMEMIN_1(memin_1), .oMEMIN_2(memin_2), 
                                                 .oMEMIN_3(memin_3), .oMEMIN_4(memin_4), .oMEMIN_5(memin_5), 
@@ -211,7 +211,7 @@ module TOP #(
     assign  cmr_addr  = (grav_sel_en      ) ? grav_addr: cl_row;
     assign  cmr_wea   = (grav_sel_en      ) ? 1'b0     : wea;
     assign  cmr_web   = (grav_sel_en      ) ? 1'b0     : web;
-    assign  memout_cx = (mem_sel_sync_cclk) ? memout_ca: memout_cb;
+    assign  memout_cx = (cmr_field==1'b0  ) ? memout_ca: memout_cb;
 
     // Dual Port SRAMÇ…ÇÕ1 word = 1lineï™ÇÃÉfÅ[É^ÇèëÇ´çûÇﬁ
     MEM m_MEMA0( .clka(CCLK   ), .addra(cmr_addr  ), .dina(memin_0), .ena(~cmr_field        ), .wea(cmr_wea), .douta(memout_ca),
@@ -328,8 +328,8 @@ module TOP #(
 
     UART_IF m_UART_IF( .CLK(clk_uart_x8), .RST_N(RST_N),
                 .iSUM_S (sum_s ),
-                .iSUM_SX(sum_sy),
-                .iSUM_SY(sum_sx),
+                .iSUM_SX(sum_sx),
+                .iSUM_SY(sum_sy),
                 //
                 .iTRIG(start_trig),
                 //
