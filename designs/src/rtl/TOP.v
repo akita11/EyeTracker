@@ -217,7 +217,7 @@ module TOP #(
     // Dual Port SRAMには1 word = 1line分のデータを書き込む for GRAV_CALC
     MEM m_MEMCA( .clka(CCLK   ), .addra(cmr_addr  ), .dina(memin_0), .ena(~cmr_field        ), .wea(cmr_wea), .douta(memout_ca),
                  .clkb(1'b0   ), .addrb('h0       ), .dinb('h0    ), .enb(1'b0              ), .web(1'b0   ), .doutb(         ) );    
-    MEM m_MEMCB( .clka(CCLK   ), .addra(cmr_addr  ), .dina(memin_0), .ena( cmr_field        ), .wea(cmr_wea), .douta(memout_cb),
+    MEM m_MEMCB( .clka(CCLK   ), .addra(cmr_addr  ), .dina(memin_0), .ena( cmr_field        ), .wea(cmr_web), .douta(memout_cb),
                  .clkb(1'b0   ), .addrb('h0       ), .dinb('h0    ), .enb(1'b0              ), .web(1'b0   ), .doutb(         ) );    
 
     // Dual Port SRAMには1 word = 1line分のデータを書き込む
