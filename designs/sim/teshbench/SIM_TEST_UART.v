@@ -1,13 +1,13 @@
 // -----------------------------------------------------------------------------
-//  Title         : Simulation Top module
-//  Project       : EyeTracker
+//  Title         : Test for UART module
+//  Project       : Common Project
 // -----------------------------------------------------------------------------
-//  File          : SIM_TOP.v
+//  File          : SIM_TEST_UART.v
 //  Author        : K.Ishiwatari
-//  Created       : 2017/ 1/ 1
+//  Created       : 2017/ 4/ 2
 //  Last modified : 
 // -----------------------------------------------------------------------------
-//  Description   : Simulation Top module
+//  Description   : Test for UART module
 // -----------------------------------------------------------------------------
 //  Copyright (C) 2017 K.Ishiwatari All Rights Reserved.
 // -----------------------------------------------------------------------------
@@ -129,16 +129,12 @@ module  SIM_TOP();
         $finish;
     end
 
-    always begin
-        clk = 1'b1;
-        #(`CLOCK_PERIOD/2)  clk = 1'b0;
-        #(`CLOCK_PERIOD/2);
+    always #(`CLOCK_PERIOD/2) begin
+        clk <=  ~clk;
     end
 
-    always begin
-        cclk = 1'b1;
-        #(`CCLOCK_PERIOD/2) cclk = 1'b0;
-        #(`CCLOCK_PERIOD/2);
+    always #(`CCLOCK_PERIOD/2) begin
+        cclk <=  ~cclk;
     end
 
 endmodule

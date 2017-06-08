@@ -1,0 +1,243 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<wave_config>
+   <wave_state>
+   </wave_state>
+   <db_ref_list>
+      <db_ref path="SIM_TOP_behav.wdb" id="1">
+         <top_modules>
+            <top_module name="SIM_TOP" />
+            <top_module name="glbl" />
+         </top_modules>
+      </db_ref>
+   </db_ref_list>
+   <zoom_setting>
+      <ZoomStartTime time="12841816666666fs"></ZoomStartTime>
+      <ZoomEndTime time="12842816666667fs"></ZoomEndTime>
+      <Cursor1Time time="12842650000000fs"></Cursor1Time>
+   </zoom_setting>
+   <column_width_setting>
+      <NameColumnWidth column_width="175"></NameColumnWidth>
+      <ValueColumnWidth column_width="114"></ValueColumnWidth>
+   </column_width_setting>
+   <WVObjectSize size="55" />
+   <wvobject fp_name="/SIM_TOP/clk" type="logic">
+      <obj_property name="ElementShortName">clk</obj_property>
+      <obj_property name="ObjectShortName">clk</obj_property>
+   </wvobject>
+   <wvobject fp_name="/SIM_TOP/cclk" type="logic">
+      <obj_property name="ElementShortName">cclk</obj_property>
+      <obj_property name="ObjectShortName">cclk</obj_property>
+   </wvobject>
+   <wvobject fp_name="/SIM_TOP/resetn" type="logic">
+      <obj_property name="ElementShortName">resetn</obj_property>
+      <obj_property name="ObjectShortName">resetn</obj_property>
+   </wvobject>
+   <wvobject fp_name="/SIM_TOP/start_camera" type="logic">
+      <obj_property name="ElementShortName">start_camera</obj_property>
+      <obj_property name="ObjectShortName">start_camera</obj_property>
+   </wvobject>
+   <wvobject fp_name="/SIM_TOP/jp_set" type="array">
+      <obj_property name="ElementShortName">jp_set[7:0]</obj_property>
+      <obj_property name="ObjectShortName">jp_set[7:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/SIM_TOP/data_r" type="array">
+      <obj_property name="ElementShortName">data_r[7:0]</obj_property>
+      <obj_property name="ObjectShortName">data_r[7:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/SIM_TOP/data_l" type="array">
+      <obj_property name="ElementShortName">data_l[7:0]</obj_property>
+      <obj_property name="ObjectShortName">data_l[7:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/SIM_TOP/fval" type="logic">
+      <obj_property name="ElementShortName">fval</obj_property>
+      <obj_property name="ObjectShortName">fval</obj_property>
+   </wvobject>
+   <wvobject fp_name="/SIM_TOP/dval" type="logic">
+      <obj_property name="ElementShortName">dval</obj_property>
+      <obj_property name="ObjectShortName">dval</obj_property>
+   </wvobject>
+   <wvobject fp_name="/SIM_TOP/lval" type="logic">
+      <obj_property name="ElementShortName">lval</obj_property>
+      <obj_property name="ObjectShortName">lval</obj_property>
+   </wvobject>
+   <wvobject fp_name="/SIM_TOP/vga_clk" type="logic">
+      <obj_property name="ElementShortName">vga_clk</obj_property>
+      <obj_property name="ObjectShortName">vga_clk</obj_property>
+   </wvobject>
+   <wvobject fp_name="/SIM_TOP/vga_vsync" type="logic">
+      <obj_property name="ElementShortName">vga_vsync</obj_property>
+      <obj_property name="ObjectShortName">vga_vsync</obj_property>
+   </wvobject>
+   <wvobject fp_name="/SIM_TOP/vga_hsync" type="logic">
+      <obj_property name="ElementShortName">vga_hsync</obj_property>
+      <obj_property name="ObjectShortName">vga_hsync</obj_property>
+   </wvobject>
+   <wvobject fp_name="/SIM_TOP/vga_r" type="array">
+      <obj_property name="ElementShortName">vga_r[7:0]</obj_property>
+      <obj_property name="ObjectShortName">vga_r[7:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/SIM_TOP/vga_g" type="array">
+      <obj_property name="ElementShortName">vga_g[7:0]</obj_property>
+      <obj_property name="ObjectShortName">vga_g[7:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/SIM_TOP/vga_b" type="array">
+      <obj_property name="ElementShortName">vga_b[7:0]</obj_property>
+      <obj_property name="ObjectShortName">vga_b[7:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/SIM_TOP/i" type="array">
+      <obj_property name="ElementShortName">i[31:0]</obj_property>
+      <obj_property name="ObjectShortName">i[31:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/SIM_TOP/j" type="array">
+      <obj_property name="ElementShortName">j[31:0]</obj_property>
+      <obj_property name="ObjectShortName">j[31:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/SIM_TOP/l" type="array">
+      <obj_property name="ElementShortName">l[31:0]</obj_property>
+      <obj_property name="ObjectShortName">l[31:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/SIM_TOP/k" type="array">
+      <obj_property name="ElementShortName">k[31:0]</obj_property>
+      <obj_property name="ObjectShortName">k[31:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/SIM_TOP/HTOTAL" type="array">
+      <obj_property name="ElementShortName">HTOTAL[31:0]</obj_property>
+      <obj_property name="ObjectShortName">HTOTAL[31:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/SIM_TOP/VTOTAL" type="array">
+      <obj_property name="ElementShortName">VTOTAL[31:0]</obj_property>
+      <obj_property name="ObjectShortName">VTOTAL[31:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/SIM_TOP/HACTIVE" type="array">
+      <obj_property name="ElementShortName">HACTIVE[31:0]</obj_property>
+      <obj_property name="ObjectShortName">HACTIVE[31:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/SIM_TOP/VACTIVE" type="array">
+      <obj_property name="ElementShortName">VACTIVE[31:0]</obj_property>
+      <obj_property name="ObjectShortName">VACTIVE[31:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/SIM_TOP/PIXEL_WIDTH" type="array">
+      <obj_property name="ElementShortName">PIXEL_WIDTH[31:0]</obj_property>
+      <obj_property name="ObjectShortName">PIXEL_WIDTH[31:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/SIM_TOP/JP_WIDTH" type="array">
+      <obj_property name="ElementShortName">JP_WIDTH[31:0]</obj_property>
+      <obj_property name="ObjectShortName">JP_WIDTH[31:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/SIM_TOP/m_TOP/FVAL" type="logic">
+      <obj_property name="ElementShortName">FVAL</obj_property>
+      <obj_property name="ObjectShortName">FVAL</obj_property>
+   </wvobject>
+   <wvobject fp_name="/SIM_TOP/m_TOP/m_CALC_GRAVITY_Y/oSELECT_EN" type="logic">
+      <obj_property name="ElementShortName">oSELECT_EN</obj_property>
+      <obj_property name="ObjectShortName">oSELECT_EN</obj_property>
+   </wvobject>
+   <wvobject fp_name="/SIM_TOP/m_TOP/m_CALC_GRAVITY_Y/iDATA_EN" type="logic">
+      <obj_property name="ElementShortName">iDATA_EN</obj_property>
+      <obj_property name="ObjectShortName">iDATA_EN</obj_property>
+   </wvobject>
+   <wvobject fp_name="/SIM_TOP/m_TOP/m_CALC_GRAVITY_Y/state" type="array">
+      <obj_property name="ElementShortName">state[3:0]</obj_property>
+      <obj_property name="ObjectShortName">state[3:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/SIM_TOP/m_TOP/m_CALC_GRAVITY_Y/sum_s" type="array">
+      <obj_property name="ElementShortName">sum_s[19:0]</obj_property>
+      <obj_property name="ObjectShortName">sum_s[19:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/SIM_TOP/m_TOP/m_CALC_GRAVITY_Y/sum_sx" type="array">
+      <obj_property name="ElementShortName">sum_sx[27:0]</obj_property>
+      <obj_property name="ObjectShortName">sum_sx[27:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/SIM_TOP/m_TOP/m_CALC_GRAVITY_Y/sum_sy" type="array">
+      <obj_property name="ElementShortName">sum_sy[27:0]</obj_property>
+      <obj_property name="ObjectShortName">sum_sy[27:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/SIM_TOP/m_TOP/m_CALC_GRAVITY_Y/addr" type="array">
+      <obj_property name="ElementShortName">addr[10:0]</obj_property>
+      <obj_property name="ObjectShortName">addr[10:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/SIM_TOP/m_TOP/m_CALC_GRAVITY_Y/iMEMIN" type="array">
+      <obj_property name="ElementShortName">iMEMIN[639:0]</obj_property>
+      <obj_property name="ObjectShortName">iMEMIN[639:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/SIM_TOP/m_TOP/m_CALC_GRAVITY_Y/m_COUNT_HIGH_BIT/oCOUNT" type="array">
+      <obj_property name="ElementShortName">oCOUNT[10:0]</obj_property>
+      <obj_property name="ObjectShortName">oCOUNT[10:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/SIM_TOP/m_TOP/m_CALC_GRAVITY_Y/m_COUNT_HIGH_BIT/iBIT" type="array">
+      <obj_property name="ElementShortName">iBIT[639:0]</obj_property>
+      <obj_property name="ObjectShortName">iBIT[639:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/SIM_TOP/m_TOP/m_CALC_GRAVITY_Y/m_COUNT_HIGH_BIT/oCOUNT" type="array">
+      <obj_property name="ElementShortName">oCOUNT[10:0]</obj_property>
+      <obj_property name="ObjectShortName">oCOUNT[10:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/SIM_TOP/m_TOP/m_CALC_GRAVITY_Y/m_COUNT_HIGH_BIT/iBIT" type="array">
+      <obj_property name="ElementShortName">iBIT[639:0]</obj_property>
+      <obj_property name="ObjectShortName">iBIT[639:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/SIM_TOP/m_TOP/m_CALC_GRAVITY_Y/state" type="array">
+      <obj_property name="ElementShortName">state[3:0]</obj_property>
+      <obj_property name="ObjectShortName">state[3:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/SIM_TOP/m_TOP/m_CALC_GRAVITY_Y/count_val" type="array">
+      <obj_property name="ElementShortName">count_val[10:0]</obj_property>
+      <obj_property name="ObjectShortName">count_val[10:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/SIM_TOP/m_TOP/m_CALC_GRAVITY_Y/\inst_loop[10].m_SUM_UNIT /CLK" type="logic">
+      <obj_property name="ElementShortName">CLK</obj_property>
+      <obj_property name="ObjectShortName">CLK</obj_property>
+   </wvobject>
+   <wvobject fp_name="/SIM_TOP/m_TOP/m_CALC_GRAVITY_Y/\inst_loop[10].m_SUM_UNIT /RST_N" type="logic">
+      <obj_property name="ElementShortName">RST_N</obj_property>
+      <obj_property name="ObjectShortName">RST_N</obj_property>
+   </wvobject>
+   <wvobject fp_name="/SIM_TOP/m_TOP/m_CALC_GRAVITY_Y/\inst_loop[10].m_SUM_UNIT /iCLR" type="logic">
+      <obj_property name="ElementShortName">iCLR</obj_property>
+      <obj_property name="ObjectShortName">iCLR</obj_property>
+   </wvobject>
+   <wvobject fp_name="/SIM_TOP/m_TOP/m_CALC_GRAVITY_Y/\inst_loop[10].m_SUM_UNIT /iDATA_EN" type="logic">
+      <obj_property name="ElementShortName">iDATA_EN</obj_property>
+      <obj_property name="ObjectShortName">iDATA_EN</obj_property>
+   </wvobject>
+   <wvobject fp_name="/SIM_TOP/m_TOP/m_CALC_GRAVITY_Y/\inst_loop[10].m_SUM_UNIT /iFACTOR" type="array">
+      <obj_property name="ElementShortName">iFACTOR[9:0]</obj_property>
+      <obj_property name="ObjectShortName">iFACTOR[9:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/SIM_TOP/m_TOP/m_CALC_GRAVITY_Y/\inst_loop[10].m_SUM_UNIT /iD" type="array">
+      <obj_property name="ElementShortName">iD[0:0]</obj_property>
+      <obj_property name="ObjectShortName">iD[0:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/SIM_TOP/m_TOP/m_CALC_GRAVITY_Y/\inst_loop[10].m_SUM_UNIT /oD" type="array">
+      <obj_property name="ElementShortName">oD[19:0]</obj_property>
+      <obj_property name="ObjectShortName">oD[19:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/SIM_TOP/m_TOP/m_CALC_GRAVITY_Y/\inst_loop[10].m_SUM_UNIT /FACTOR_WIDTH" type="array">
+      <obj_property name="ElementShortName">FACTOR_WIDTH[31:0]</obj_property>
+      <obj_property name="ObjectShortName">FACTOR_WIDTH[31:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/SIM_TOP/m_TOP/m_CALC_GRAVITY_Y/\inst_loop[10].m_SUM_UNIT /IDATA_WIDTH" type="array">
+      <obj_property name="ElementShortName">IDATA_WIDTH[31:0]</obj_property>
+      <obj_property name="ObjectShortName">IDATA_WIDTH[31:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/SIM_TOP/m_TOP/m_CALC_GRAVITY_Y/\inst_loop[10].m_SUM_UNIT /ODATA_WIDTH" type="array">
+      <obj_property name="ElementShortName">ODATA_WIDTH[31:0]</obj_property>
+      <obj_property name="ObjectShortName">ODATA_WIDTH[31:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/SIM_TOP/m_TOP/m_CALC_GRAVITY_Y/pe[0]" type="array">
+      <obj_property name="ElementShortName">[0][19:0]</obj_property>
+      <obj_property name="ObjectShortName">[0][19:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/SIM_TOP/m_TOP/m_CALC_GRAVITY_Y/pe[10]" type="array">
+      <obj_property name="ElementShortName">[10][19:0]</obj_property>
+      <obj_property name="ObjectShortName">[10][19:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/SIM_TOP/m_TOP/UART_RXD" type="logic">
+      <obj_property name="ElementShortName">UART_RXD</obj_property>
+      <obj_property name="ObjectShortName">UART_RXD</obj_property>
+   </wvobject>
+   <wvobject fp_name="/SIM_TOP/m_TOP/UART_TXD" type="logic">
+      <obj_property name="ElementShortName">UART_TXD</obj_property>
+      <obj_property name="ObjectShortName">UART_TXD</obj_property>
+   </wvobject>
+</wave_config>

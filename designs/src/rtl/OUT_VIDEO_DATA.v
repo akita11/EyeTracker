@@ -21,15 +21,18 @@ module OUT_VIDEO_DATA #(
     input   wire                            CLK,
     input   wire                            RST_N,
     //
-    input   wire                            iHSYNC,
+    input   wire                            iVSYNC_POL,
+    input   wire                            iHSYNC_POL,
+    //
     input   wire                            iVSYNC,
+    input   wire                            iHSYNC,
     input   wire                            iDE,
     input   wire    [PIXEL_WIDTH -1: 0]     iR0,
     input   wire    [PIXEL_WIDTH -1: 0]     iG0,
     input   wire    [PIXEL_WIDTH -1: 0]     iB0,
     //
-    output  wire                            oHSYNC,
     output  wire                            oVSYNC,
+    output  wire                            oHSYNC,
     output  wire                            oDE,
     output  wire    [PIXEL_WIDTH -1: 0]     oR0,
     output  wire    [PIXEL_WIDTH -1: 0]     oG0,
@@ -45,8 +48,8 @@ module OUT_VIDEO_DATA #(
     reg             [PIXEL_WIDTH -1: 0]     b0;
 
     // 
-    assign  oHSYNC = hsync;
-    assign  oVSYNC = vsync;
+    assign  oVSYNC = vsync ^ iVSYNC_POL;
+    assign  oHSYNC = hsync ^ iHSYNC_POL;
     assign  oDE    = de;
     assign  oR0    = r0;
     assign  oG0    = g0;

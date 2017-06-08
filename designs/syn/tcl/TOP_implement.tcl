@@ -20,9 +20,11 @@
 set_property PULLUP   TRUE [get_ports RST_N]
 
 set_property PULLDOWN TRUE [get_ports [list DATA_L[*] DATA_R[*] FVAL DVAL LVAL CCLK]]
-set_property PULLUP   TRUE [get_ports [list JP[*]]]
+set_property PULLDOWN TRUE [get_ports [list JP[*]]]
 set_property PULLUP   TRUE [get_ports [list UART_RXD]]
-
+#
+#set_property PULLUP   TRUE [get_ports [list VGAOUT_MODE]]
+#
 set_property PULLDOWN TRUE [get_ports [list DUMMY0 DUMMY1]]
 
 # /* ----- I/O constraints ----- */
@@ -30,7 +32,9 @@ set_property IOSTANDARD LVCMOS33 [get_ports [list DATA_L[*] DATA_R[*] FVAL DVAL 
 set_property IOSTANDARD LVCMOS33 [get_ports [list VGA_R[*] VGA_G[*] VGA_B[*] VGA_HSYNC VGA_VSYNC VGA_CLK]]
 set_property IOSTANDARD LVCMOS33 [get_ports [list CLK RST_N]]
 set_property IOSTANDARD LVCMOS33 [get_ports [list JP[*] UART_RXD UART_TXD]]
-
+#
+set_property IOSTANDARD LVCMOS33 [get_ports [list VGAOUT_MODE]]
+#
 set_property IOSTANDARD LVCMOS18 [get_ports [list DUMMY0 DUMMY1]]
 
 set_property SLEW SLOW [get_ports [list VGA_R[*] VGA_G[*] VGA_B[*] VGA_HSYNC VGA_VSYNC VGA_CLK]]
@@ -106,8 +110,8 @@ set_property PACKAGE_PIN E17  [get_ports CLK]
 set_property PACKAGE_PIN K17  [get_ports RST_N]
 
 #
-set_property PACKAGE_PIN U17  [get_ports UART_TXD]
-set_property PACKAGE_PIN W16  [get_ports UART_RXD]
+set_property PACKAGE_PIN U17  [get_ports UART_RXD]
+set_property PACKAGE_PIN W16  [get_ports UART_TXD]
 
 #
 set_property PACKAGE_PIN AA18 [get_ports [list JP[0]]]
@@ -122,6 +126,10 @@ set_property PACKAGE_PIN AB16 [get_ports [list JP[7]]]
 #
 set_property PACKAGE_PIN Y11 [get_ports [list DUMMY0]]
 set_property PACKAGE_PIN Y12 [get_ports [list DUMMY1]]
+#
+# SW1[2]
+set_property PACKAGE_PIN T20 [get_ports [list VGAOUT_MODE]]
+#
 
 # /* ----- Misc. ----- */
 set_property CFGBVS VCCO [current_design]
