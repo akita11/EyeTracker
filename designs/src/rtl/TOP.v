@@ -118,13 +118,6 @@ module TOP #(
     wire    [PIXEL_WIDTH -1: 0]         pixel_g0;
     wire    [PIXEL_WIDTH -1: 0]         pixel_b0;
 
-    wire                                out_pixel_hsync;
-    wire                                out_pixel_vsync;
-    wire                                out_pixel_de;
-    wire    [PIXEL_WIDTH -1: 0]         out_pixel_r0;
-    wire    [PIXEL_WIDTH -1: 0]         out_pixel_g0;
-    wire    [PIXEL_WIDTH -1: 0]         out_pixel_b0;
-
     //
     wire    [SUM_S_WIDTH -1: 0]         sum_s;
     wire    [SUM_SX_WIDTH -1: 0]        sum_sx;
@@ -368,6 +361,10 @@ module TOP #(
                 .oDATA(uart_calc_data)
     );
 
+    //
+    assign  host_if_rd = eye_reg_rd;
+
+    //
     HOST_IF_CORE #( .ADDR_WIDTH(16), .FIFO_DATA_WIDTH(16*8) )   m_HOST_IF_CORE ( .CLK(CLK), .RST_N(RST_N),
                 // for Internal Bus
                 .oOUT_ADDR(host_if_addr ),
@@ -401,8 +398,8 @@ module TOP #(
                 .oRE_BIT(host_re_bit),
                 .oWD    (host_if_wd),
                 .iRD_EN (host_if_re),
-                .iRD    (eye_reg_rd)
-);
+                .iRD    (host_if_rd)
+            );
 
     EXPAND_SIGNAL #( .EXPAND_NUM(16) ) m_EXPAND_SIG_BUF_CLR ( .CLK(CLK), .RST_N(RST_N), .iS(buf_clr), .oS(buffer_clr) );
 
