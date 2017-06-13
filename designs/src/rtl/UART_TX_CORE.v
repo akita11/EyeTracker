@@ -38,6 +38,7 @@ module UART_TX_CORE #(
                     OUT_DATA                    = 4'b0010,
                     OUT_PARITY                  = 4'b0011,
                     STOP_BIT                    = 4'b0100;
+
     //
     localparam      STATE_WIDTH                 = 4;
     localparam      COUNTER_WIDTH               = 4;

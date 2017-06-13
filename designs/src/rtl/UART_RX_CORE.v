@@ -47,9 +47,6 @@ module UART_RX_CORE #(
     localparam      DATA_WIDTH                  = 8;
 
     //
-    wire                                        start_trig;
-
-    //
     reg     [STATE_WIDTH -1: 0]                 next_state, state;
     reg     [COUNTER_WIDTH -1: 0]               next_wait_count, wait_count;
     reg     [$clog2(OVER_SAMPLING): 0]          next_latch_count, latch_count;
@@ -210,15 +207,15 @@ module UART_RX_CORE #(
                                         next_data         <= data;
                                     end
                                 end else begin
-                                    next_state       <= IDLE_STATE;
+                                    next_state       <= state;
                                     //
                                     next_wait_count  <= wait_count;
                                     next_latch_count <= latch_count - 'h1;
                                     //
-                                    next_retry        <= 1'b0;
+                                    next_retry        <= retry;
                                     next_parity_error <= parity_error;
                                     //
-                                    next_de           <= 1'b0;
+                                    next_de           <= de;
                                     next_data         <= data;
                                 end
                             end
@@ -240,21 +237,27 @@ module UART_RX_CORE #(
     // 
     always @(posedge CLK or negedge RST_N) begin
         if (!RST_N) begin
-            state       <= IDLE_STATE;
+            state        <= IDLE_STATE;
             //
-            wait_count  <= 'h0;
-            latch_count <= 'h0;
+            wait_count   <= 'h0;
+            latch_count  <= 'h0;
             //
-            de          <= 1'b0;
-            data        <= 'h0;
+            retry        <= 1'b0;
+            parity_error <= 1'b0;
+            //
+            de           <= 1'b0;
+            data         <= 'h0;
         end else begin
-            state       <= next_state;
+            state        <= next_state;
             //
-            wait_count  <= next_wait_count;
-            latch_count <= next_latch_count;
+            wait_count   <= next_wait_count;
+            latch_count  <= next_latch_count;
             //
-            de          <= next_de;
-            data        <= next_data;
+            retry        <= next_retry;
+            parity_error <= next_parity_error;
+            //
+            de           <= next_de;
+            data         <= next_data;
         end
     end
 
