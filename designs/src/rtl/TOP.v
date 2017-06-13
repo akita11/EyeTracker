@@ -43,7 +43,6 @@ module TOP #(
     output  wire    [PIXEL_WIDTH -1: 0] VGA_R,
     output  wire    [PIXEL_WIDTH -1: 0] VGA_G,
     output  wire    [PIXEL_WIDTH -1: 0] VGA_B
-    ,input   wire                        VGAOUT_MODE
 );
     // parameter
     parameter   JP_WIDTH                = 8;
@@ -52,6 +51,14 @@ module TOP #(
     parameter   SUM_S_WIDTH             = 20;
     parameter   SUM_SX_WIDTH            = 28;
     parameter   SUM_SY_WIDTH            = 28;
+
+    //
+    parameter   HOST_ADDR_WIDTH         = 16;
+    parameter   HOST_WE_WIDTH           =  4;
+    parameter   HOST_RE_WIDTH           =  4;
+
+    //
+    parameter   MAX_BUF_SIZE            = 16;
 
     //
     parameter   DATA_WIDTH              = 8;
@@ -97,8 +104,6 @@ module TOP #(
     wire                                mem_sel;
     wire                                mem_sel_sync_cclk;
 
-    wire    [ADDR_WIDTH -1: 0]          vga_vcount;
-
     wire    [ADDR_WIDTH -1: 0]          tmg_hcount;
     wire    [ADDR_WIDTH -1: 0]          tmg_vcount;
 
@@ -131,7 +136,29 @@ module TOP #(
     wire                                clk_uart_x8;
 
     //
-    wire    [DATA_WIDTH -1: 0]          uart_data;
+    wire    [DATA_WIDTH -1: 0]          uart_inp_data;
+    wire    [DATA_WIDTH -1: 0]          uart_out_data;
+    wire    [DATA_WIDTH -1: 0]          uart_calc_data;
+    wire    [DATA_WIDTH -1: 0]          uart_host_data;
+
+    //
+    wire    [HOST_ADDR_WIDTH -1: 0]     host_if_addr;
+    wire                                host_if_we;
+    wire                                host_if_re;
+    wire    [DATA_WIDTH -1: 0]          host_if_wdata;
+    wire    [DATA_WIDTH -1: 0]          host_if_rdata;
+
+    //
+    wire    [HOST_WE_WIDTH -1: 0]       host_we_bit;
+    wire    [HOST_RE_WIDTH -1: 0]       host_re_bit;
+    wire    [DATA_WIDTH -1: 0]          host_if_wd;
+    wire    [DATA_WIDTH -1: 0]          host_if_rd;
+
+    //
+    wire    [DATA_WIDTH -1: 0]          eye_reg_rd;
+
+    //
+    wire    [MAX_BUF_SIZE * 8 -1: 0]    uart_rx_fifo;
 
     // Reset Signal
     wire                                cclk_rst_n;
@@ -144,11 +171,8 @@ module TOP #(
 
     // 
 //    assign  threshold = 8'h01;
-    assign  threshold = JP;
+//    assign  threshold = JP;
     // vgaout_mode:1=raw, 0=digitized
-//    assign  vgaout_mode = 1'b0;
-//    assign  vgaout_mode = 1'b1;
-    assign  vgaout_mode = VGAOUT_MODE;
 
 
     // Instance
@@ -171,7 +195,7 @@ module TOP #(
     );
 
     // Calc gravity
-    CALC_GRAVITY_Y #( .ADDR_WIDTH(10), .MDATA_WIDTH(640), .MAX_Y_ADDR(480), .PIXEL_WIDTH(8) ) 
+    CALC_GRAVITY_Y #( .ADDR_WIDTH(ADDR_WIDTH), .MDATA_WIDTH(640), .MAX_Y_ADDR(480), .PIXEL_WIDTH(8) ) 
                                                 m_CALC_GRAVITY_Y ( .CCLK(CCLK), .RST_N(cclk_rst_n),
                                                 //
                                                 .iVSYNC(cmr_vsync),
@@ -185,7 +209,7 @@ module TOP #(
                                                 // 
                                                 .oSELECT_EN(grav_sel_en),
                                                 //
-                                                .iBUSY(busy),
+                                                .iBUSY(uart_calc_busy),
                                                 //
                                                 .oSTART_TRIG(start_trig),
                                                 //
@@ -278,14 +302,6 @@ module TOP #(
                                     .oVGA_R(pixel_r0), .oVGA_G(pixel_g0), .oVGA_B(pixel_b0)
     );
 
-    // for high fanout issue
-    CYCLE_DELAY #( .DATA_WIDTH(1), .DELAY(1) )    m_PIXEL_HSYNC_DLY ( .CLK(VCLK), .RST_N(RST_N), .iD(pixel_hsync), .oD(out_pixel_hsync) );
-    CYCLE_DELAY #( .DATA_WIDTH(1), .DELAY(1) )    m_PIXEL_VSYNC_DLY ( .CLK(VCLK), .RST_N(RST_N), .iD(pixel_vsync), .oD(out_pixel_vsync) );
-    CYCLE_DELAY #( .DATA_WIDTH(1), .DELAY(1) )    m_PIXEL_DE_DLY    ( .CLK(VCLK), .RST_N(RST_N), .iD(pixel_de   ), .oD(out_pixel_de   ) );
-    CYCLE_DELAY #( .DATA_WIDTH(8), .DELAY(1) )    m_PIXEL_VGA_R_DLY ( .CLK(VCLK), .RST_N(RST_N), .iD(pixel_r0   ), .oD(out_pixel_r0   ) );
-    CYCLE_DELAY #( .DATA_WIDTH(8), .DELAY(1) )    m_PIXEL_VGA_G_DLY ( .CLK(VCLK), .RST_N(RST_N), .iD(pixel_g0   ), .oD(out_pixel_g0   ) );
-    CYCLE_DELAY #( .DATA_WIDTH(8), .DELAY(1) )    m_PIXEL_VGA_B_DLY ( .CLK(VCLK), .RST_N(RST_N), .iD(pixel_b0   ), .oD(out_pixel_b0   ) );
-
     //
     OUT_VIDEO_DATA #( .PIXEL_WIDTH(PIXEL_WIDTH) ) m_OUT_VIDEO_DATA(.CLK(VGA_CLK), .RST_N(RST_N), 
                                      .iVSYNC_POL(1'b0), .iHSYNC_POL(1'b0),
@@ -304,33 +320,37 @@ module TOP #(
     ASYNC_SYNC_RST  m_CCLK_RST_N    ( .CLK(CCLK   ), .RST_N(RST_N), .SYNC_RST_N(cclk_rst_n   ) );
     ASYNC_SYNC_RST  m_VGA_CLK_RST_N ( .CLK(VGA_CLK), .RST_N(RST_N), .SYNC_RST_N(vga_clk_rst_n) );
 
+    //
+    assign  uart_out_de   = (uart_sw) ? uart_host_de  : uart_calc_de;
+    assign  uart_out_data = (uart_sw) ? uart_host_data: uart_calc_data;
+
     // UART (temporal)
     UART_TX_CORE #( .OVER_SAMPLING(8) )    m_UART_TX_CORE( .CLK(clk_uart_x8), .RST_N(RST_N), 
-                .iSEVEN_BIT(1'b1),         // Low = 8bit,        High = 7bit
-                .iPARITY_EN(1'b0),         // Low = Non Parity,  High = Parity Enable
+                .iSEVEN_BIT (1'b1),        // Low = 8bit,        High = 7bit
+                .iPARITY_EN (1'b0),        // Low = Non Parity,  High = Parity Enable
                 .iODD_PARITY(1'b0),        // Low = Even Parity, High = Odd Parity
-                .iSTOP_BIT(1'b0),          // Low = 1bit,        High = 2bit
+                .iSTOP_BIT  (1'b0),        // Low = 1bit,        High = 2bit
                 //
-                .iDE(uart_de),
-                .iDATA(uart_data),
+                .iDE  (uart_out_de  ),
+                .iDATA(uart_out_data),
                 //
                 .oUART_TX_BUSY(tx_busy),
-                .oUART_TX(UART_TXD)
+                .oUART_TX     (UART_TXD)
     );
 
     UART_RX_CORE #( .OVER_SAMPLING(8) )    m_UART_RX_CORE ( .CLK(clk_uart_x8), .RST_N(RST_N),
-                .iSEVEN_BIT(1'b1),         // Low = 8bit,        High = 7bit
-                .iPARITY_EN(1'b0),         // Low = Non Parity,  High = Parity Enable
+                .iSEVEN_BIT (1'b1),        // Low = 8bit,        High = 7bit
+                .iPARITY_EN (1'b0),        // Low = Non Parity,  High = Parity Enable
                 .iODD_PARITY(1'b0),        // Low = Even Parity, High = Odd Parity
-                .iSTOP_BIT(1'b0),          // Low = 1bit,        High = 2bit
+                .iSTOP_BIT  (1'b0),        // Low = 1bit,        High = 2bit
                 //
                 .iUART_RX(UART_RXD),
                 //
-                .oRETRY(),
+                .oRETRY       (),
                 .oPARITY_ERROR(),
                 //
-                .oDE(),
-                .oDATA()
+                .oDE  (uart_inp_de  ),
+                .oDATA(uart_inp_data)
     );
 
     UART_IF m_UART_IF( .CLK(clk_uart_x8), .RST_N(RST_N),
@@ -342,11 +362,72 @@ module TOP #(
                 //
                 .iUART_TX_BUSY(tx_busy),
                 //
-                .oBUSY(busy),
+                .oBUSY(uart_calc_busy),
                 //
-                .oDE(uart_de),
-                .oDATA(uart_data)
+                .oDE  (uart_calc_de  ),
+                .oDATA(uart_calc_data)
     );
+
+    HOST_IF_CORE #( .ADDR_WIDTH(16), .FIFO_DATA_WIDTH(16*8) )   m_HOST_IF_CORE ( .CLK(CLK), .RST_N(RST_N),
+                // for Internal Bus
+                .oOUT_ADDR(host_if_addr ),
+                .oOUT_WE  (host_if_we   ),
+                .oOUT_RE  (host_if_re   ),
+                .oOUT_DATA(host_if_wdata),
+                .iRD      (host_if_rdata),
+                // from UART_RECEIVER_FIFO
+                .iDE        (uart_rx_fifo_int),
+                .iDATA      (uart_rx_fifo),
+                .oBUFFER_CLR(buf_clr),
+                //
+                .iUART_TX_BUSY(tx_busy),
+                //
+                .oBUSY(uart_host_busy),
+                //
+                .oDE  (uart_host_de  ),
+                .oDATA(uart_host_data)
+            );
+
+    REG_BUS_IF #( .ADDR_WDITH(16), .WE_WDITH(4), .RE_WDITH(4) )     m_REG_BUF_IF ( .CLK(CLK), .RST_N(RST_N),
+                // from/to HOST_IF
+                .iADDR (host_if_addr),
+                .iWE   (host_if_we),
+                .iRE   (host_if_re),
+                .iDATA (host_if_wdata),
+                .oRD_EN(host_if_rden),
+                .oRD   (host_if_rdata),
+                // from/to each REG module
+                .oWE_BIT(host_we_bit),
+                .oRE_BIT(host_re_bit),
+                .oWD    (host_if_wd),
+                .iRD_EN (host_if_re),
+                .iRD    (eye_reg_rd)
+);
+
+    EXPAND_SIGNAL #( .EXPAND_NUM(16) ) m_EXPAND_SIG_BUF_CLR ( .CLK(CLK), .RST_N(RST_N), .iS(buf_clr), .oS(buffer_clr) );
+
+    UART_RECEIVER_FIFO #( .BUFFER_SIZE(16) )    m_UART_RECEIVER_FIFO ( .CLK(clk_uart_x8), .RST_N(RST_N),
+                //
+                .iCLR (buffer_clr   ),
+                //
+                .iDE  (uart_inp_de  ),
+                .iDATA(uart_inp_data),
+                //
+                .oINT (uart_rx_fifo_int),
+                .oDATA(uart_rx_fifo)
+            );
+
+    EYE_TRACKER_REG     m_EYE_TRACKER_REG ( .CLK(CLK), .RST_N(RST_N),
+                // from/to HOST_IF
+                .iWE_BIT(host_we_bit), 
+                .iRE_BIT(host_re_bit), 
+                .iDATA  (host_if_wd ),
+                .oRD    (eye_reg_rd ),
+                //
+                .oUART_SW     (uart_sw    ),
+                .oVGA_OUT_MODE(vgaout_mode),
+                .oTHRESHOLD   (threshold  )
+            );
 
 
     // DUMMY pin
