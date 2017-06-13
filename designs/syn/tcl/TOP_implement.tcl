@@ -33,7 +33,7 @@ set_property IOSTANDARD LVCMOS33 [get_ports [list VGA_R[*] VGA_G[*] VGA_B[*] VGA
 set_property IOSTANDARD LVCMOS33 [get_ports [list CLK RST_N]]
 set_property IOSTANDARD LVCMOS33 [get_ports [list JP[*] UART_RXD UART_TXD]]
 #
-set_property IOSTANDARD LVCMOS33 [get_ports [list VGAOUT_MODE]]
+#set_property IOSTANDARD LVCMOS33 [get_ports [list VGAOUT_MODE]]
 #
 set_property IOSTANDARD LVCMOS18 [get_ports [list DUMMY0 DUMMY1]]
 
