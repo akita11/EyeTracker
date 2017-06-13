@@ -70,7 +70,7 @@ set_property IOSTANDARD LVCMOS33 [get_ports {{VGA_R[*]} {VGA_G[*]} {VGA_B[*]} VG
 set_property IOSTANDARD LVCMOS33 [get_ports CLK]
 set_property IOSTANDARD LVCMOS33 [get_ports RST_N]
 set_property IOSTANDARD LVCMOS33 [get_ports {{JP[*]} UART_RXD UART_TXD}]
-set_property IOSTANDARD LVCMOS33 [get_ports VGAOUT_MODE]
+#set_property IOSTANDARD LVCMOS33 [get_ports VGAOUT_MODE]
 set_property IOSTANDARD LVCMOS18 [get_ports DUMMY0]
 set_property IOSTANDARD LVCMOS18 [get_ports DUMMY1]
 set_property SLEW SLOW [get_ports {{VGA_R[*]} {VGA_G[*]} {VGA_B[*]} VGA_HSYNC VGA_VSYNC VGA_CLK}]

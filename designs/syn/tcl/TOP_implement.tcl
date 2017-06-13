@@ -128,7 +128,7 @@ set_property PACKAGE_PIN Y11 [get_ports [list DUMMY0]]
 set_property PACKAGE_PIN Y12 [get_ports [list DUMMY1]]
 #
 # SW1[2]
-set_property PACKAGE_PIN T20 [get_ports [list VGAOUT_MODE]]
+#set_property PACKAGE_PIN T20 [get_ports [list VGAOUT_MODE]]
 #
 
 # /* ----- Misc. ----- */
