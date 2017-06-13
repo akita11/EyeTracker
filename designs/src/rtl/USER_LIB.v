@@ -109,5 +109,65 @@ module DET_EDGE (
             dly <= iS;
         end
     end
+endmodule
+
+module EXPAND_SIGNAL #(
+    parameter   EXPAND_NUM = 1
+) (
+    input   wire                            CLK,
+    input   wire                            RST_N,
+    input   wire                            iS,
+    output  wire                            oS
+);
+
+    wire                                    start_trig;
+
+    reg     [$clog2(EXPAND_NUM): 0]         counter;
+    reg                                     sig;
+
+    //
+    assign  oS = sig;
+
+    // 
+    DET_EDGE m_DET_START_TRIG( .CLK(CLK), .RST_N(RST_N), .iS(iS), .oRISE(start_trig), .oFALL() );
+
+    //
+    always @(posedge CLK or negedge RST_N) begin
+        if (!RST_N) begin
+            counter <= 'h0;
+            sig     <= 1'b0;
+        end else if (start_trig) begin
+            counter <= EXPAND_NUM -'h1;
+            sig     <= 1'b1;
+        end else if (counter != 'h0) begin
+            counter <= counter -'h1;
+            sig     <= sig;
+        end else begin
+            counter <= 'h0;
+            sig     <= 1'b0;
+        end
+    end
+
+endmodule
+
+module DFF_REG #(
+    parameter   DATA_WIDTH = 1,
+    parameter   INIT_VAL   = 'h0
+) (
+    input   wire                            CLK,
+    input   wire                            RST_N,
+    input   wire                            iWE,
+    input   wire    [DATA_WIDTH -1: 0]      iD,
+    output  reg     [DATA_WIDTH -1: 0]      oD
+);
+
+    //
+    always @(posedge CLK or negedge RST_N) begin
+        if (!RST_N) begin
+            oD <= INIT_VAL;
+        end else begin
+            oD <= (iWE) ? iD: oD;
+        end
+    end
 
 endmodule
