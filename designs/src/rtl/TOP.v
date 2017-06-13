@@ -385,7 +385,7 @@ module TOP #(
                 .oDATA(uart_host_data)
             );
 
-    REG_BUS_IF #( .ADDR_WDITH(16), .WE_WDITH(4), .RE_WDITH(4) )     m_REG_BUF_IF ( .CLK(CLK), .RST_N(RST_N),
+    REG_BUS_IF #( .ADDR_WIDTH(16), .WE_WDITH(4), .RE_WDITH(4) )     m_REG_BUF_IF ( .CLK(CLK), .RST_N(RST_N),
                 // from/to HOST_IF
                 .iADDR (host_if_addr),
                 .iWE   (host_if_we),
