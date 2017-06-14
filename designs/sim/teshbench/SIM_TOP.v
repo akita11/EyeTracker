@@ -196,7 +196,7 @@ module  SIM_TOP();
         printk("0");
         printk("0");
         printk('h0A);
-        //
+        // EXP = 0x01
         repeat (10000) begin
             @(posedge clk);
         end
@@ -209,7 +209,7 @@ module  SIM_TOP();
         printk("0");
         printk("1");
         printk('h0A);
-        //
+        // EXP = 0x01
         repeat (10000) begin
             @(posedge clk);
         end
@@ -222,7 +222,7 @@ module  SIM_TOP();
         printk("0");
         printk("2");
         printk('h0A);
-        //
+        // EXP = 0x01
         repeat (10000) begin
             @(posedge clk);
         end
@@ -234,7 +234,7 @@ module  SIM_TOP();
         printk("w");
         printk("r");
         printk(" ");
-        printk("4");
+        printk("2");
         printk("0");
         printk("0");
         printk("2");
@@ -281,6 +281,26 @@ module  SIM_TOP();
         printk(" ");
         printk("0");
         printk("1");
+        printk('h0A);
+        //
+        repeat (10000) begin
+            @(posedge clk);
+        end
+        //
+        repeat (10000) begin
+            @(posedge clk);
+        end
+        //
+        printk("w");
+        printk("r");
+        printk(" ");
+        printk("0");
+        printk("0");
+        printk("0");
+        printk("2");
+        printk(" ");
+        printk("F");
+        printk("E");
         printk('h0A);
         //
         repeat (10000) begin
