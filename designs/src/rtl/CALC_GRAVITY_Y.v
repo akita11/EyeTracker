@@ -355,26 +355,37 @@ module CALC_GRAVITY_Y #(
         end
     end
 
-/*
-    DIV_28_20_SX    m_DIV_28_20_SX  (
-            .aclk(CCLK), .aclken(1'b1), .aresetn(RST_N),
-            .s_axis_divisor_tvalid(1'b1), .s_axis_divisor_tready(),
-            .s_axis_divisor_tdata({4'h0, sum_s}),
-            .s_axis_dividend_tvalid(1'b1), .s_axis_dividend_tready(),
-            .s_axis_dividend_tdata({4'h0, sum_sx}),
-            .m_axis_dout_tvalid(),
-            .m_axis_dout_tdata(div_sum_sx_sum_s)
+    //
+    MATH_DIV_CTRL   m_MATH_DIV_CTRL ( .CLK(CCLK), .RST_N(RST_N), 
+                                      .iDIVIDEND_TREADY(dividend_tready), .iDIVISOR_TREADY(divisor_tready), .iDOUT_TVALID(dout_tvalid),
+                                      //
+                                      .oDIVIDEND_TVALID(dividend_tvalid), .oDIVISOR_TVALID(divisor_tvalid)
             );
 
-    DIV_28_20_SY    m_DIV_28_20_SY  (
+    //
+/*
+    DIV_28_20   m_DIV_28_20_SX  (
             .aclk(CCLK), .aclken(1'b1), .aresetn(RST_N),
-            .s_axis_divisor_tvalid(1'b1), .s_axis_divisor_tready(),
-            .s_axis_divisor_tdata({4'h0, sum_s}),
-            .s_axis_dividend_tvalid(1'b1), .s_axis_dividend_tready(),
-            .s_axis_dividend_tdata({4'h0, sum_sy}),
-            .m_axis_dout_tvalid(),
-            .m_axis_dout_tdata(div_sum_sx_sum_s)
+            .s_axis_divisor_tvalid (divisor_tvalid), 
+            .s_axis_divisor_tready (divisor_tready),
+            .s_axis_divisor_tdata  ({4'h0, sum_s}),
+            .s_axis_dividend_tvalid(dividend_tvalid), 
+            .s_axis_dividend_tready(dividend_tready),
+            .s_axis_dividend_tdata ({4'h0, sum_sx}),
+            .m_axis_dout_tvalid    (dout_tvalid),
+            .m_axis_dout_tdata     (div_sum_sx_sum_s)
+            );
+
+    DIV_28_20   m_DIV_28_20_SY  (
+            .aclk(CCLK), .aclken(1'b1), .aresetn(RST_N),
+            .s_axis_divisor_tvalid (divisor_tvalid), 
+            .s_axis_divisor_tready (divisor_tready),
+            .s_axis_divisor_tdata  ({4'h0, sum_s}),
+            .s_axis_dividend_tvalid(dividend_tvalid), 
+            .s_axis_dividend_tready(dividend_tready),
+            .s_axis_dividend_tdata ({4'h0, sum_sy}),
+            .m_axis_dout_tvalid    (dout_tvalid),
+            .m_axis_dout_tdata     (div_sum_sx_sum_s)
             );
 */
-
 endmodule
