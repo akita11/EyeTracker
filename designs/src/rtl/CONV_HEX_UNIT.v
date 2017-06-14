@@ -20,6 +20,7 @@ module CONV_HEX_UNIT (
     //
     input   wire    [DATA_WIDTH * 2 -1: 0]  iD,
     //
+    output  reg                             oDEC_ERR,
     output  reg     [DATA_WIDTH     -1: 0]  oD
 );
     //
@@ -28,15 +29,20 @@ module CONV_HEX_UNIT (
     //
     always @(posedge CLK or negedge RST_N) begin
         if (!RST_N) begin
-            oD <= 'h0;
+            oDEC_ERR <= 1'b0;
+            oD       <= 'h0;
         end else if ((iD >= "0") && (iD <= "9")) begin
-            oD <= iD - "0";
+            oDEC_ERR <= 1'b0;
+            oD       <= iD - "0";
         end else if ((iD >= "A") && (iD <= "F")) begin
-            oD <= iD - "A" + 'hA;
+            oDEC_ERR <= 1'b0;
+            oD       <= iD - "A" + 'hA;
         end else if ((iD >= "a") && (iD <= "f")) begin
-            oD <= iD - "a" + 'hA;
+            oDEC_ERR <= 1'b0;
+            oD       <= iD - "a" + 'hA;
         end else begin
-            oD <= 'h0;
+            oDEC_ERR <= 1'b1;
+            oD       <= 'h0;
         end
     end
 

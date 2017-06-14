@@ -22,8 +22,15 @@ module CONV_HEX #(
     //
     input   wire    [CHAR_NUM * 8 -1 : 0]       iASCII,
     //
+    output  wire                                oDEC_ERR,
     output  wire    [CHAR_NUM * 4 -1 : 0]       oDATA
 );
+
+    //
+    wire    [CHAR_NUM -1 :0]                    dec_err;
+
+    //
+    assign  oDEC_ERR = |dec_err;
 
     //
     generate
@@ -35,6 +42,7 @@ module CONV_HEX #(
                 //
                 .iD(iASCII[i*8+7:i*8]), 
                 //
+                .oDEC_ERR(dec_err[i]),
                 .oD(oDATA[i*4+3:i*4])
             );
         end
