@@ -401,7 +401,7 @@ module TOP #(
                 .iRD    (host_if_rd)
             );
 
-    EXPAND_SIGNAL #( .EXPAND_NUM(16) ) m_EXPAND_SIG_BUF_CLR ( .CLK(CLK), .RST_N(RST_N), .iS(buf_clr), .oS(buffer_clr) );
+    EXPAND_SIGNAL #( .EXPAND_NUM(27) ) m_EXPAND_SIG_BUF_CLR ( .CLK(CLK), .RST_N(RST_N), .iS(buf_clr), .oS(buffer_clr) );
 
     UART_RECEIVER_FIFO #( .BUFFER_SIZE(16) )    m_UART_RECEIVER_FIFO ( .CLK(clk_uart_x8), .RST_N(RST_N),
                 //
