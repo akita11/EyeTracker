@@ -82,6 +82,7 @@ module HOST_IF_CORE #(
     wire    [DATA_WIDTH * 4 -1 : 0]             inp_addr_str;
     wire    [DATA_WIDTH * 1 -1 : 0]             inp_sepa_str;
     wire    [DATA_WIDTH * 2 -1 : 0]             inp_data_str;
+    wire    [DATA_WIDTH * 1 -1 : 0]             inp_sep2_str;
 
     wire    [HOLD_DATA_WIDTH -1: 0]             ok_msg_str;
     wire    [HOLD_DATA_WIDTH -1: 0]             ng_msg_str;
@@ -142,6 +143,7 @@ module HOST_IF_CORE #(
     assign  inp_addr_str = { iDATA[31:24], iDATA[39:32], iDATA[47:40], iDATA[55:48] };
     assign  inp_sepa_str = { iDATA[63:56] };
     assign  inp_data_str = { iDATA[71:64], iDATA[79:72] };
+    assign  inp_sep2_str = { iDATA[79:72] };
 
     //
 //    assign  ok_msg_str = { 8'h00, 8'h00, 8'h00, 8'h00,                     8'h00, 8'h0A, 8'h0D, "K", "O" };
@@ -153,8 +155,8 @@ module HOST_IF_CORE #(
     assign  null_str   = { 8'h00, 8'h00, 8'h00, 8'h00,           8'h00,           8'h00, 8'h00, 8'h00, 8'h00 };
 
     //
-    CONV_HEX #( .CHAR_NUM(4) ) m_CONV_HEX_ADDR ( .CLK(CLK), .RST_N(RST_N), .iASCII(inp_addr_str), .oDATA(inp_addr) );
-    CONV_HEX #( .CHAR_NUM(2) ) m_CONV_HEX_DATA ( .CLK(CLK), .RST_N(RST_N), .iASCII(inp_data_str), .oDATA(inp_data) );
+    CONV_HEX #( .CHAR_NUM(4) ) m_CONV_HEX_ADDR ( .CLK(CLK), .RST_N(RST_N), .iASCII(inp_addr_str), .oDEC_ERR(), .oDATA(inp_addr) );
+    CONV_HEX #( .CHAR_NUM(2) ) m_CONV_HEX_DATA ( .CLK(CLK), .RST_N(RST_N), .iASCII(inp_data_str), .oDEC_ERR(), .oDATA(inp_data) );
 
     //
     CONV_ASCII #( .DATA_WIDTH(8) ) m_CONV_ASCII_RD ( .CLK(CLK), .RST_N(RST_N), .iDATA(iRD), .oASCII(rd_ascii) );
@@ -194,10 +196,10 @@ module HOST_IF_CORE #(
                                     next_uart_de    <= 1'h0;
                                     next_uart_data  <= 'hFF;
                                     next_hold_data  <= null_str;
-                                end else if ((inp_cmd_3w == "rd ") || (inp_cmd_3w == "RD ")) begin
+                                end else if (((inp_cmd_3w == "rd ") || (inp_cmd_3w == "RD ")) && (inp_sepa_str == 8'h0A)) begin
                                     next_state      <= RD_ACCESS;
-                                    //
-                                    next_wait_count <= 'h2 - 'h1;
+                                    // Need 4[cycle] to get correct read data.
+                                    next_wait_count <= 'h4 - 'h1;
                                     //
                                     next_buf_clr    <= 1'b0;
                                     //
@@ -209,7 +211,7 @@ module HOST_IF_CORE #(
                                     next_uart_de    <= uart_de;
                                     next_uart_data  <= uart_data;
                                     next_hold_data  <= ok_msg_str;
-                                end else if ((inp_cmd_3w == "wr ") || (inp_cmd_3w == "WR ")) begin
+                                end else if (((inp_cmd_3w == "wr ") || (inp_cmd_3w == "WR ")) && (inp_sepa_str == " ") && (inp_sep2_str == 8'h0A)) begin
                                     next_state      <= WR_ACCESS;
                                     //
                                     next_wait_count <= 'h0;
