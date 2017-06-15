@@ -273,7 +273,8 @@ module TOP #(
                                    .iHTOTAL(800), .iHACT(640), .iHS_WIDTH(96), .iHS_BP(48),
                                    .iVTOTAL(525), .iVACT(480), .iVS_WIDTH( 2), .iVS_BP(33),
                                    .oHSYNC(tmg_hsync), .oVSYNC(tmg_vsync), .oDE(tmg_de), .oFIELD(mem_sel), 
-                                   .oHCOUNT(tmg_hcount), .oVCOUNT(tmg_vcount)
+                                   .oHTCOUNT(), .oVTCOUNT(),
+                                   .oHDCOUNT(tmg_hcount), .oVDCOUNT(tmg_vcount)
     );
 
     //
