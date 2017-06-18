@@ -54,8 +54,8 @@ module TOP #(
 
     //
     parameter   HOST_ADDR_WIDTH         = 16;
-    parameter   HOST_WE_WIDTH           =  4;
-    parameter   HOST_RE_WIDTH           =  4;
+    parameter   HOST_WE_WIDTH           = 24;
+    parameter   HOST_RE_WIDTH           = 24;
 
     //
     parameter   MAX_BUF_SIZE            = 16;
@@ -122,6 +122,8 @@ module TOP #(
     wire    [SUM_S_WIDTH -1: 0]         sum_s;
     wire    [SUM_SX_WIDTH -1: 0]        sum_sx;
     wire    [SUM_SY_WIDTH -1: 0]        sum_sy;
+    wire    [SUM_SX_WIDTH -1: 0]        quotient_sx;
+    wire    [SUM_SY_WIDTH -1: 0]        quotient_sy;
 
     wire    [4 -1: 0]                   calc_state;
 
@@ -209,6 +211,8 @@ module TOP #(
                                                 .oSUM_S (sum_s ),
                                                 .oSUM_SX(sum_sx),
                                                 .oSUM_SY(sum_sy),
+                                                .oQUOTIENT_SX(quotient_sx),
+                                                .oQUOTIENT_SY(quotient_sy),
                                                 // Debug
                                                 .oSTATE(calc_state)
     );
@@ -287,10 +291,11 @@ module TOP #(
                                     .iMEMOUT_3(memout_3x), .iMEMOUT_4(memout_4x), .iMEMOUT_5(memout_5x),
                                     //
                                     .iVGAout_mode(vgaout_mode),
+                                    .iCURSOR_EN  (cursor_en  ),
                                     // iVGAout_mode:1=raw, 0=digitized
                                     //
                                     //
-                                    .iPOINT_X('h100), .iPOINT_Y('h100),
+                                    .iPOINT_X(quotient_sx[10 -1: 0]), .iPOINT_Y(quotient_sy[10 -1: 0]),
                                     //
                                     .oVGA_HSYNC(pixel_hsync), .oVGA_VSYNC(pixel_vsync), .oVGA_DE(pixel_de),
                                     .oVGA_R(pixel_r0), .oVGA_G(pixel_g0), .oVGA_B(pixel_b0)
@@ -422,9 +427,13 @@ module TOP #(
                 .iDATA  (host_if_wd ),
                 .oRD    (eye_reg_rd ),
                 //
+                .iQUOTIENT_SX(quotient_sx),
+                .iQUOTIENT_SY(quotient_sy),
+                //
                 .oUART_SW     (uart_sw    ),
                 .oVGA_OUT_MODE(vgaout_mode),
-                .oTHRESHOLD   (threshold  )
+                .oTHRESHOLD   (threshold  ),
+                .oCURSOR_EN   (cursor_en  )
             );
 
 
