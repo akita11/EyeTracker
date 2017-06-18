@@ -143,7 +143,7 @@ module HOST_IF_CORE #(
     assign  inp_addr_str = { iDATA[31:24], iDATA[39:32], iDATA[47:40], iDATA[55:48] };
     assign  inp_sepa_str = { iDATA[63:56] };
     assign  inp_data_str = { iDATA[71:64], iDATA[79:72] };
-    assign  inp_sep2_str = { iDATA[79:72] };
+    assign  inp_sep2_str = { iDATA[87:80] };
 
     //
 //    assign  ok_msg_str = { 8'h00, 8'h00, 8'h00, 8'h00,                     8'h00, 8'h0A, 8'h0D, "K", "O" };
