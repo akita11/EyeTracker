@@ -55,6 +55,8 @@ module  SIM_TOP();
     //
     reg                                 tx_inp_de;
     reg     [DATA_WIDTH -1: 0]          tx_inp_data;
+    wire                                rx_out_de;
+    wire    [DATA_WIDTH -1: 0]          rx_out_data;
     //
     integer                             i, j, l, k;
     //
@@ -93,8 +95,8 @@ module  SIM_TOP();
                                       .oRETRY       (),
                                       .oPARITY_ERROR(),
                                       //
-                                      .oDE  (),
-                                      .oDATA()
+                                      .oDE  (rx_out_de),
+                                      .oDATA(rx_out_data)
                                     );
 
     // Simulation control
@@ -327,6 +329,8 @@ module  SIM_TOP();
         begin
             tx_inp_de   <= 1'b1;
             tx_inp_data <= data;
+            //
+            $display("[UART Tx] %s",tx_inp_data);
             repeat (16) begin
                @(posedge uart_clk);
             end
@@ -341,5 +345,12 @@ module  SIM_TOP();
             end
         end
     endtask
+
+    //
+    always begin
+        @(posedge rx_out_de);
+        #1
+        $display("[UART Rx] %s",rx_out_data);
+    end
 
 endmodule
