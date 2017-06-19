@@ -38,6 +38,7 @@ module CALC_GRAVITY_Y #(
     input   wire                                        iBUSY,
     //
     output  wire                                        oSTART_TRIG,
+    output  wire                                        oSTART_Q_TRIG,
     //
     output  wire    [SUM_S_WIDTH -1: 0]                 oSUM_S,
     output  wire    [SUM_SX_WIDTH -1: 0]                oSUM_SX,
@@ -378,6 +379,9 @@ module CALC_GRAVITY_Y #(
                                                                    .iWE(divid_sy_load_en), .iD(div_sum_sy_sum_s[48:41]), .oD(oQUOTIENT_SY[23:16]) );
     DFF_REG #( .DATA_WIDTH(4), .INIT_VAL(8'h00) ) m_DIVIDED_SY_H ( .CLK(CCLK), .RST_N(RST_N), 
                                                                    .iWE(divid_sy_load_en), .iD(div_sum_sy_sum_s[52:49]), .oD(oQUOTIENT_SY[27:24]) );
+    //
+    DFF #( .DATA_WIDTH(1) ) m_START_Q_TRIG ( .CLK(CCLK), .RST_N(RST_N), 
+                                             .iD(divid_sx_load_en | divid_sy_load_en), .oD(oSTART_Q_TRIG) );
 
     //
     MATH_DIV_CTRL   m_MATH_DIV_SX_CTRL ( .CLK(CCLK), .RST_N(RST_N), 

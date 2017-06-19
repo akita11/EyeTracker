@@ -125,6 +125,12 @@ module TOP #(
     wire    [SUM_SX_WIDTH -1: 0]        quotient_sx;
     wire    [SUM_SY_WIDTH -1: 0]        quotient_sy;
 
+    wire                                start_trig;
+    wire                                start_q_trig;
+    wire                                uart_start_trig;
+
+    wire                                out_sel;
+
     wire    [4 -1: 0]                   calc_state;
 
     //
@@ -206,7 +212,8 @@ module TOP #(
                                                 //
                                                 .iBUSY(uart_calc_busy),
                                                 //
-                                                .oSTART_TRIG(start_trig),
+                                                .oSTART_TRIG  (start_trig  ),
+                                                .oSTART_Q_TRIG(start_q_trig),
                                                 //
                                                 .oSUM_S (sum_s ),
                                                 .oSUM_SX(sum_sx),
@@ -352,12 +359,18 @@ module TOP #(
                 .oDATA(uart_inp_data)
     );
 
+    assign  uart_start_trig = (out_sel==1'b1) ? start_q_trig: start_trig;
+
     UART_IF m_UART_IF( .CLK(clk_uart_x8), .RST_N(RST_N),
+                .iOUT_SEL(out_sel),
+                //
                 .iSUM_S (sum_s ),
                 .iSUM_SX(sum_sx),
                 .iSUM_SY(sum_sy),
+                .iQUOTIENT_SX(quotient_sx),
+                .iQUOTIENT_SY(quotient_sy),
                 //
-                .iTRIG(start_trig),
+                .iTRIG(uart_start_trig),
                 //
                 .iUART_TX_BUSY(tx_busy),
                 //
@@ -391,7 +404,7 @@ module TOP #(
                 .oDATA(uart_host_data)
             );
 
-    REG_BUS_IF #( .ADDR_WIDTH(16), .WE_WIDTH(4), .RE_WIDTH(4) )     m_REG_BUF_IF ( .CLK(CLK), .RST_N(RST_N),
+    REG_BUS_IF #( .ADDR_WIDTH(16), .WE_WIDTH(24), .RE_WIDTH(24) )     m_REG_BUF_IF ( .CLK(CLK), .RST_N(RST_N),
                 // from/to HOST_IF
                 .iADDR (host_if_addr),
                 .iWE   (host_if_we),
@@ -427,13 +440,20 @@ module TOP #(
                 .iDATA  (host_if_wd ),
                 .oRD    (eye_reg_rd ),
                 //
+                .iFVSYNC(cmr_vsync),
+                .iRVSYNC(tmg_vsync),
+                //
+                .iSUM_S (sum_s ),
+                .iSUM_SX(sum_sx),
+                .iSUM_SY(sum_sy),
                 .iQUOTIENT_SX(quotient_sx),
                 .iQUOTIENT_SY(quotient_sy),
                 //
                 .oUART_SW     (uart_sw    ),
                 .oVGA_OUT_MODE(vgaout_mode),
                 .oTHRESHOLD   (threshold  ),
-                .oCURSOR_EN   (cursor_en  )
+                .oCURSOR_EN   (cursor_en  ),
+                .oOUT_SEL     (out_sel    )
             );
 
 

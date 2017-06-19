@@ -19,9 +19,13 @@ module UART_IF #(
     input   wire                                CLK,
     input   wire                                RST_N,
     //
+    input   wire                                iOUT_SEL,
+    //
     input   wire    [SUM_S_WIDTH -1: 0]         iSUM_S,
     input   wire    [SUM_SX_WIDTH -1: 0]        iSUM_SX,
     input   wire    [SUM_SY_WIDTH -1: 0]        iSUM_SY,
+    input   wire    [SUM_SX_WIDTH -1: 0]        iQUOTIENT_SX,
+    input   wire    [SUM_SY_WIDTH -1: 0]        iQUOTIENT_SY,
     //
     input   wire                                iTRIG,
     //
@@ -34,22 +38,28 @@ module UART_IF #(
 );
 
     // 
-    localparam      IDLE_STATE                  = 4'b0000,
-                    PRE_S                       = 4'b0001,
-                    OUT_S                       = 4'b0010,
-                    WAIT_S                      = 4'b0011,
-                    PRE_SX                      = 4'b0100,
-                    OUT_SX                      = 4'b0101,
-                    WAIT_SX                     = 4'b0110,
-                    PRE_SY                      = 4'b0111,
-                    OUT_SY                      = 4'b1000,
-                    WAIT_SY                     = 4'b1001,
-                    PRE_LF                      = 4'b1010,
-                    OUT_LF                      = 4'b1011,
-                    WAIT_LF                     = 4'b1100;
+    localparam      IDLE_STATE                  = 5'b0_0000,
+                    PRE_S                       = 5'b0_0001,
+                    OUT_S                       = 5'b0_0010,
+                    WAIT_S                      = 5'b0_0011,
+                    PRE_SX                      = 5'b0_0100,
+                    OUT_SX                      = 5'b0_0101,
+                    WAIT_SX                     = 5'b0_0110,
+                    PRE_SY                      = 5'b0_0111,
+                    OUT_SY                      = 5'b0_1000,
+                    WAIT_SY                     = 5'b0_1001,
+                    PRE_QSX                     = 5'b0_1010,
+                    OUT_QSX                     = 5'b0_1011,
+                    WAIT_QSX                    = 5'b0_1100,
+                    PRE_QSY                     = 5'b0_1101,
+                    OUT_QSY                     = 5'b0_1110,
+                    WAIT_QSY                    = 5'b0_1111,
+                    PRE_LF                      = 5'b1_0000,
+                    OUT_LF                      = 5'b1_0001,
+                    WAIT_LF                     = 5'b1_0010;
 
     //
-    localparam      STATE_WIDTH                 = 4;
+    localparam      STATE_WIDTH                 = 5;
     localparam      COUNTER_WIDTH               = 4;
     localparam      DATA_WIDTH                  = 8;
 
@@ -68,6 +78,8 @@ module UART_IF #(
     wire    [SUM_S_WIDTH * 2 -1: 0]             ascii_s;
     wire    [SUM_SX_WIDTH * 2 -1: 0]            ascii_sx;
     wire    [SUM_SY_WIDTH * 2 -1: 0]            ascii_sy;
+    wire    [SUM_SX_WIDTH * 2 -1: 0]            ascii_qsx;
+    wire    [SUM_SY_WIDTH * 2 -1: 0]            ascii_qsy;
 
     //
     reg     [STATE_WIDTH -1: 0]                 next_state, state;
@@ -89,9 +101,11 @@ module UART_IF #(
     DET_EDGE m_DET_BUSY_EDGE( .CLK(CLK), .RST_N(RST_N), .iS(iUART_TX_BUSY), .oRISE(rise_busy), .oFALL(fall_busy) );
 
     //
-    CONV_ASCII #( .DATA_WIDTH(20) ) m_CONV_ASCII_S  ( .CLK(CLK), .RST_N(RST_N), .iDATA(iSUM_S ), .oASCII(ascii_s ) );
-    CONV_ASCII #( .DATA_WIDTH(28) ) m_CONV_ASCII_SX ( .CLK(CLK), .RST_N(RST_N), .iDATA(iSUM_SX), .oASCII(ascii_sx) );
-    CONV_ASCII #( .DATA_WIDTH(28) ) m_CONV_ASCII_SY ( .CLK(CLK), .RST_N(RST_N), .iDATA(iSUM_SY), .oASCII(ascii_sy) );
+    CONV_ASCII #( .DATA_WIDTH(20) ) m_CONV_ASCII_S   ( .CLK(CLK), .RST_N(RST_N), .iDATA(iSUM_S      ), .oASCII(ascii_s  ) );
+    CONV_ASCII #( .DATA_WIDTH(28) ) m_CONV_ASCII_SX  ( .CLK(CLK), .RST_N(RST_N), .iDATA(iSUM_SX     ), .oASCII(ascii_sx ) );
+    CONV_ASCII #( .DATA_WIDTH(28) ) m_CONV_ASCII_SY  ( .CLK(CLK), .RST_N(RST_N), .iDATA(iSUM_SY     ), .oASCII(ascii_sy ) );
+    CONV_ASCII #( .DATA_WIDTH(28) ) m_CONV_ASCII_QSX ( .CLK(CLK), .RST_N(RST_N), .iDATA(iQUOTIENT_SX), .oASCII(ascii_qsx) );
+    CONV_ASCII #( .DATA_WIDTH(28) ) m_CONV_ASCII_QSY ( .CLK(CLK), .RST_N(RST_N), .iDATA(iQUOTIENT_SY), .oASCII(ascii_qsy) );
 
     //
     always @(*) begin
@@ -167,15 +181,14 @@ module UART_IF #(
                                 next_hold_data  <= hold_data;
                             end else begin
                                 if (wait_count == 'h0) begin
-
-                                    next_state      <= PRE_SX;
+                                    next_state      <= (iOUT_SEL==1'b1) ? PRE_QSX: PRE_SX;
                                     //
                                     next_wait_count <= 'h0;
                                     //
                                     next_com_out_en <= 1'b0;
                                     next_out_data   <= out_data;
                                     //
-                                    next_hold_data  <= ascii_sx;
+                                    next_hold_data  <= (iOUT_SEL==1'b1) ? ascii_qsx: ascii_sx;
                                 end else begin
                                     next_state      <= OUT_S;
                                     //
@@ -313,6 +326,143 @@ module UART_IF #(
                                     next_busy       <= 1'b1;
                                 end else begin
                                     next_state      <= OUT_SY;
+                                    //
+                                    next_wait_count <= wait_count - 'h1;
+                                    //
+                                    next_com_out_en <= 1'b1;
+                                    next_out_data   <= hold_data[HOLD_DATA_WIDTH - 1: HOLD_DATA_WIDTH - 1 - 7];
+                                    //
+                                    next_hold_data  <= { hold_data[HOLD_DATA_WIDTH - 1 - 8: 0], 8'h0 };
+                                    //
+                                    next_busy       <= 1'b1;
+                                end
+                            end
+                        end
+            PRE_QSX:    begin
+                            next_state      <= OUT_QSX;
+                            //
+                            next_wait_count <= 'h7 - 'h1;
+                            //
+                            next_com_out_en <= 1'b1;
+                            next_out_data   <= hold_data[HOLD_DATA_WIDTH - 1: HOLD_DATA_WIDTH -1 - 7];
+                            //
+                            next_hold_data  <= { hold_data[HOLD_DATA_WIDTH - 1 - 8: 0], 8'h0 };
+                            //
+                            next_busy       <= 1'b1;
+                        end
+            OUT_QSX:    begin
+                            //
+                            next_wait_count <= wait_count;
+                            //
+                            next_out_data   <= out_data;
+                            //
+                            next_hold_data  <= hold_data;
+                            //
+                            next_busy       <= 1'b1;
+                            //
+                            if (rise_busy) begin
+                                next_state      <= WAIT_QSX;
+                                //
+                                next_com_out_en <= 1'b0;
+                            end else begin
+                                next_state      <= state;
+                                //
+                                next_com_out_en <= 1'b1;
+                            end
+                        end
+            WAIT_QSX:   begin
+                            next_busy       <= 1'b1;
+                            //
+                            if (iUART_TX_BUSY) begin
+                                next_state      <= state;
+                                //
+                                next_wait_count <= wait_count;
+                                //
+                                next_com_out_en <= 1'b0;
+                                next_out_data   <= out_data;
+                                //
+                                next_hold_data  <= hold_data;
+                            end else begin
+                                if (wait_count == 'h0) begin
+                                    next_state      <= PRE_QSY;
+                                    //
+                                    next_wait_count <= 'h0;
+                                    //
+                                    next_com_out_en <= 1'b0;
+                                    next_out_data   <= out_data;
+                                    //
+                                    next_hold_data  <= ascii_qsy;
+                                end else begin
+                                    next_state      <= OUT_QSX;
+                                    //
+                                    next_wait_count <= wait_count - 'h1;
+                                    //
+                                    next_com_out_en <= 1'b1;
+                                    next_out_data   <= hold_data[HOLD_DATA_WIDTH - 1: HOLD_DATA_WIDTH - 1 - 7];
+                                    //
+                                    next_hold_data  <= { hold_data[HOLD_DATA_WIDTH - 1 - 8: 0], 8'h0 };
+                                end
+                            end
+                        end
+            PRE_QSY:    begin
+                            next_state      <= OUT_QSY;
+                            //
+                            next_wait_count <= 'h7 - 'h1;
+                            //
+                            next_com_out_en <= 1'b1;
+                            next_out_data   <= hold_data[HOLD_DATA_WIDTH - 1: HOLD_DATA_WIDTH -1 - 7];
+                            //
+                            next_hold_data  <= { hold_data[HOLD_DATA_WIDTH - 1 - 8: 0], 8'h0 };
+                            //
+                            next_busy       <= 1'b1;
+                        end
+            OUT_QSY:    begin
+                            //
+                            next_wait_count <= wait_count;
+                            //
+                            next_out_data   <= out_data;
+                            //
+                            next_hold_data  <= hold_data;
+                            //
+                            next_busy       <= 1'b1;
+                            //
+                            if (rise_busy) begin
+                                next_state      <= WAIT_QSY;
+                                //
+                                next_com_out_en <= 1'b0;
+                            end else begin
+                                next_state      <= state;
+                                //
+                                next_com_out_en <= 1'b1;
+                            end
+                        end
+            WAIT_QSY:   begin
+                            if (iUART_TX_BUSY) begin
+                                next_state      <= state;
+                                //
+                                next_wait_count <= wait_count;
+                                //
+                                next_com_out_en <= 1'b0;
+                                next_out_data   <= out_data;
+                                //
+                                next_hold_data  <= hold_data;
+                                //
+                                next_busy       <= 1'b1;
+                            end else begin
+                                if (wait_count == 'h0) begin
+                                    next_state      <= PRE_LF;
+                                    //
+                                    next_wait_count <= 'h0;
+                                    //
+                                    next_com_out_en <= 1'b0;
+                                    next_out_data   <= 'hFF;
+                                    //
+//                                    next_hold_data  <= 8'h0A;
+                                    next_hold_data  <= {8'h0A, 48'h0 };
+                                     //
+                                    next_busy       <= 1'b1;
+                                end else begin
+                                    next_state      <= OUT_QSY;
                                     //
                                     next_wait_count <= wait_count - 'h1;
                                     //
