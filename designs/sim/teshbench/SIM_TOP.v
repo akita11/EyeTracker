@@ -55,6 +55,7 @@ module  SIM_TOP();
     //
     reg                                 tx_inp_de;
     reg     [DATA_WIDTH -1: 0]          tx_inp_data;
+    reg     [DATA_WIDTH -1: 0]          exp_rd;
     wire                                rx_out_de;
     wire    [DATA_WIDTH -1: 0]          rx_out_data;
     //
@@ -351,6 +352,14 @@ module  SIM_TOP();
         @(posedge rx_out_de);
         #1
         $display("[UART Rx] %s",rx_out_data);
+        $display("EXP = 0x%02X / RD = 0x%02X", exp_rd, rx_out_data);
+        if (exp_rd===8'hxx) begin
+
+        end else if (exp_rd==rx_out_data) begin
+            $display("Info : OK !");
+        end else begin
+            $display("Info : Error !");
+        end
     end
 
 endmodule
