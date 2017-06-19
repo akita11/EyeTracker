@@ -171,3 +171,30 @@ module DFF_REG #(
     end
 
 endmodule
+
+module DFF_V_REG #(
+    parameter   DATA_WIDTH = 1,
+    parameter   INIT_VAL   = 'h0
+) (
+    input   wire                            CLK,
+    input   wire                            RST_N,
+    input   wire                            iWE,
+    input   wire                            iVS,
+    input   wire    [DATA_WIDTH -1: 0]      iD,
+    output  reg     [DATA_WIDTH -1: 0]      oD
+);
+
+    reg     [DATA_WIDTH -1: 0]              data;
+
+    //
+    always @(posedge CLK or negedge RST_N) begin
+        if (!RST_N) begin
+            oD   <= INIT_VAL;
+            data <= 'h0;
+        end else begin
+            oD   <= (iVS) ? data: oD;
+            data <= (iWE) ?   iD: data;
+        end
+    end
+
+endmodule
