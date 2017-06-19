@@ -361,6 +361,10 @@ module TOP #(
 
     assign  uart_start_trig = (out_sel==1'b1) ? start_q_trig: start_trig;
 
+    //  Ezpand signal
+    // 27[cycle] + alpha
+    EXPAND_SIGNAL #( .EXPAND_NUM(30) ) m_EXPAND_SIG_UART_START_TRIG ( .CLK(CLK), .RST_N(RST_N), .iS(uart_start_trig), .oS(expand_uart_start_trig) );
+
     UART_IF m_UART_IF( .CLK(clk_uart_x8), .RST_N(RST_N),
                 .iOUT_SEL(out_sel),
                 //
@@ -370,7 +374,7 @@ module TOP #(
                 .iQUOTIENT_SX(quotient_sx),
                 .iQUOTIENT_SY(quotient_sy),
                 //
-                .iTRIG(uart_start_trig),
+                .iTRIG(expand_uart_start_trig),
                 //
                 .iUART_TX_BUSY(tx_busy),
                 //
