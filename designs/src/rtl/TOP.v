@@ -125,7 +125,7 @@ module TOP #(
     wire    [SUM_SX_WIDTH -1: 0]        quotient_sx;
     wire    [SUM_SY_WIDTH -1: 0]        quotient_sy;
 
-    wire                                start_trig;
+    wire                                start_s_trig;
     wire                                start_q_trig;
     wire                                uart_start_trig;
 
@@ -212,7 +212,7 @@ module TOP #(
                                                 //
                                                 .iBUSY(uart_calc_busy),
                                                 //
-                                                .oSTART_TRIG  (start_trig  ),
+                                                .oSTART_S_TRIG(start_s_trig),
                                                 .oSTART_Q_TRIG(start_q_trig),
                                                 //
                                                 .oSUM_S (sum_s ),
@@ -359,7 +359,7 @@ module TOP #(
                 .oDATA(uart_inp_data)
     );
 
-    assign  uart_start_trig = (out_sel==1'b1) ? start_q_trig: start_trig;
+    assign  uart_start_trig = (out_sel==1'b1) ? start_q_trig: start_s_trig;
 
     //  Ezpand signal
     // 27[cycle] + alpha
@@ -477,7 +477,7 @@ module TOP #(
         .probe4(DATA_R),
         .probe5(pixel_vsync),
         .probe6(pixel_hsync),
-        .probe7(start_trig/*pixel_de*/),
+        .probe7(start_s_trig/*pixel_de*/),
         .probe8(cmr_vsync),
         .probe9(cmr_hsync),
         .probe10(cmr_de),
@@ -496,7 +496,7 @@ module TOP #(
         .probe23(cmr_addr[8] /*sum_s[3]*/)
 /*
         .probe19(clk_uart_x8),
-        .probe20(start_trig),
+        .probe20(start_s_trig),
         .probe21(uart_de),
         .probe22(uart_data),
         .probe23(tx_busy)
