@@ -37,7 +37,7 @@ module CALC_GRAVITY_Y #(
     //
     input   wire                                        iBUSY,
     //
-    output  wire                                        oSTART_TRIG,
+    output  wire                                        oSTART_S_TRIG,
     output  wire                                        oSTART_Q_TRIG,
     //
     output  wire    [SUM_S_WIDTH -1: 0]                 oSUM_S,
@@ -85,15 +85,15 @@ module CALC_GRAVITY_Y #(
     wire    [SUM_S_WIDTH + SUM_SY_WIDTH + 8 - 1: 0]     div_sum_sy_sum_s;
 
     //
-    assign  oSELECT_EN   = select_en;
-    assign  oADDR        = addr;
+    assign  oSELECT_EN     = select_en;
+    assign  oADDR          = addr;
 
-    assign  oSTART_TRIG  = s_trig;
+    assign  oSTART_S_TRIG  = s_trig_dly;
 
     //
-    assign  oSUM_S       = sum_s;
-    assign  oSUM_SX      = sum_sx;
-    assign  oSUM_SY      = sum_sy;
+    assign  oSUM_S         = sum_s;
+    assign  oSUM_SX        = sum_sx;
+    assign  oSUM_SY        = sum_sy;
 
     // for Debug
     assign  oSTATE  = state;
@@ -101,6 +101,9 @@ module CALC_GRAVITY_Y #(
     //
     DET_EDGE m_DET_VSYNC_EDGE( .CLK(CCLK), .RST_N(RST_N), .iS(iVSYNC), .oRISE(rise_vsync), .oFALL(fall_vsync) );
     DET_EDGE m_DET_BUSY_EDGE ( .CLK(CCLK), .RST_N(RST_N), .iS(iBUSY ), .oRISE(rise_busy ), .oFALL(fall_busy ) );
+
+    //
+    CYCLE_DELAY #( .DATA_WIDTH(1), .DELAY(1) )  m_TRIG_DLY( .CLK(CCLK), .RST_N(RST_N), .iD(s_trig), .oD(s_trig_dly) );
 
     // 
     COUNT_HIGH_BIT #( .BIT_WIDTH(MDATA_WIDTH) ) m_COUNT_HIGH_BIT    ( .iBIT(iMEMIN), .oCOUNT(count_val) );
@@ -362,25 +365,25 @@ module CALC_GRAVITY_Y #(
 
     //
     DFF_REG #( .DATA_WIDTH(8), .INIT_VAL(8'h00) ) m_DIVIDED_SX_L ( .CLK(CCLK), .RST_N(RST_N), 
-                                                                   .iWE(divid_sx_load_en), .iD(div_sum_sx_sum_s[32:25]), .oD(oQUOTIENT_SX[ 7: 0]) );
+                                                                   .iWE(divid_sx_load_en), .iD(div_sum_sx_sum_s[31:24]), .oD(oQUOTIENT_SX[ 7: 0]) );
     DFF_REG #( .DATA_WIDTH(8), .INIT_VAL(8'h00) ) m_DIVIDED_SX_LM( .CLK(CCLK), .RST_N(RST_N), 
-                                                                   .iWE(divid_sx_load_en), .iD(div_sum_sx_sum_s[40:33]), .oD(oQUOTIENT_SX[15: 8]) );
+                                                                   .iWE(divid_sx_load_en), .iD(div_sum_sx_sum_s[39:32]), .oD(oQUOTIENT_SX[15: 8]) );
     DFF_REG #( .DATA_WIDTH(8), .INIT_VAL(8'h00) ) m_DIVIDED_SX_HM( .CLK(CCLK), .RST_N(RST_N), 
-                                                                   .iWE(divid_sx_load_en), .iD(div_sum_sx_sum_s[48:41]), .oD(oQUOTIENT_SX[23:16]) );
+                                                                   .iWE(divid_sx_load_en), .iD(div_sum_sx_sum_s[47:40]), .oD(oQUOTIENT_SX[23:16]) );
     DFF_REG #( .DATA_WIDTH(4), .INIT_VAL(8'h00) ) m_DIVIDED_SX_H ( .CLK(CCLK), .RST_N(RST_N), 
-                                                                   .iWE(divid_sx_load_en), .iD(div_sum_sx_sum_s[52:49]), .oD(oQUOTIENT_SX[27:24]) );
+                                                                   .iWE(divid_sx_load_en), .iD(div_sum_sx_sum_s[51:48]), .oD(oQUOTIENT_SX[27:24]) );
 
     //
     DFF_REG #( .DATA_WIDTH(8), .INIT_VAL(8'h00) ) m_DIVIDED_SY_L ( .CLK(CCLK), .RST_N(RST_N), 
-                                                                   .iWE(divid_sy_load_en), .iD(div_sum_sy_sum_s[32:25]), .oD(oQUOTIENT_SY[ 7: 0]) );
+                                                                   .iWE(divid_sy_load_en), .iD(div_sum_sy_sum_s[31:24]), .oD(oQUOTIENT_SY[ 7: 0]) );
     DFF_REG #( .DATA_WIDTH(8), .INIT_VAL(8'h00) ) m_DIVIDED_SY_LM( .CLK(CCLK), .RST_N(RST_N), 
-                                                                   .iWE(divid_sy_load_en), .iD(div_sum_sy_sum_s[40:33]), .oD(oQUOTIENT_SY[15: 8]) );
+                                                                   .iWE(divid_sy_load_en), .iD(div_sum_sy_sum_s[39:32]), .oD(oQUOTIENT_SY[15: 8]) );
     DFF_REG #( .DATA_WIDTH(8), .INIT_VAL(8'h00) ) m_DIVIDED_SY_HM( .CLK(CCLK), .RST_N(RST_N), 
-                                                                   .iWE(divid_sy_load_en), .iD(div_sum_sy_sum_s[48:41]), .oD(oQUOTIENT_SY[23:16]) );
+                                                                   .iWE(divid_sy_load_en), .iD(div_sum_sy_sum_s[47:40]), .oD(oQUOTIENT_SY[23:16]) );
     DFF_REG #( .DATA_WIDTH(4), .INIT_VAL(8'h00) ) m_DIVIDED_SY_H ( .CLK(CCLK), .RST_N(RST_N), 
-                                                                   .iWE(divid_sy_load_en), .iD(div_sum_sy_sum_s[52:49]), .oD(oQUOTIENT_SY[27:24]) );
+                                                                   .iWE(divid_sy_load_en), .iD(div_sum_sy_sum_s[51:48]), .oD(oQUOTIENT_SY[27:24]) );
     //
-    DFF #( .DATA_WIDTH(1) ) m_START_Q_TRIG ( .CLK(CCLK), .RST_N(RST_N), 
+    CYCLE_DELAY #( .DATA_WIDTH(1), .DELAY(2) ) m_START_Q_TRIG_DLY ( .CLK(CCLK), .RST_N(RST_N), 
                                              .iD(divid_sx_load_en | divid_sy_load_en), .oD(oSTART_Q_TRIG) );
 
     //
@@ -419,8 +422,7 @@ module CALC_GRAVITY_Y #(
             .s_axis_dividend_tvalid(dividend_sx_tvalid), 
             .s_axis_dividend_tdata ({4'h0, sum_sx}),
             .m_axis_dout_tvalid    (dout_sx_tvalid),
-            .m_axis_dout_tdata     (div_sum_sx_sum_s),
-            .m_axis_dout_tuser     ()
+            .m_axis_dout_tdata     (div_sum_sx_sum_s)
             );
 
     DIV_28_20   m_DIV_28_20_SY  (
