@@ -175,7 +175,7 @@ module VGAout #(
                         'b1_0_1_0_00, // 
                         'b1_0_1_0_01, // 
                         'b1_0_1_0_10: // 
-                            cursor_en <= 1'b0;
+                            cursor_en <= (iCURSOR_EN==1'b1) ? (h_pos_en | v_pos_en): 1'b0;
                         'b1_0_1_0_11: // 
                             cursor_en <= (iCURSOR_EN==1'b1) ? (h_pos_en | v_pos_en): 1'b0;
                     // EXIST_VIDEO => No
@@ -184,7 +184,7 @@ module VGAout #(
                         'b1_0_0_0_00, // 
                         'b1_0_0_0_01, // 
                         'b1_0_0_0_10: // 
-                            cursor_en <= 1'b0;
+                            cursor_en <= (iCURSOR_EN==1'b1) ? (h_pos_en | v_pos_en): 1'b0;
                         'b1_0_0_0_11: // 
                             cursor_en <= (iCURSOR_EN==1'b1) ? (h_pos_en | v_pos_en): 1'b0;
                 // iVGAout_mode => High
