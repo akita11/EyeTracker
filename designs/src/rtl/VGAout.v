@@ -130,68 +130,22 @@ module VGAout #(
     assign  h_area_en    = (iH_ADDR == iPOINT_X - 'h1) | (iH_ADDR == iPOINT_X      ) | (iH_ADDR == iPOINT_X + 'h1);
     assign  v_area_en    = (iV_ADDR == iPOINT_Y - 'h1) | (iV_ADDR == iPOINT_Y      ) | (iV_ADDR == iPOINT_Y + 'h1);
     assign  h_pos_en     = (iH_ADDR == iPOINT_X      );
-    assign  v_pos_en     = (iH_ADDR == iPOINT_Y      );
+    assign  v_pos_en     = (iV_ADDR == iPOINT_Y      );
 
     // 
     always @(*) begin
-        casex ({iDE, iVGAout_mode, video_exist, edge_area_en, h_area_en, v_area_en})
+        casex ({iDE, h_pos_en, v_pos_en})
             // iDE => High
-                // iVGAout_mode => Low
-                    // EXIST_VIDEO => Yes
-                        // Location => Edge or iPOINT_X/iPOINT_Y ÅÖ Å}1
-                        'b1_0_1_1_xx, // 
-                        'b1_0_1_0_11: // 
-                            video_load_en <= (iCURSOR_EN==1'b0) ? 1'b0: 1'b1;
-                        'b1_0_1_0_00, // 
-                        'b1_0_1_0_01, // 
-                        'b1_0_1_0_10: // 
-                            video_load_en <= 1'b1;
-                    // EXIST_VIDEO => No
-                        // Location => Edge or iPOINT_X/iPOINT_Y ÅÖ Å}1
-                        'b1_0_0_1_xx, // 
-                        'b1_0_0_0_11: // 
-                            video_load_en <= 1'b1;
-                        'b1_0_0_0_00, // 
-                        'b1_0_0_0_01, // 
-                        'b1_0_0_0_10: // 
-                            video_load_en <= (iCURSOR_EN==1'b0) ? 1'b0: 1'b1;
-                // iVGAout_mode => High
-                'b1_1_x_x_xx:
-                    video_load_en <= 1'b1;
-            // iDE => Low
-            'b0_x_x_x_xx:
-                video_load_en <= 1'b0;
-        endcase
-    end
-
-    // 
-    always @(*) begin
-        casex ({iDE, iVGAout_mode, video_exist, edge_area_en, h_area_en, v_area_en})
-            // iDE => High
-                // iVGAout_mode => Low
-                    // EXIST_VIDEO => Yes
-                        // Location => Edge or iPOINT_X/iPOINT_Y ÅÖ Å}1
-                        'b1_0_1_1_xx, // 
-                        'b1_0_1_0_00, // 
-                        'b1_0_1_0_01, // 
-                        'b1_0_1_0_10: // 
-                            cursor_en <= (iCURSOR_EN==1'b1) ? (h_pos_en | v_pos_en): 1'b0;
-                        'b1_0_1_0_11: // 
-                            cursor_en <= (iCURSOR_EN==1'b1) ? (h_pos_en | v_pos_en): 1'b0;
-                    // EXIST_VIDEO => No
-                        // Location => Edge or iPOINT_X/iPOINT_Y ÅÖ Å}1
-                        'b1_0_0_1_xx, // 
-                        'b1_0_0_0_00, // 
-                        'b1_0_0_0_01, // 
-                        'b1_0_0_0_10: // 
-                            cursor_en <= (iCURSOR_EN==1'b1) ? (h_pos_en | v_pos_en): 1'b0;
-                        'b1_0_0_0_11: // 
-                            cursor_en <= (iCURSOR_EN==1'b1) ? (h_pos_en | v_pos_en): 1'b0;
-                // iVGAout_mode => High
-                'b1_1_x_x_xx:
+                // iPOINT_X == iH_ADDR or iPOINT_Y == iV_ADDR
+                'b1_01,
+                'b1_10,
+                'b1_11:
+                    cursor_en <= (iCURSOR_EN==1'b1) ? 1'b1: 1'b0;
+                // Other
+                'b1_00:
                     cursor_en <= 1'b0;
             // iDE => Low
-            'b0_x_x_x_xx:
+            'b0_xx:
                 cursor_en <= 1'b0;
         endcase
     end
@@ -202,11 +156,11 @@ module VGAout #(
             oVGA_R <= 'h0;
             oVGA_G <= 'h0;
             oVGA_B <= 'h0;
-        end else if (cursor_en) begin
+        end else if (cursor_en==1'b1) begin
             oVGA_R <= 8'hFF;
             oVGA_G <= 8'h00;
             oVGA_B <= 8'h00;
-        end else if (video_load_en) begin
+        end else if (iDE==1'b1) begin
             oVGA_R <= mem_dat;
             oVGA_G <= mem_dat;
             oVGA_B <= mem_dat;
