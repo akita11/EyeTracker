@@ -368,9 +368,9 @@ module TOP #(
     UART_IF m_UART_IF( .CLK(clk_uart_x8), .RST_N(RST_N),
                 .iOUT_SEL(out_sel),
                 //
-                .iSUM_S (sum_s ),
-                .iSUM_SX(sum_sx),
-                .iSUM_SY(sum_sy),
+                .iSUM_S      (sum_s      ),
+                .iSUM_SX     (sum_sx     ),
+                .iSUM_SY     (sum_sy     ),
                 .iQUOTIENT_SX(quotient_sx),
                 .iQUOTIENT_SY(quotient_sy),
                 //
@@ -381,8 +381,14 @@ module TOP #(
                 .oBUSY(uart_calc_busy),
                 //
                 .oDE  (uart_calc_de  ),
-                .oDATA(uart_calc_data)
-    );
+                .oDATA(uart_calc_data),
+                //
+                .oRSLT_S_FF  (rslt_s_ff  ),
+                .oRSLT_SX_FF (rslt_sx_ff ),
+                .oRSLT_SY_FF (rslt_sy_ff ),
+                .oRSLT_QSX_FF(rslt_qsx_ff),
+                .oRSLT_QSY_FF(rslt_qsy_ff)
+            );
 
     //
     assign  host_if_rd = eye_reg_rd;
@@ -475,13 +481,13 @@ module TOP #(
         .probe2(DVAL),
         .probe3(DATA_L),
         .probe4(DATA_R),
-        .probe5(pixel_vsync),
-        .probe6(pixel_hsync),
+        .probe5(rslt_sx_ff  /*pixel_vsync*/),
+        .probe6(rslt_sy_ff  /*pixel_hsync*/),
         .probe7(start_s_trig/*pixel_de*/),
         .probe8(cmr_vsync),
         .probe9(cmr_hsync),
         .probe10(cmr_de),
-        .probe11(mem_sel /*memout_cx_en*/),
+        .probe11(rslt_s_ff /*mem_sel*/ /*memout_cx_en*/),
         .probe12(grav_sel_en),
         .probe13(cmr_field/*busy*/),
         .probe14(UART_TXD),

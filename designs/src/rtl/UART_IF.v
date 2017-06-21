@@ -34,7 +34,13 @@ module UART_IF #(
     output  wire                                oBUSY,
     //
     output  wire                                oDE,
-    output  wire    [DATA_WIDTH -1 : 0]         oDATA
+    output  wire    [DATA_WIDTH -1 : 0]         oDATA,
+    //
+    output  wire                                oRSLT_S_FF,
+    output  wire                                oRSLT_SX_FF,
+    output  wire                                oRSLT_SY_FF,
+    output  wire                                oRSLT_QSX_FF,
+    output  wire                                oRSLT_QSY_FF
 );
 
     // 
@@ -97,7 +103,10 @@ module UART_IF #(
     assign  oDATA = out_data;
 
     //
-    DET_EDGE m_DET_TRIG_EDGE( .CLK(CLK), .RST_N(RST_N), .iS(iTRIG), .oRISE(start_trig), .oFALL() );
+    CYCLE_DELAY #( .DATA_WIDTH(1), .DELAY(1) )  m_TRIG_DLY( .CLK(CLK), .RST_N(RST_N), .iD(iTRIG), .oD(trig_dly) );
+
+    //
+    DET_EDGE m_DET_TRIG_EDGE( .CLK(CLK), .RST_N(RST_N), .iS(trig_dly), .oRISE(start_trig), .oFALL() );
     DET_EDGE m_DET_BUSY_EDGE( .CLK(CLK), .RST_N(RST_N), .iS(iUART_TX_BUSY), .oRISE(rise_busy), .oFALL(fall_busy) );
 
     //
@@ -106,6 +115,13 @@ module UART_IF #(
     CONV_ASCII #( .DATA_WIDTH(28) ) m_CONV_ASCII_SY  ( .CLK(CLK), .RST_N(RST_N), .iDATA(iSUM_SY     ), .oASCII(ascii_sy ) );
     CONV_ASCII #( .DATA_WIDTH(28) ) m_CONV_ASCII_QSX ( .CLK(CLK), .RST_N(RST_N), .iDATA(iQUOTIENT_SX), .oASCII(ascii_qsx) );
     CONV_ASCII #( .DATA_WIDTH(28) ) m_CONV_ASCII_QSY ( .CLK(CLK), .RST_N(RST_N), .iDATA(iQUOTIENT_SY), .oASCII(ascii_qsy) );
+
+    //
+    IS_XDIGIT #( .DATA_WIDTH(SUM_S_WIDTH  * 2) ) m_IS_XDIGIT_S  ( .CLK(CLK), .RST_N(RST_N), .iCHAR(iSUM_S      ), .oRESULT(rslt_s  ), .oRESULT_FF(oRSLT_S_FF  ) );
+    IS_XDIGIT #( .DATA_WIDTH(SUM_SX_WIDTH * 2) ) m_IS_XDIGIT_SX ( .CLK(CLK), .RST_N(RST_N), .iCHAR(iSUM_SX     ), .oRESULT(rslt_sx ), .oRESULT_FF(oRSLT_SX_FF ) );
+    IS_XDIGIT #( .DATA_WIDTH(SUM_SY_WIDTH * 2) ) m_IS_XDIGIT_SY ( .CLK(CLK), .RST_N(RST_N), .iCHAR(iSUM_SY     ), .oRESULT(rslt_sy ), .oRESULT_FF(oRSLT_SY_FF ) );
+    IS_XDIGIT #( .DATA_WIDTH(SUM_SX_WIDTH * 2) ) m_IS_XDIGIT_QSX( .CLK(CLK), .RST_N(RST_N), .iCHAR(iQUOTIENT_SX), .oRESULT(rslt_qsx), .oRESULT_FF(oRSLT_QSX_FF) );
+    IS_XDIGIT #( .DATA_WIDTH(SUM_SY_WIDTH * 2) ) m_IS_XDIGIT_QSY( .CLK(CLK), .RST_N(RST_N), .iCHAR(iQUOTIENT_SY), .oRESULT(rslt_qsy), .oRESULT_FF(oRSLT_QSY_FF) );
 
     //
     always @(*) begin
