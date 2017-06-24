@@ -117,11 +117,11 @@ module UART_IF #(
     CONV_ASCII #( .DATA_WIDTH(28) ) m_CONV_ASCII_QSY ( .CLK(CLK), .RST_N(RST_N), .iDATA(iQUOTIENT_SY), .oASCII(ascii_qsy) );
 
     //
-    IS_XDIGIT #( .DATA_WIDTH(SUM_S_WIDTH  * 2) ) m_IS_XDIGIT_S  ( .CLK(CLK), .RST_N(RST_N), .iCHAR(iSUM_S      ), .oRESULT(rslt_s  ), .oRESULT_FF(oRSLT_S_FF  ) );
-    IS_XDIGIT #( .DATA_WIDTH(SUM_SX_WIDTH * 2) ) m_IS_XDIGIT_SX ( .CLK(CLK), .RST_N(RST_N), .iCHAR(iSUM_SX     ), .oRESULT(rslt_sx ), .oRESULT_FF(oRSLT_SX_FF ) );
-    IS_XDIGIT #( .DATA_WIDTH(SUM_SY_WIDTH * 2) ) m_IS_XDIGIT_SY ( .CLK(CLK), .RST_N(RST_N), .iCHAR(iSUM_SY     ), .oRESULT(rslt_sy ), .oRESULT_FF(oRSLT_SY_FF ) );
-    IS_XDIGIT #( .DATA_WIDTH(SUM_SX_WIDTH * 2) ) m_IS_XDIGIT_QSX( .CLK(CLK), .RST_N(RST_N), .iCHAR(iQUOTIENT_SX), .oRESULT(rslt_qsx), .oRESULT_FF(oRSLT_QSX_FF) );
-    IS_XDIGIT #( .DATA_WIDTH(SUM_SY_WIDTH * 2) ) m_IS_XDIGIT_QSY( .CLK(CLK), .RST_N(RST_N), .iCHAR(iQUOTIENT_SY), .oRESULT(rslt_qsy), .oRESULT_FF(oRSLT_QSY_FF) );
+    IS_XDIGIT #( .DATA_WIDTH(SUM_S_WIDTH  * 2) ) m_IS_XDIGIT_S  ( .CLK(CLK), .RST_N(RST_N), .iCHAR(ascii_s  ), .oRESULT(rslt_s  ), .oRESULT_FF(oRSLT_S_FF  ) );
+    IS_XDIGIT #( .DATA_WIDTH(SUM_SX_WIDTH * 2) ) m_IS_XDIGIT_SX ( .CLK(CLK), .RST_N(RST_N), .iCHAR(ascii_sx ), .oRESULT(rslt_sx ), .oRESULT_FF(oRSLT_SX_FF ) );
+    IS_XDIGIT #( .DATA_WIDTH(SUM_SY_WIDTH * 2) ) m_IS_XDIGIT_SY ( .CLK(CLK), .RST_N(RST_N), .iCHAR(ascii_sy ), .oRESULT(rslt_sy ), .oRESULT_FF(oRSLT_SY_FF ) );
+    IS_XDIGIT #( .DATA_WIDTH(SUM_SX_WIDTH * 2) ) m_IS_XDIGIT_QSX( .CLK(CLK), .RST_N(RST_N), .iCHAR(ascii_qsx), .oRESULT(rslt_qsx), .oRESULT_FF(oRSLT_QSX_FF) );
+    IS_XDIGIT #( .DATA_WIDTH(SUM_SY_WIDTH * 2) ) m_IS_XDIGIT_QSY( .CLK(CLK), .RST_N(RST_N), .iCHAR(ascii_qsy), .oRESULT(rslt_qsy), .oRESULT_FF(oRSLT_QSY_FF) );
 
     //
     always @(*) begin
