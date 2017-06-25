@@ -15,7 +15,6 @@
 ../src/rtl/MEMOUTSEL.v
 ../src/rtl/OUT_VIDEO_DATA.v
 ../src/rtl/REG_BUS_IF.v
-../src/rtl/SUM_UNIT.v
 ../src/rtl/TMG_CTRL.v
 ../src/rtl/TOP.v
 ../src/rtl/SUM_UNIT.v
