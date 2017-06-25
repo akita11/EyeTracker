@@ -53,7 +53,7 @@ proc ReadFile {fname} {
                 set ext_fname [file extension $fname]
                 switch -glob -- $ext_fname {
                     .v {
-                        read_verilog -library Lib [glob $fname]
+                        read_verilog $fname
                     }
                     .xdc {
                         read_xdc $fname
