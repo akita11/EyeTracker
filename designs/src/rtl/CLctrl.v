@@ -29,7 +29,6 @@ module CLctrl #(
     input   wire    [PIXEL_WIDTH -1: 0]     iDATA_L,
     input   wire    [PIXEL_WIDTH -1: 0]     iDATA_R,
     //
-    input   wire                            iVGAout_mode,
     input   wire                            iMEM_SEL,
     input   wire    [PIXEL_WIDTH -1: 0]     iTHRESHOLD,
     //
