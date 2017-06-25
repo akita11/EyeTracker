@@ -422,7 +422,8 @@ module CALC_GRAVITY_Y #(
             .s_axis_dividend_tvalid(dividend_sx_tvalid), 
             .s_axis_dividend_tdata ({4'h0, sum_sx}),
             .m_axis_dout_tvalid    (dout_sx_tvalid),
-            .m_axis_dout_tdata     (div_sum_sx_sum_s)
+            .m_axis_dout_tdata     (div_sum_sx_sum_s),
+            .m_axis_dout_tuser     ()
             );
 
     DIV_28_20   m_DIV_28_20_SY  (
@@ -432,7 +433,8 @@ module CALC_GRAVITY_Y #(
             .s_axis_dividend_tvalid(dividend_sy_tvalid), 
             .s_axis_dividend_tdata ({4'h0, sum_sy}),
             .m_axis_dout_tvalid    (dout_sy_tvalid),
-            .m_axis_dout_tdata     (div_sum_sy_sum_s)
+            .m_axis_dout_tdata     (div_sum_sy_sum_s),
+            .m_axis_dout_tuser     ()
             );
 
 endmodule
