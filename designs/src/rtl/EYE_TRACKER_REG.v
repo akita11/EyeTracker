@@ -92,7 +92,7 @@ module EYE_TRACKER_REG (
             8'b0000_0010:   rd1_data <= iQUOTIENT_SX[15: 8];
             8'b0000_0100:   rd1_data <= iQUOTIENT_SX[23:16];
             8'b0000_1000:   rd1_data <= { 4'h0, iQUOTIENT_SX[27:24] };
-            8'b0001_0000:   rd1_data <= iQUOTIENT_SX[ 7: 0];
+            8'b0001_0000:   rd1_data <= iQUOTIENT_SY[ 7: 0];
             8'b0010_0000:   rd1_data <= iQUOTIENT_SY[15: 8];
             8'b0100_0000:   rd1_data <= iQUOTIENT_SY[23:16];
             8'b1000_0000:   rd1_data <= { 4'h0, iQUOTIENT_SY[27:24] };
