@@ -45,23 +45,23 @@ module TOP #(
     output  wire    [PIXEL_WIDTH -1: 0] VGA_B
 );
     // parameter
-    parameter   JP_WIDTH                = 8;
+    localparam  JP_WIDTH                = 8;
 
     //
-    parameter   SUM_S_WIDTH             = 20;
-    parameter   SUM_SX_WIDTH            = 28;
-    parameter   SUM_SY_WIDTH            = 28;
+    localparam  SUM_S_WIDTH             = 20;
+    localparam  SUM_SX_WIDTH            = 28;
+    localparam  SUM_SY_WIDTH            = 28;
 
     //
-    parameter   HOST_ADDR_WIDTH         = 16;
-    parameter   HOST_WE_WIDTH           = 24;
-    parameter   HOST_RE_WIDTH           = 24;
+    localparam  HOST_ADDR_WIDTH         = 16;
+    localparam  HOST_WE_WIDTH           = 24;
+    localparam  HOST_RE_WIDTH           = 24;
 
     //
-    parameter   MAX_BUF_SIZE            = 16;
+    localparam  MAX_BUF_SIZE            = 16;
 
     //
-    parameter   DATA_WIDTH              = 8;
+    localparam  DATA_WIDTH              = 8;
 
     // for internal signals
     wire                                cmr_vsync;
@@ -188,7 +188,7 @@ module TOP #(
     CLctrl #( .ADDR_WIDTH(ADDR_WIDTH), .MDATA_WIDTH(640), .PIXEL_WIDTH(PIXEL_WIDTH) ) m_CLctrl ( .CCLK(CCLK), .RST_N(cclk_rst_n),
                                                 .iVSYNC(cmr_vsync), .iHSYNC(cmr_hsync), .iDE(cmr_de), .iDATA_L(cmr_data_l), .iDATA_R(cmr_data_r),
                                                 //
-                                                .iVGAout_mode(vgaout_mode), .iMEM_SEL(cmr_field), .iTHRESHOLD(threshold),
+                                                .iMEM_SEL(cmr_field), .iTHRESHOLD(threshold),
                                                 .oWEA(wea), .oWEB(web), .oCL_ROW(cl_row),
                                                 .oMEMIN_0(memin_0), .oMEMIN_1(memin_1), .oMEMIN_2(memin_2), 
                                                 .oMEMIN_3(memin_3), .oMEMIN_4(memin_4), .oMEMIN_5(memin_5), 
@@ -255,25 +255,25 @@ module TOP #(
                  .clkb(VGA_CLK), .addrb(tmg_vcount), .dinb('h0    ), .enb(1'b1              ), .web(1'b0   ), .doutb(memout_0b) );    
 
     // for Raw Video out
-    MEM m_MEMA1( .clka(CCLK   ), .addra(cl_row    ), .dina(memin_1), .ena(~cmr_field        ), .wea(cmr_wea), 
+    MEM m_MEMA1( .clka(CCLK   ), .addra(cl_row    ), .dina(memin_1), .ena(~cmr_field        ), .wea(cmr_wea), .douta(         ),
                  .clkb(VGA_CLK), .addrb(tmg_vcount), .dinb('h0    ), .enb(1'b1              ), .web(1'b0   ), .doutb(memout_1a) );    
-    MEM m_MEMB1( .clka(CCLK   ), .addra(cl_row    ), .dina(memin_1), .ena( cmr_field        ), .wea(cmr_web), 
+    MEM m_MEMB1( .clka(CCLK   ), .addra(cl_row    ), .dina(memin_1), .ena( cmr_field        ), .wea(cmr_web), .douta(         ),
                  .clkb(VGA_CLK), .addrb(tmg_vcount), .dinb('h0    ), .enb(1'b1              ), .web(1'b0   ), .doutb(memout_1b) );    
-    MEM m_MEMA2( .clka(CCLK   ), .addra(cl_row    ), .dina(memin_2), .ena(~cmr_field        ), .wea(cmr_wea), 
+    MEM m_MEMA2( .clka(CCLK   ), .addra(cl_row    ), .dina(memin_2), .ena(~cmr_field        ), .wea(cmr_wea), .douta(         ),
                  .clkb(VGA_CLK), .addrb(tmg_vcount), .dinb('h0    ), .enb(1'b1              ), .web(1'b0   ), .doutb(memout_2a) );    
-    MEM m_MEMB2( .clka(CCLK   ), .addra(cl_row    ), .dina(memin_2), .ena( cmr_field        ), .wea(cmr_web), 
+    MEM m_MEMB2( .clka(CCLK   ), .addra(cl_row    ), .dina(memin_2), .ena( cmr_field        ), .wea(cmr_web), .douta(         ),
                  .clkb(VGA_CLK), .addrb(tmg_vcount), .dinb('h0    ), .enb(1'b1              ), .web(1'b0   ), .doutb(memout_2b) );    
-    MEM m_MEMA3( .clka(CCLK   ), .addra(cl_row    ), .dina(memin_3), .ena(~cmr_field        ), .wea(cmr_wea), 
+    MEM m_MEMA3( .clka(CCLK   ), .addra(cl_row    ), .dina(memin_3), .ena(~cmr_field        ), .wea(cmr_wea), .douta(         ),
                  .clkb(VGA_CLK), .addrb(tmg_vcount), .dinb('h0    ), .enb(1'b1              ), .web(1'b0   ), .doutb(memout_3a) );    
-    MEM m_MEMB3( .clka(CCLK   ), .addra(cl_row    ), .dina(memin_3), .ena( cmr_field        ), .wea(cmr_web), 
+    MEM m_MEMB3( .clka(CCLK   ), .addra(cl_row    ), .dina(memin_3), .ena( cmr_field        ), .wea(cmr_web), .douta(         ),
                  .clkb(VGA_CLK), .addrb(tmg_vcount), .dinb('h0    ), .enb(1'b1              ), .web(1'b0   ), .doutb(memout_3b) );    
-    MEM m_MEMA4( .clka(CCLK   ), .addra(cl_row    ), .dina(memin_4), .ena(~cmr_field        ), .wea(cmr_wea), 
+    MEM m_MEMA4( .clka(CCLK   ), .addra(cl_row    ), .dina(memin_4), .ena(~cmr_field        ), .wea(cmr_wea), .douta(         ),
                  .clkb(VGA_CLK), .addrb(tmg_vcount), .dinb('h0    ), .enb(1'b1              ), .web(1'b0   ), .doutb(memout_4a) );    
-    MEM m_MEMB4( .clka(CCLK   ), .addra(cl_row    ), .dina(memin_4), .ena( cmr_field        ), .wea(cmr_web), 
+    MEM m_MEMB4( .clka(CCLK   ), .addra(cl_row    ), .dina(memin_4), .ena( cmr_field        ), .wea(cmr_web), .douta(         ),
                  .clkb(VGA_CLK), .addrb(tmg_vcount), .dinb('h0    ), .enb(1'b1              ), .web(1'b0   ), .doutb(memout_4b) );    
-//    MEM m_MEMA5( .clka(CCLK   ), .addra(cl_row    ), .dina(memin_5), .ena(~cmr_field        ), .wea(cmr_wea), 
+//    MEM m_MEMA5( .clka(CCLK   ), .addra(cl_row    ), .dina(memin_5), .ena(~cmr_field        ), .wea(cmr_wea), .douta(         ),
 //                 .clkb(VGA_CLK), .addrb(tmg_vcount), .dinb('h0    ), .enb(1'b1              ), .web(1'b0   ), .doutb(memout_5a) );    
-//    MEM m_MEMB5( .clka(CCLK   ), .addra(cl_row    ), .dina(memin_5), .ena( cmr_field        ), .wea(cmr_web), 
+//    MEM m_MEMB5( .clka(CCLK   ), .addra(cl_row    ), .dina(memin_5), .ena( cmr_field        ), .wea(cmr_web), .douta(         ),
 //                 .clkb(VGA_CLK), .addrb(tmg_vcount), .dinb('h0    ), .enb(1'b1              ), .web(1'b0   ), .doutb(memout_5b) );    
 
     // for Meta-stable 
@@ -407,8 +407,6 @@ module TOP #(
                 .oBUFFER_CLR(buf_clr),
                 //
                 .iUART_TX_BUSY(tx_busy),
-                //
-                .oBUSY(uart_host_busy),
                 //
                 .oDE  (uart_host_de  ),
                 .oDATA(uart_host_data)
