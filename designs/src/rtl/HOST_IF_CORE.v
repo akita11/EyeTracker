@@ -33,8 +33,6 @@ module HOST_IF_CORE #(
     //
     input   wire                                iUART_TX_BUSY,
     //
-    output  wire                                oBUSY,
-    //
     output  wire                                oDE,
     output  wire    [DATA_WIDTH -1 : 0]         oDATA
 );
@@ -99,9 +97,6 @@ module HOST_IF_CORE #(
     assign  oOUT_WE   = out_we;
     assign  oOUT_RE   = out_re;
     assign  oOUT_DATA = out_data;
-
-    //
-//    assign  oBUSY = busy;
 
     //
     assign  oBUFFER_CLR = buf_clr;
