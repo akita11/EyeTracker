@@ -54,8 +54,8 @@ module TOP #(
 
     //
     localparam  HOST_ADDR_WIDTH         = 16;
-    localparam  HOST_WE_WIDTH           = 24;
-    localparam  HOST_RE_WIDTH           = 24;
+    localparam  HOST_WE_WIDTH           = 32;
+    localparam  HOST_RE_WIDTH           = 32;
 
     //
     localparam  MAX_BUF_SIZE            = 16;
@@ -119,9 +119,11 @@ module TOP #(
     wire    [PIXEL_WIDTH -1: 0]         pixel_b0;
 
     //
-    wire    [SUM_S_WIDTH -1: 0]         sum_s;
+    wire    [SUM_S_WIDTH  -1: 0]        sum_s;
     wire    [SUM_SX_WIDTH -1: 0]        sum_sx;
     wire    [SUM_SY_WIDTH -1: 0]        sum_sy;
+    wire    [SUM_S_WIDTH  -1: 0]        fractional_sx;
+    wire    [SUM_S_WIDTH  -1: 0]        fractional_sy;
     wire    [SUM_SX_WIDTH -1: 0]        quotient_sx;
     wire    [SUM_SY_WIDTH -1: 0]        quotient_sy;
 
@@ -218,6 +220,8 @@ module TOP #(
                                                 .oSUM_S (sum_s ),
                                                 .oSUM_SX(sum_sx),
                                                 .oSUM_SY(sum_sy),
+                                                .oFRACTIONAL_SX(fractional_sx),
+                                                .oFRACTIONAL_SY(fractional_sy),
                                                 .oQUOTIENT_SX(quotient_sx),
                                                 .oQUOTIENT_SY(quotient_sy),
                                                 // Debug
@@ -368,11 +372,13 @@ module TOP #(
     UART_IF m_UART_IF( .CLK(clk_uart_x8), .RST_N(RST_N),
                 .iOUT_SEL(out_sel),
                 //
-                .iSUM_S      (sum_s      ),
-                .iSUM_SX     (sum_sx     ),
-                .iSUM_SY     (sum_sy     ),
-                .iQUOTIENT_SX(quotient_sx),
-                .iQUOTIENT_SY(quotient_sy),
+                .iSUM_S        (sum_s        ),
+                .iSUM_SX       (sum_sx       ),
+                .iSUM_SY       (sum_sy       ),
+                .iFRACTIONAL_SX(fractional_sx),
+                .iFRACTIONAL_SY(fractional_sy),
+                .iQUOTIENT_SX  (quotient_sx  ),
+                .iQUOTIENT_SY  (quotient_sy  ),
                 //
                 .iTRIG(expand_uart_start_trig),
                 //
@@ -412,7 +418,7 @@ module TOP #(
                 .oDATA(uart_host_data)
             );
 
-    REG_BUS_IF #( .ADDR_WIDTH(16), .WE_WIDTH(24), .RE_WIDTH(24) )     m_REG_BUF_IF ( .CLK(CLK), .RST_N(RST_N),
+    REG_BUS_IF #( .ADDR_WIDTH(16), .WE_WIDTH(32), .RE_WIDTH(32) )     m_REG_BUF_IF ( .CLK(CLK), .RST_N(RST_N),
                 // from/to HOST_IF
                 .iADDR (host_if_addr),
                 .iWE   (host_if_we),
@@ -441,7 +447,7 @@ module TOP #(
                 .oDATA(uart_rx_fifo)
             );
 
-    EYE_TRACKER_REG     m_EYE_TRACKER_REG ( .CLK(CLK), .RST_N(RST_N),
+    EYE_TRACKER_REG #( .WE_WIDTH(32), .RE_WIDTH(32) )   m_EYE_TRACKER_REG ( .CLK(CLK), .RST_N(RST_N),
                 // from/to HOST_IF
                 .iWE_BIT(host_we_bit), 
                 .iRE_BIT(host_re_bit), 
@@ -451,11 +457,13 @@ module TOP #(
                 .iFVSYNC(cmr_vsync),
                 .iRVSYNC(tmg_vsync),
                 //
-                .iSUM_S (sum_s ),
-                .iSUM_SX(sum_sx),
-                .iSUM_SY(sum_sy),
-                .iQUOTIENT_SX(quotient_sx),
-                .iQUOTIENT_SY(quotient_sy),
+                .iSUM_S        (sum_s        ),
+                .iSUM_SX       (sum_sx       ),
+                .iSUM_SY       (sum_sy       ),
+                .iFRACTIONAL_SX(fractional_sx),
+                .iFRACTIONAL_SY(fractional_sy),
+                .iQUOTIENT_SX  (quotient_sx  ),
+                .iQUOTIENT_SY  (quotient_sy  ),
                 //
                 .oUART_SW     (uart_sw    ),
                 .oVGA_OUT_MODE(vgaout_mode),

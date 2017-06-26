@@ -14,7 +14,10 @@
 
 `timescale  1ns/1ps
 
-module EYE_TRACKER_REG (
+module EYE_TRACKER_REG #(
+    parameter   WE_WIDTH    = 32,
+    parameter   RE_WIDTH    = 32
+) (
     input   wire                                CLK,
     input   wire                                RST_N,
     // from/to HOST_IF
@@ -26,9 +29,11 @@ module EYE_TRACKER_REG (
     input   wire                                iFVSYNC,
     input   wire                                iRVSYNC,
     //
-    input   wire    [SUM_S_WIDTH -1: 0]         iSUM_S,
+    input   wire    [SUM_S_WIDTH  -1: 0]        iSUM_S,
     input   wire    [SUM_SX_WIDTH -1: 0]        iSUM_SX,
     input   wire    [SUM_SY_WIDTH -1: 0]        iSUM_SY,
+    input   wire    [SUM_S_WIDTH  -1: 0]        iFRACTIONAL_SX,
+    input   wire    [SUM_S_WIDTH  -1: 0]        iFRACTIONAL_SY,
     input   wire    [SUM_SX_WIDTH -1: 0]        iQUOTIENT_SX,
     input   wire    [SUM_SY_WIDTH -1: 0]        iQUOTIENT_SY,
     //
@@ -41,8 +46,6 @@ module EYE_TRACKER_REG (
 
     //
     localparam      DATA_WIDTH                  = 8;
-    localparam      WE_WIDTH                    = 24;
-    localparam      RE_WIDTH                    = 24;
 
     //
     localparam      SUM_S_WIDTH                 = 20;
@@ -87,16 +90,24 @@ module EYE_TRACKER_REG (
     end
 
     always @(*) begin
-        case (iRE_BIT[23:16])
-            8'b0000_0001:   rd1_data <= iQUOTIENT_SX[ 7: 0];
-            8'b0000_0010:   rd1_data <= iQUOTIENT_SX[15: 8];
-            8'b0000_0100:   rd1_data <= iQUOTIENT_SX[23:16];
-            8'b0000_1000:   rd1_data <= { 4'h0, iQUOTIENT_SX[27:24] };
-            8'b0001_0000:   rd1_data <= iQUOTIENT_SY[ 7: 0];
-            8'b0010_0000:   rd1_data <= iQUOTIENT_SY[15: 8];
-            8'b0100_0000:   rd1_data <= iQUOTIENT_SY[23:16];
-            8'b1000_0000:   rd1_data <= { 4'h0, iQUOTIENT_SY[27:24] };
-            default:        rd1_data <= 'h00;
+        case (iRE_BIT[31:16])
+            16'b0000_0000_0000_0001:    rd1_data <= iQUOTIENT_SX[ 7: 0];
+            16'b0000_0000_0000_0010:    rd1_data <= iQUOTIENT_SX[15: 8];
+            16'b0000_0000_0000_0100:    rd1_data <= iQUOTIENT_SX[23:16];
+            16'b0000_0000_0000_1000:    rd1_data <= { 4'h0, iQUOTIENT_SX[27:24] };
+            16'b0000_0000_0001_0000:    rd1_data <= iQUOTIENT_SY[ 7: 0];
+            16'b0000_0000_0010_0000:    rd1_data <= iQUOTIENT_SY[15: 8];
+            16'b0000_0000_0100_0000:    rd1_data <= iQUOTIENT_SY[23:16];
+            16'b0000_0000_1000_0000:    rd1_data <= { 4'h0, iQUOTIENT_SY[27:24] };
+            16'b0000_0001_0000_0000:    rd1_data <= iFRACTIONAL_SX[ 7: 0];
+            16'b0000_0010_0000_0000:    rd1_data <= iFRACTIONAL_SX[15: 8];
+            16'b0000_0100_0000_0000:    rd1_data <= { 4'h0, iFRACTIONAL_SX[19:16] };
+            16'b0000_1000_0000_0000:    rd1_data <= 'h00;
+            16'b0001_0000_0000_0000:    rd1_data <= iFRACTIONAL_SY[ 7: 0];
+            16'b0010_0000_0000_0000:    rd1_data <= iFRACTIONAL_SY[15: 8];
+            16'b0100_0000_0000_0000:    rd1_data <= { 4'h0, iFRACTIONAL_SY[19:16] };
+            16'b1000_0000_0000_0000:    rd1_data <= 'h00;
+            default:                    rd1_data <= 'h00;
         endcase
     end
 

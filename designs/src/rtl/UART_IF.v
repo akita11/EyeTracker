@@ -21,9 +21,11 @@ module UART_IF #(
     //
     input   wire                                iOUT_SEL,
     //
-    input   wire    [SUM_S_WIDTH -1: 0]         iSUM_S,
+    input   wire    [SUM_S_WIDTH  -1: 0]        iSUM_S,
     input   wire    [SUM_SX_WIDTH -1: 0]        iSUM_SX,
     input   wire    [SUM_SY_WIDTH -1: 0]        iSUM_SY,
+    input   wire    [SUM_S_WIDTH  -1: 0]        iFRACTIONAL_SX,
+    input   wire    [SUM_S_WIDTH  -1: 0]        iFRACTIONAL_SY,
     input   wire    [SUM_SX_WIDTH -1: 0]        iQUOTIENT_SX,
     input   wire    [SUM_SY_WIDTH -1: 0]        iQUOTIENT_SY,
     //
@@ -113,8 +115,8 @@ module UART_IF #(
     CONV_ASCII #( .DATA_WIDTH(20) ) m_CONV_ASCII_S   ( .CLK(CLK), .RST_N(RST_N), .iDATA(iSUM_S      ), .oASCII(ascii_s  ) );
     CONV_ASCII #( .DATA_WIDTH(28) ) m_CONV_ASCII_SX  ( .CLK(CLK), .RST_N(RST_N), .iDATA(iSUM_SX     ), .oASCII(ascii_sx ) );
     CONV_ASCII #( .DATA_WIDTH(28) ) m_CONV_ASCII_SY  ( .CLK(CLK), .RST_N(RST_N), .iDATA(iSUM_SY     ), .oASCII(ascii_sy ) );
-    CONV_ASCII #( .DATA_WIDTH(28) ) m_CONV_ASCII_QSX ( .CLK(CLK), .RST_N(RST_N), .iDATA(iQUOTIENT_SX), .oASCII(ascii_qsx) );
-    CONV_ASCII #( .DATA_WIDTH(28) ) m_CONV_ASCII_QSY ( .CLK(CLK), .RST_N(RST_N), .iDATA(iQUOTIENT_SY), .oASCII(ascii_qsy) );
+    CONV_ASCII #( .DATA_WIDTH(28) ) m_CONV_ASCII_QSX ( .CLK(CLK), .RST_N(RST_N), .iDATA({iQUOTIENT_SX[11: 0], iFRACTIONAL_SX[19: 4]}), .oASCII(ascii_qsx) );
+    CONV_ASCII #( .DATA_WIDTH(28) ) m_CONV_ASCII_QSY ( .CLK(CLK), .RST_N(RST_N), .iDATA({iQUOTIENT_SY[11: 0], iFRACTIONAL_SY[19: 4]}), .oASCII(ascii_qsy) );
 
     //
     IS_XDIGIT #( .DATA_WIDTH(SUM_S_WIDTH  * 2) ) m_IS_XDIGIT_S  ( .CLK(CLK), .RST_N(RST_N), .iCHAR(ascii_s  ), .oRESULT(rslt_s  ), .oRESULT_FF(oRSLT_S_FF  ) );
