@@ -16,7 +16,7 @@ create_ip -name div_gen -vendor xilinx.com -library ip -version 5.1 -module_name
           -dir c:/work/EyeTracker/designs/FPGA/project_1/project_1.srcs/sources_1/ip
 set_property -dict [list CONFIG.dividend_and_quotient_width {28} CONFIG.divisor_width {20} \
              CONFIG.operand_sign {Unsigned} CONFIG.divide_by_zero_detect {true} CONFIG.ACLKEN {true} CONFIG.ARESETN {true} \
-             CONFIG.fractional_width {20} CONFIG.latency {30}] [get_ips DIV_28_20]
+             CONFIG.remainder_type {Fractional} CONFIG.fractional_width {20} CONFIG.latency {50}] [get_ips DIV_28_20]
 #generate_target {instantiation_template} [get_files c:/work/EyeTracker/designs/FPGA/project_1/project_1.srcs/sources_1/ip/DIV_28_20/DIV_28_20.xci]
 generate_target all [get_files  c:/work/EyeTracker/designs/FPGA/project_1/project_1.srcs/sources_1/ip/DIV_28_20/DIV_28_20.xci]
 catch { config_ip_cache -export [get_ips -all DIV_28_20] }
