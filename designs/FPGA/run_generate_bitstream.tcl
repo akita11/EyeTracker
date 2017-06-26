@@ -116,7 +116,7 @@ report_timing -sort_by group -max_paths 100 -path_type summary -file ${outputDir
 report_clock_utilization -file ${outputDir}/clock_util.rpt
 report_utilization -file ${outputDir}/post_route_util.rpt
 report_power -file ${outputDir}/post_route_power.rpt
-report_drc -file ${outputDir}/post_imp_drc.rpt
+report_drc -file ${outputDir}/post_impl_drc.rpt
 write_verilog -force ${outputDir}/${project_name}_netlist.v
 write_xdc -no_fixed_only -force ${outputDir}/${project_name}_impl.xdc
 
