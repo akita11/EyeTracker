@@ -13,94 +13,38 @@
 #//  Copyright (C) 2017 K.Ishiwatari All Rights Reserved.
 #// -----------------------------------------------------------------------------
 
-#// -----------------------------------------------------------------------------
-#       proc ReadListFile
-#// -----------------------------------------------------------------------------
-proc ReadListFile {fname encode eofile} {
-    if {[file readable $fname]} {
-        set fileid [open $fname "r"]
-        fconfigure $fileid -encoding $encode -translation $eofile
-        set contents [read $fileid]
-        close $fileid
-        return $contents
-    }
-}
+# /* ---- Define parameter
+source ./tcl/extend_tcl_library.tcl
 
-#// -----------------------------------------------------------------------------
-#       proc ReadFromFileList
-#// -----------------------------------------------------------------------------
-proc ReadFromFileList {fname} {
-    set fname_list [ReadListFile $fname "euc-jp" "lf"]
-    foreach fname $fname_list {
-        ReadFile $fname
-    }
-}
+# /* ----------------------------------------------------------------------------- */
+#        Main
+# /* ----------------------------------------------------------------------------- */
 
-#// -----------------------------------------------------------------------------
-#       proc ReadFile
-#// -----------------------------------------------------------------------------
-proc ReadFile {fname} {
-    switch -glob -- $fname {
-        [/][/]* {
-            # Comment
-        }
-        [#]* {
-            # Comment
-        }
-        default {
-            if { [file isfile $fname] == 1} {
-                puts "Read file = $fname"
-                set ext_fname [file extension $fname]
-                switch -glob -- $ext_fname {
-                    .v {
-                        read_verilog $fname
-                    }
-                    .xdc {
-                        read_xdc $fname
-                    }
-                    .tcl {
-                        source $fname
-                    }
-                    default {
-                    }
-                }
-            } else {
-                puts "File ($fname) does not exist."
-            }
-        }
-    }
-}
-
-#// -----------------------------------------------------------------------------
-#       Main
-#// -----------------------------------------------------------------------------
-
-#//   Define parameter
 set project_name    EyeTracker
 set device_name     xc7k160tfbg484-1
 set top_module      TOP
 
-#//   Define parameter
+# /* ---- Define parameter ---- */
 set outputDir ./project/$project_name
 file mkdir ${outputDir}
 
-#//   Prepare environment
+# /* ---- Prepare environment ---- */
 #create_project -in_memory -part $device_name
 
-#//   Read RTL File
+# /* ---- Read RTL File ---- */
 ReadFromFileList "./filelist.f"
 
-#//   Read IP File
+# /* ---- Read IP File ---- */
 ReadFromFileList "./filelist_ip_gen.f"
 
-#//   Synthesis
+# /* ---- Synthesis ---- */
 ReadFile ../syn/constraints/TOP_syn.xdc
 synth_design -top $top_module -part $device_name
 write_checkpoint -force ${outputDir}/post_synth
 report_timing_summary -file ${outputDir}/post_synth_timing_summary.rpt
 report_power -file ${outputDir}/post_synth_power.rpt
 
-#//   Placement
+# /* ---- Placement ---- */
 ReadFile ../syn/tcl/TOP_impliment.tcl
 opt_design
 place_design
@@ -108,7 +52,7 @@ phys_opt_design
 write_checkpoint -force ${outputDir}/post_place
 report_timing_summary -file ${outputDir}/post_place_timing_summary.rpt
 
-#//   Routing
+# /* ---- Routing ---- */
 route_design
 write_checkpoint -force ${outputDir}/post_route
 report_timing_summary -file ${outputDir}/post_route_timing_summary.rpt
@@ -120,6 +64,9 @@ report_drc -file ${outputDir}/post_impl_drc.rpt
 write_verilog -force ${outputDir}/${project_name}_netlist.v
 write_xdc -no_fixed_only -force ${outputDir}/${project_name}_impl.xdc
 
-#//   Generate a bitstream
+# /* ---- Generate a bitstream ---- */
 ReadFile  ../syn/tcl/TOP_bitstream.tcl
 write_bitstream -force ${outputDir}/${project_name}.bit
+
+# /* ---- Generate MCS file ---- */
+write_cfgmem -format MCS -interface SPIx1 -size 128 -loadbit "up 0 ${outputDir}/${project_name}.bit" -file ${outputDir}/${project_name}.mcs
