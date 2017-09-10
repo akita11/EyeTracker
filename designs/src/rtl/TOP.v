@@ -320,11 +320,13 @@ module TOP #(
     );
 
     // Clock Control
-    CLK25M  m_CLK25M ( .CLK(CLK), .RST_N(RST_N), .CLKOUT(VGA_CLK) );
+    CLK25M  m_CLK25M ( .CLK(/*bufg_clk*/ CLK), .RST_N(RST_N), .CLKOUT(VGA_CLK), .BUFG_OUT(bufg_out) );
 
     //            =>       x8  / 50MHz / 27 
     // 230400 bps => 1843.2KHz / 1801.851KHz
-    CLK_DIVIDER #( .DIVIDE(27) )    m_CLK_UART( .CLK(CLK), .RST_N(RST_N), .oDIV_CLK(clk_uart_x8) );
+//    BUFG m_CLK_DIVIDER(.I(CLK), .O(bufg_clk));
+   
+    CLK_DIVIDER #( .DIVIDE(27) )    m_CLK_UART( .CLK(bufg_clk /*CLK*/), .RST_N(RST_N), .oDIV_CLK(clk_uart_x8) );
 
     // Reset Control
     ASYNC_SYNC_RST  m_CCLK_RST_N    ( .CLK(CCLK   ), .RST_N(RST_N), .SYNC_RST_N(cclk_rst_n   ) );
@@ -367,7 +369,7 @@ module TOP #(
 
     //  Ezpand signal
     // 27[cycle] + alpha
-    EXPAND_SIGNAL #( .EXPAND_NUM(30) ) m_EXPAND_SIG_UART_START_TRIG ( .CLK(CLK), .RST_N(RST_N), .iS(uart_start_trig), .oS(expand_uart_start_trig) );
+    EXPAND_SIGNAL #( .EXPAND_NUM(30) ) m_EXPAND_SIG_UART_START_TRIG ( .CLK(bufg_clk /*CLK*/), .RST_N(RST_N), .iS(uart_start_trig), .oS(expand_uart_start_trig) );
 
     UART_IF m_UART_IF( .CLK(clk_uart_x8), .RST_N(RST_N),
                 .iOUT_SEL(out_sel),
@@ -400,7 +402,7 @@ module TOP #(
     assign  host_if_rd = eye_reg_rd;
 
     //
-    HOST_IF_CORE #( .ADDR_WIDTH(16), .FIFO_DATA_WIDTH(16*8) )   m_HOST_IF_CORE ( .CLK(CLK), .RST_N(RST_N),
+    HOST_IF_CORE #( .ADDR_WIDTH(16), .FIFO_DATA_WIDTH(16*8) )   m_HOST_IF_CORE ( .CLK(bufg_clk /*CLK*/), .RST_N(RST_N),
                 // for Internal Bus
                 .oOUT_ADDR(host_if_addr ),
                 .oOUT_WE  (host_if_we   ),
@@ -418,7 +420,7 @@ module TOP #(
                 .oDATA(uart_host_data)
             );
 
-    REG_BUS_IF #( .ADDR_WIDTH(16), .WE_WIDTH(32), .RE_WIDTH(32) )     m_REG_BUF_IF ( .CLK(CLK), .RST_N(RST_N),
+    REG_BUS_IF #( .ADDR_WIDTH(16), .WE_WIDTH(32), .RE_WIDTH(32) )     m_REG_BUF_IF ( .CLK(bufg_clk /*CLK*/), .RST_N(RST_N),
                 // from/to HOST_IF
                 .iADDR (host_if_addr),
                 .iWE   (host_if_we),
@@ -434,7 +436,7 @@ module TOP #(
                 .iRD    (host_if_rd)
             );
 
-    EXPAND_SIGNAL #( .EXPAND_NUM(27) ) m_EXPAND_SIG_BUF_CLR ( .CLK(CLK), .RST_N(RST_N), .iS(buf_clr), .oS(buffer_clr) );
+    EXPAND_SIGNAL #( .EXPAND_NUM(27) ) m_EXPAND_SIG_BUF_CLR ( .CLK(bufg_clk /*CLK*/), .RST_N(RST_N), .iS(buf_clr), .oS(buffer_clr) );
 
     UART_RECEIVER_FIFO #( .BUFFER_SIZE(16) )    m_UART_RECEIVER_FIFO ( .CLK(clk_uart_x8), .RST_N(RST_N),
                 //
@@ -447,7 +449,7 @@ module TOP #(
                 .oDATA(uart_rx_fifo)
             );
 
-    EYE_TRACKER_REG #( .WE_WIDTH(32), .RE_WIDTH(32) )   m_EYE_TRACKER_REG ( .CLK(CLK), .RST_N(RST_N),
+    EYE_TRACKER_REG #( .WE_WIDTH(32), .RE_WIDTH(32) )   m_EYE_TRACKER_REG ( .CLK(bufg_clk /*CLK*/), .RST_N(RST_N),
                 // from/to HOST_IF
                 .iWE_BIT(host_we_bit), 
                 .iRE_BIT(host_re_bit), 
@@ -474,55 +476,55 @@ module TOP #(
 
 
     // DUMMY pin
-    DFF #( .DATA_WIDTH(1) ) m_DUMMY0( .CLK(CLK), .RST_N(RST_N), .iD(DUMMY0), .oD() );
-    DFF #( .DATA_WIDTH(1) ) m_DUMMY1( .CLK(CLK), .RST_N(RST_N), .iD(DUMMY1), .oD() );
+    DFF #( .DATA_WIDTH(1) ) m_DUMMY0( .CLK(bufg_clk /*CLK*/), .RST_N(RST_N), .iD(DUMMY0), .oD() );
+    DFF #( .DATA_WIDTH(1) ) m_DUMMY1( .CLK(bufg_clk /*CLK*/), .RST_N(RST_N), .iD(DUMMY1), .oD() );
 
     // ILA
 
-    ILA m_ILA(
-        .clk(VGA_CLK),
-        //
-        .probe0(FVAL),
-        .probe1(LVAL),
-        .probe2(DVAL),
-        .probe3(DATA_L),
-        .probe4(DATA_R),
-        .probe5(rslt_sx_ff  /*pixel_vsync*/),
-        .probe6(rslt_sy_ff  /*pixel_hsync*/),
-        .probe7(start_s_trig/*pixel_de*/),
-        .probe8(cmr_vsync),
-        .probe9(cmr_hsync),
-        .probe10(cmr_de),
-        .probe11(rslt_s_ff /*mem_sel*/ /*memout_cx_en*/),
-        .probe12(grav_sel_en),
-        .probe13(cmr_field/*busy*/),
-        .probe14(UART_TXD),
-        .probe15(calc_state),
-        .probe16(VGA_VSYNC),
-        .probe17(VGA_HSYNC),
-        .probe18(VGA_R),
-        .probe19(sum_s[0]),
-        .probe20(sum_s[1]),
-        .probe21(cmr_addr[9] /*sum_s[2]*/),
-        .probe22(cmr_addr[7:0] /*threshold[7:0]*/),
-        .probe23(cmr_addr[8] /*sum_s[3]*/)
-/*
-        .probe19(clk_uart_x8),
-        .probe20(start_s_trig),
-        .probe21(uart_de),
-        .probe22(uart_data),
-        .probe23(tx_busy)
-*/
-//        .probe24(sum_s),
-//        .probe25(sum_sy)
-/*
-.probe18(sum_s[7:0]),
-.probe19(sum_s[8]),
-.probe20(sum_s[9]),
-.probe21(sum_s[10]),
-.probe22(sum_s[18:11]),
-.probe23(sum_s[19])
-*/
-);
+//    ILA m_ILA(
+//        .clk(VGA_CLK),
+//        //
+//        .probe0(FVAL),
+//        .probe1(LVAL),
+//        .probe2(DVAL),
+//        .probe3(DATA_L),
+//        .probe4(DATA_R),
+//        .probe5(rslt_sx_ff  /*pixel_vsync*/),
+//        .probe6(rslt_sy_ff  /*pixel_hsync*/),
+//        .probe7(start_s_trig/*pixel_de*/),
+//        .probe8(cmr_vsync),
+//        .probe9(cmr_hsync),
+//        .probe10(cmr_de),
+//        .probe11(rslt_s_ff /*mem_sel*/ /*memout_cx_en*/),
+//        .probe12(grav_sel_en),
+//        .probe13(cmr_field/*busy*/),
+//        .probe14(UART_TXD),
+//        .probe15(calc_state),
+//        .probe16(VGA_VSYNC),
+//        .probe17(VGA_HSYNC),
+//        .probe18(VGA_R),
+//        .probe19(sum_s[0]),
+//        .probe20(sum_s[1]),
+//        .probe21(cmr_addr[9] /*sum_s[2]*/),
+//        .probe22(cmr_addr[7:0] /*threshold[7:0]*/),
+//        .probe23(cmr_addr[8] /*sum_s[3]*/)
+///*
+//        .probe19(clk_uart_x8),
+//        .probe20(start_s_trig),
+//        .probe21(uart_de),
+//        .probe22(uart_data),
+//        .probe23(tx_busy)
+//*/
+////        .probe24(sum_s),
+////        .probe25(sum_sy)
+///*
+//.probe18(sum_s[7:0]),
+//.probe19(sum_s[8]),
+//.probe20(sum_s[9]),
+//.probe21(sum_s[10]),
+//.probe22(sum_s[18:11]),
+//.probe23(sum_s[19])
+//*/
+//);
 
 endmodule

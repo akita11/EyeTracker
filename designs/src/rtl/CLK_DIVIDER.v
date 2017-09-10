@@ -29,8 +29,9 @@ module CLK_DIVIDER #(
     reg                                     div_clk;
 
     //
-    assign  oDIV_CLK = div_clk;
-
+//    assign  oDIV_CLK = div_clk;
+    BUFG    m_DIV_CLK(.I(div_clk), .O(oDIV_CLK));
+   
     // 
     always @(posedge CLK or negedge RST_N) begin
         if (!RST_N) begin

@@ -18,9 +18,10 @@ module CLK25M(
     // 
     input   wire                            CLK,
     input   wire                            RST_N,
-    output  wire                            CLKOUT
+    output  wire                            CLKOUT,
+    output  wire                            BUFG_OUT
 );
 
-    CLKGEN_MMCM     m_CLKGEN_MMCM ( .clk_in1(CLK), .resetn(RST_N), .clk_out1(CLKOUT), .locked() );
+    CLKGEN_MMCM     m_CLKGEN_MMCM ( .clk_in1(CLK), .resetn(RST_N), .clk_out1(CLKOUT), .clk_out2(BUFG_OUT), .locked() );
 
 endmodule
