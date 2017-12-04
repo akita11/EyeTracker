@@ -22,6 +22,8 @@ module CLK25M(
     output  wire                            BUFG_OUT
 );
 
-    CLKGEN_MMCM     m_CLKGEN_MMCM ( .clk_in1(CLK), .resetn(RST_N), .clk_out1(CLKOUT), .clk_out2(BUFG_OUT), .locked() );
+    // Spartan6 : resetn => Active High
+    // Kintex-7 : resetn => Active Low
+    CLKGEN_MMCM     m_CLKGEN_MMCM ( .clk_in1(CLK), .resetn(~RST_N), .clk_out1(CLKOUT), .clk_out2(BUFG_OUT), .locked() );
 
 endmodule
