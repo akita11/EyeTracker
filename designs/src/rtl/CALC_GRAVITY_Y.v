@@ -115,7 +115,8 @@ module CALC_GRAVITY_Y #(
         genvar                                          i;
         //
         for (i=0; i< MDATA_WIDTH; i=i+1) begin: inst_loop
-            SUM_UNIT #( .FACTOR_WIDTH($clog2(MDATA_WIDTH)), .IDATA_WIDTH(1), .ODATA_WIDTH(SUM_S_WIDTH) ) m_SUM_UNIT(
+//            SUM_UNIT #( .FACTOR_WIDTH($clog2(MDATA_WIDTH)), .IDATA_WIDTH(1), .ODATA_WIDTH(SUM_S_WIDTH) ) m_SUM_UNIT(
+            SUM_UNIT #( .FACTOR_WIDTH(10), .IDATA_WIDTH(1), .ODATA_WIDTH(SUM_S_WIDTH) ) m_SUM_UNIT(
                 .CLK(CCLK), .RST_N(RST_N), 
                 //
                 .iCLR(clear), .iDATA_EN(iDATA_EN), .iFACTOR(i), .iD(iMEMIN[i]), 

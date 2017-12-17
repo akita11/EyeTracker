@@ -321,7 +321,9 @@ module TOP #(
     );
 
     // Clock Control
-    CLK25M  m_CLK25M ( .CLK(/*bufg_clk*/ CLK), .RST_N(RST_N), .CLKOUT(cts_vga_clk), .BUFG_OUT(bufg_out) );
+    // Spartan6 : resetn => Active High
+    // Kintex-7 : resetn => Active Low
+    CLK25M  m_CLK25M ( .CLK(/*bufg_clk*/ CLK), .RST_N(~RST_N), .CLKOUT(cts_vga_clk), .BUFG_OUT(bufg_out) );
 
     //            =>       x8  / 50MHz / 27 
     // 230400 bps => 1843.2KHz / 1801.851KHz
