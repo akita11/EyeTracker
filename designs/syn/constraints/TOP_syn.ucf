@@ -189,7 +189,7 @@ TIMESPEC "TS_CLK" = PERIOD "CLK" 20.000 ns HIGH 50.00%;
 #set_clock_uncertainty -setup 0.300 [get_clocks CCLK]
 #set_clock_uncertainty -hold 0.100 [get_clocks CCLK]
 NET "CCLK" TNM_NET = "CCLK";
-TIMESPEC "TS_CCLK" = PERIOD "CCLK" 12.500 ns HIGH 50.00%;
+TIMESPEC "TS_CCLK" = PERIOD "CCLK" 25.000 ns HIGH 50.00%;
 
 ## /* ----- VCLK ----- */
 ##create_clock -name VGA_CLK -period 40.000 -waveform "0 20.000" [get_pins m_CLK25M/m_CLKGEN_MMCM/inst/mmcm_adv_inst/CLKOUT0]

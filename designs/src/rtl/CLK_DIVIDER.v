@@ -21,12 +21,14 @@ module CLK_DIVIDER #(
     input   wire                            CLK,
     input   wire                            RST_N,
     //
-    output  wire                            oDIV_CLK
+    output  wire                            oDIV_CLK,
+    output  wire                            oDIV_CE
 );
 
     //
     reg     [$clog2(DIVIDE): 0]             counter;
     reg                                     div_clk;
+    reg                                     div_ce;
 
     //
 //    assign  oDIV_CLK = div_clk;
@@ -36,15 +38,19 @@ module CLK_DIVIDER #(
     always @(posedge CLK or negedge RST_N) begin
         if (!RST_N) begin
             div_clk <= 1'b0;
+            div_ce  <= 1'b0;
             counter <= 'h0;
         end else if (counter == (DIVIDE - 'h1)) begin
             div_clk <= 1'b0;
+            div_ce  <= 1'b1;
             counter <= 'h0;
         end else if (counter >= DIVIDE/2) begin
             div_clk <= 1'b1;
+            div_ce  <= 1'b0;
             counter <= counter + 1;
         end else begin
             div_clk <= div_clk;
+            div_ce  <= 1'b0;
             counter <= counter + 1;
         end
     end

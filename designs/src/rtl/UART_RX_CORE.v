@@ -20,6 +20,8 @@ module UART_RX_CORE #(
     input   wire                                CLK,
     input   wire                                RST_N,
     //
+    input   wire                                iCLK_CE,
+    //
     input   wire                                iSEVEN_BIT,         // Low = 8bit,        High = 7bit
     input   wire                                iPARITY_EN,         // Low = Non Parity,  High = Parity Enable
     input   wire                                iODD_PARITY,        // Low = Even Parity, High = Odd Parity
@@ -247,7 +249,7 @@ module UART_RX_CORE #(
             //
             de           <= 1'b0;
             data         <= 'h0;
-        end else begin
+        end else if (iCLK_CE) begin
             state        <= next_state;
             //
             wait_count   <= next_wait_count;
@@ -258,6 +260,17 @@ module UART_RX_CORE #(
             //
             de           <= next_de;
             data         <= next_data;
+        end else begin
+            state        <= state;
+            //
+            wait_count   <= wait_count;
+            latch_count  <= latch_count;
+            //
+            retry        <= retry;
+            parity_error <= parity_error;
+            //
+            de           <= de;
+            data         <= data;
         end
     end
 

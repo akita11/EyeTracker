@@ -20,6 +20,8 @@ module UART_TX_CORE #(
     input   wire                                CLK,
     input   wire                                RST_N,
     // 
+    input   wire                                iCLK_CE,
+    //
     input   wire                                iSEVEN_BIT,         // Low = 8bit,        High = 7bit
     input   wire                                iPARITY_EN,         // Low = Non Parity,  High = Parity Enable
     input   wire                                iODD_PARITY,        // Low = Even Parity, High = Odd Parity
@@ -60,7 +62,7 @@ module UART_TX_CORE #(
     assign  oUART_TX = (com_out_en) ? out_data[0]: 1'b1;
 
     // 
-    DET_EDGE m_DET_START_TRIG( .CLK(CLK), .RST_N(RST_N), .iS(iDE), .oRISE(start_trig), .oFALL() );
+    DET_EDGE m_DET_START_TRIG( .CLK(CLK), .RST_N(RST_N), .iS(iDE&iCLK_CE), .oRISE(start_trig), .oFALL() );
 
     // 
     always @(*) begin
@@ -243,7 +245,7 @@ module UART_TX_CORE #(
             out_data   <= 'hFF;
             //
             tx_busy    <= 1'b0;
-        end else begin
+        end else if (iCLK_CE) begin
             state      <= next_state;
             //
             wait_count <= next_wait_count;
@@ -253,6 +255,16 @@ module UART_TX_CORE #(
             out_data   <= next_out_data;
             //
             tx_busy    <= next_tx_busy;
+        end else begin
+            state      <= state;
+            //
+            wait_count <= wait_count;
+            hold_count <= hold_count;
+            //
+            com_out_en <= com_out_en;
+            out_data   <= out_data;
+            //
+            tx_busy    <= tx_busy;
         end
     end
 

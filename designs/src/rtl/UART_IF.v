@@ -19,6 +19,8 @@ module UART_IF #(
     input   wire                                CLK,
     input   wire                                RST_N,
     //
+    input   wire                                iCLK_CE,
+    //
     input   wire                                iOUT_SEL,
     //
     input   wire    [SUM_S_WIDTH  -1: 0]        iSUM_S,
@@ -105,11 +107,11 @@ module UART_IF #(
     assign  oDATA = out_data;
 
     //
-    CYCLE_DELAY #( .DATA_WIDTH(1), .DELAY(1) )  m_TRIG_DLY( .CLK(CLK), .RST_N(RST_N), .iD(iTRIG), .oD(trig_dly) );
+    CYCLE_DELAY #( .DATA_WIDTH(1), .DELAY(1) )  m_TRIG_DLY( .CLK(CLK), .RST_N(RST_N), .iD(iTRIG & iCLK_CE), .oD(trig_dly) );
 
     //
-    DET_EDGE m_DET_TRIG_EDGE( .CLK(CLK), .RST_N(RST_N), .iS(trig_dly), .oRISE(start_trig), .oFALL() );
-    DET_EDGE m_DET_BUSY_EDGE( .CLK(CLK), .RST_N(RST_N), .iS(iUART_TX_BUSY), .oRISE(rise_busy), .oFALL(fall_busy) );
+    DET_EDGE m_DET_TRIG_EDGE( .CLK(CLK), .RST_N(RST_N), .iS(trig_dly & iCLK_CE), .oRISE(start_trig), .oFALL() );
+    DET_EDGE m_DET_BUSY_EDGE( .CLK(CLK), .RST_N(RST_N), .iS(iUART_TX_BUSY & iCLK_CE), .oRISE(rise_busy), .oFALL(fall_busy) );
 
     //
     CONV_ASCII #( .DATA_WIDTH(20) ) m_CONV_ASCII_S   ( .CLK(CLK), .RST_N(RST_N), .iDATA(iSUM_S      ), .oASCII(ascii_s  ) );
@@ -591,7 +593,7 @@ module UART_IF #(
             hold_data  <= 'h0;
             //
             busy       <= 1'b0;
-        end else begin
+        end else if (iCLK_CE) begin
             state      <= next_state;
             //
             wait_count <= next_wait_count;
@@ -602,6 +604,17 @@ module UART_IF #(
             hold_data  <= next_hold_data;
             //
             busy       <= next_busy;
+        end else begin
+            state      <= state;
+            //
+            wait_count <= wait_count;
+            //
+            com_out_en <= com_out_en;
+            out_data   <= out_data;
+            //
+            hold_data  <= hold_data;
+            //
+            busy       <= busy;
         end
     end
 

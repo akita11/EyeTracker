@@ -137,6 +137,7 @@ module TOP #(
 
     //
     wire                                clk_uart_x8;
+    wire                                clk_uart_x8_ce;
 
     //
     wire    [DATA_WIDTH -1: 0]          uart_inp_data;
@@ -327,9 +328,9 @@ module TOP #(
 
     //            =>       x8  / 50MHz / 27 
     // 230400 bps => 1843.2KHz / 1801.851KHz
-//    BUFG m_CLK_DIVIDER(.I(CLK), .O(bufg_clk));
+    BUFG m_CLK_DIVIDER(.I(bufg_out /*CLK*/), .O(bufg_clk));
    
-    CLK_DIVIDER #( .DIVIDE(27) )    m_CLK_UART( .CLK(bufg_clk /*CLK*/), .RST_N(RST_N), .oDIV_CLK(clk_uart_x8) );
+    CLK_DIVIDER #( .DIVIDE(27) )    m_CLK_UART( .CLK(bufg_clk /*CLK*/), .RST_N(RST_N), .oDIV_CLK(clk_uart_x8), .oDIV_CE(clk_uart_x8_ce) );
 
     // Reset Control
     ASYNC_SYNC_RST  m_CCLK_RST_N    ( .CLK(CCLK       ), .RST_N(RST_N), .SYNC_RST_N(cclk_rst_n   ) );
@@ -340,7 +341,8 @@ module TOP #(
     assign  uart_out_data = (uart_sw) ? uart_host_data: uart_calc_data;
 
     // UART (temporal)
-    UART_TX_CORE #( .OVER_SAMPLING(8) )    m_UART_TX_CORE( .CLK(clk_uart_x8), .RST_N(RST_N), 
+    UART_TX_CORE #( .OVER_SAMPLING(8) )    m_UART_TX_CORE( .CLK(bufg_clk /*clk_uart_x8*/), .RST_N(RST_N), 
+                .iCLK_CE(clk_uart_x8_ce),
                 .iSEVEN_BIT (1'b1),        // Low = 8bit,        High = 7bit
                 .iPARITY_EN (1'b0),        // Low = Non Parity,  High = Parity Enable
                 .iODD_PARITY(1'b0),        // Low = Even Parity, High = Odd Parity
@@ -353,7 +355,8 @@ module TOP #(
                 .oUART_TX     (UART_TXD)
     );
 
-    UART_RX_CORE #( .OVER_SAMPLING(8) )    m_UART_RX_CORE ( .CLK(clk_uart_x8), .RST_N(RST_N),
+    UART_RX_CORE #( .OVER_SAMPLING(8) )    m_UART_RX_CORE ( .CLK(bufg_clk /*clk_uart_x8*/), .RST_N(RST_N),
+                .iCLK_CE(clk_uart_x8_ce),
                 .iSEVEN_BIT (1'b1),        // Low = 8bit,        High = 7bit
                 .iPARITY_EN (1'b0),        // Low = Non Parity,  High = Parity Enable
                 .iODD_PARITY(1'b0),        // Low = Even Parity, High = Odd Parity
@@ -374,7 +377,9 @@ module TOP #(
     // 27[cycle] + alpha
     EXPAND_SIGNAL #( .EXPAND_NUM(30) ) m_EXPAND_SIG_UART_START_TRIG ( .CLK(bufg_clk /*CLK*/), .RST_N(RST_N), .iS(uart_start_trig), .oS(expand_uart_start_trig) );
 
-    UART_IF m_UART_IF( .CLK(clk_uart_x8), .RST_N(RST_N),
+    UART_IF m_UART_IF( .CLK(bufg_clk /*clk_uart_x8*/), .RST_N(RST_N),
+                .iCLK_CE(clk_uart_x8_ce),
+                //
                 .iOUT_SEL(out_sel),
                 //
                 .iSUM_S        (sum_s        ),
@@ -441,7 +446,7 @@ module TOP #(
 
     EXPAND_SIGNAL #( .EXPAND_NUM(27) ) m_EXPAND_SIG_BUF_CLR ( .CLK(bufg_clk /*CLK*/), .RST_N(RST_N), .iS(buf_clr), .oS(buffer_clr) );
 
-    UART_RECEIVER_FIFO #( .BUFFER_SIZE(16) )    m_UART_RECEIVER_FIFO ( .CLK(clk_uart_x8), .RST_N(RST_N),
+    UART_RECEIVER_FIFO #( .BUFFER_SIZE(16) )    m_UART_RECEIVER_FIFO ( .CLK(bufg_clk /*CLK*/), .RST_N(RST_N),
                 //
                 .iCLR (buffer_clr   ),
                 //
