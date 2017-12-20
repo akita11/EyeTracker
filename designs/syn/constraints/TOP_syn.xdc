@@ -42,6 +42,55 @@ create_generated_clock -name UART_X8_CLK -source [get_ports CLK] -divide_by 27 -
 # /* ----- Clock Group Setting ----- */
 set_clock_groups -asynchronous -group [get_clocks CLK] -group [get_clocks CCLK] -group [get_clocks OUT_VGA_CLK] -group [get_clocks UART_X8_CLK]
 
+# /* ----- set input_delay ----- */
+#   Setup : 3.5 [ns] (20 - 3.5)
+set_input_delay -clock [get_clocks CCLK] -max 16.5 [get_ports DATA_L[7]]
+set_input_delay -clock [get_clocks CCLK] -max 16.5 [get_ports DATA_L[6]]
+set_input_delay -clock [get_clocks CCLK] -max 16.5 [get_ports DATA_L[5]]
+set_input_delay -clock [get_clocks CCLK] -max 16.5 [get_ports DATA_L[4]]
+set_input_delay -clock [get_clocks CCLK] -max 16.5 [get_ports DATA_L[3]]
+set_input_delay -clock [get_clocks CCLK] -max 16.5 [get_ports DATA_L[2]]
+set_input_delay -clock [get_clocks CCLK] -max 16.5 [get_ports DATA_L[1]]
+set_input_delay -clock [get_clocks CCLK] -max 16.5 [get_ports DATA_L[0]]
+
+set_input_delay -clock [get_clocks CCLK] -max 16.5 [get_ports DATA_R[7]]
+set_input_delay -clock [get_clocks CCLK] -max 16.5 [get_ports DATA_R[6]]
+set_input_delay -clock [get_clocks CCLK] -max 16.5 [get_ports DATA_R[5]]
+set_input_delay -clock [get_clocks CCLK] -max 16.5 [get_ports DATA_R[4]]
+set_input_delay -clock [get_clocks CCLK] -max 16.5 [get_ports DATA_R[3]]
+set_input_delay -clock [get_clocks CCLK] -max 16.5 [get_ports DATA_R[2]]
+set_input_delay -clock [get_clocks CCLK] -max 16.5 [get_ports DATA_R[1]]
+set_input_delay -clock [get_clocks CCLK] -max 16.5 [get_ports DATA_R[0]]
+
+set_input_delay -clock [get_clocks CCLK] -max 16.5 [get_ports FVAL]
+set_input_delay -clock [get_clocks CCLK] -max 16.5 [get_ports DVAL]
+set_input_delay -clock [get_clocks CCLK] -max 16.5 [get_ports LVAL]
+
+#   Hold  : 3.5 [ns] 
+set_input_delay -clock [get_clocks CCLK] -min 3.5 [get_ports DATA_L[7]]
+set_input_delay -clock [get_clocks CCLK] -min 3.5 [get_ports DATA_L[6]]
+set_input_delay -clock [get_clocks CCLK] -min 3.5 [get_ports DATA_L[5]]
+set_input_delay -clock [get_clocks CCLK] -min 3.5 [get_ports DATA_L[4]]
+set_input_delay -clock [get_clocks CCLK] -min 3.5 [get_ports DATA_L[3]]
+set_input_delay -clock [get_clocks CCLK] -min 3.5 [get_ports DATA_L[2]]
+set_input_delay -clock [get_clocks CCLK] -min 3.5 [get_ports DATA_L[1]]
+set_input_delay -clock [get_clocks CCLK] -min 3.5 [get_ports DATA_L[0]]
+
+set_input_delay -clock [get_clocks CCLK] -min 3.5 [get_ports DATA_R[7]]
+set_input_delay -clock [get_clocks CCLK] -min 3.5 [get_ports DATA_R[6]]
+set_input_delay -clock [get_clocks CCLK] -min 3.5 [get_ports DATA_R[5]]
+set_input_delay -clock [get_clocks CCLK] -min 3.5 [get_ports DATA_R[4]]
+set_input_delay -clock [get_clocks CCLK] -min 3.5 [get_ports DATA_R[3]]
+set_input_delay -clock [get_clocks CCLK] -min 3.5 [get_ports DATA_R[2]]
+set_input_delay -clock [get_clocks CCLK] -min 3.5 [get_ports DATA_R[1]]
+set_input_delay -clock [get_clocks CCLK] -min 3.5 [get_ports DATA_R[0]]
+
+set_input_delay -clock [get_clocks CCLK] -min 3.5 [get_ports FVAL]
+set_input_delay -clock [get_clocks CCLK] -min 3.5 [get_ports DVAL]
+set_input_delay -clock [get_clocks CCLK] -min 3.5 [get_ports LVAL]
+
+# /* ----- set output_delay ----- */
+
 # /* ----- set false path ----- */
 #
 set_property PULLUP true [get_ports RST_N]
