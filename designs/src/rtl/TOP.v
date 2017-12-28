@@ -341,8 +341,8 @@ module TOP #(
     assign  uart_out_data = (uart_sw) ? uart_host_data: uart_calc_data;
 
     // UART (temporal)
-    UART_TX_CORE #( .OVER_SAMPLING(8) )    m_UART_TX_CORE( .CLK(bufg_clk /*clk_uart_x8*/), .RST_N(RST_N), 
-                .iCLK_CE(clk_uart_x8_ce),
+    UART_TX_CORE #( .OVER_SAMPLING(8) )    m_UART_TX_CORE( .CLK(/*bufg_clk*/ clk_uart_x8), .RST_N(RST_N), 
+                .iCLK_CE(1'b1 /*clk_uart_x8_ce*/),
                 .iSEVEN_BIT (1'b1),        // Low = 8bit,        High = 7bit
                 .iPARITY_EN (1'b0),        // Low = Non Parity,  High = Parity Enable
                 .iODD_PARITY(1'b0),        // Low = Even Parity, High = Odd Parity
@@ -355,8 +355,8 @@ module TOP #(
                 .oUART_TX     (UART_TXD)
     );
 
-    UART_RX_CORE #( .OVER_SAMPLING(8) )    m_UART_RX_CORE ( .CLK(bufg_clk /*clk_uart_x8*/), .RST_N(RST_N),
-                .iCLK_CE(clk_uart_x8_ce),
+    UART_RX_CORE #( .OVER_SAMPLING(8) )    m_UART_RX_CORE ( .CLK(/*bufg_clk*/ clk_uart_x8), .RST_N(RST_N),
+                .iCLK_CE(1'b1 /*clk_uart_x8_ce*/),
                 .iSEVEN_BIT (1'b1),        // Low = 8bit,        High = 7bit
                 .iPARITY_EN (1'b0),        // Low = Non Parity,  High = Parity Enable
                 .iODD_PARITY(1'b0),        // Low = Even Parity, High = Odd Parity
@@ -377,8 +377,8 @@ module TOP #(
     // 27[cycle] + alpha
     EXPAND_SIGNAL #( .EXPAND_NUM(30) ) m_EXPAND_SIG_UART_START_TRIG ( .CLK(bufg_clk /*CLK*/), .RST_N(RST_N), .iS(uart_start_trig), .oS(expand_uart_start_trig) );
 
-    UART_IF m_UART_IF( .CLK(bufg_clk /*clk_uart_x8*/), .RST_N(RST_N),
-                .iCLK_CE(clk_uart_x8_ce),
+    UART_IF m_UART_IF( .CLK(/*bufg_clk*/ clk_uart_x8), .RST_N(RST_N),
+                .iCLK_CE(1'b1 /*clk_uart_x8_ce*/),
                 //
                 .iOUT_SEL(out_sel),
                 //
