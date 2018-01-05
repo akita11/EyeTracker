@@ -9,7 +9,7 @@
 // -----------------------------------------------------------------------------
 //  Description   : Top module for Camera Link
 // -----------------------------------------------------------------------------
-//  Copyright (C) 2017 K.Ishiwatari All Rights Reserved.
+//  Copyright (C) 2017-2018 K.Ishiwatari All Rights Reserved.
 // -----------------------------------------------------------------------------
 
 `timescale                                  1ns/1ps
@@ -54,8 +54,8 @@ module TOP #(
 
     //
     localparam  HOST_ADDR_WIDTH         = 16;
-    localparam  HOST_WE_WIDTH           = 32;
-    localparam  HOST_RE_WIDTH           = 32;
+    localparam  HOST_WE_WIDTH           = 48;
+    localparam  HOST_RE_WIDTH           = 48;
 
     //
     localparam  MAX_BUF_SIZE            = 16;
@@ -160,6 +160,7 @@ module TOP #(
 
     //
     wire    [DATA_WIDTH -1: 0]          eye_reg_rd;
+    wire    [DATA_WIDTH -1: 0]          dbg_cnt_rd;
 
     //
     wire    [MAX_BUF_SIZE * 8 -1: 0]    uart_rx_fifo;
@@ -407,7 +408,7 @@ module TOP #(
             );
 
     //
-    assign  host_if_rd = eye_reg_rd;
+    assign  host_if_rd = eye_reg_rd | dbg_cnt_rd;
 
     //
     HOST_IF_CORE #( .ADDR_WIDTH(16), .FIFO_DATA_WIDTH(16*8) )   m_HOST_IF_CORE ( .CLK(bufg_clk /*CLK*/), .RST_N(RST_N),
@@ -428,7 +429,7 @@ module TOP #(
                 .oDATA(uart_host_data)
             );
 
-    REG_BUS_IF #( .ADDR_WIDTH(16), .WE_WIDTH(32), .RE_WIDTH(32) )     m_REG_BUF_IF ( .CLK(bufg_clk /*CLK*/), .RST_N(RST_N),
+    REG_BUS_IF #( .ADDR_WIDTH(16), .WE_WIDTH(48), .RE_WIDTH(48) )     m_REG_BUF_IF ( .CLK(bufg_clk /*CLK*/), .RST_N(RST_N),
                 // from/to HOST_IF
                 .iADDR (host_if_addr),
                 .iWE   (host_if_we),
@@ -459,8 +460,8 @@ module TOP #(
 
     EYE_TRACKER_REG #( .WE_WIDTH(32), .RE_WIDTH(32) )   m_EYE_TRACKER_REG ( .CLK(bufg_clk /*CLK*/), .RST_N(RST_N),
                 // from/to HOST_IF
-                .iWE_BIT(host_we_bit), 
-                .iRE_BIT(host_re_bit), 
+                .iWE_BIT(host_we_bit[31: 0]), 
+                .iRE_BIT(host_re_bit[31: 0]), 
                 .iDATA  (host_if_wd ),
                 .oRD    (eye_reg_rd ),
                 //
@@ -482,6 +483,16 @@ module TOP #(
                 .oOUT_SEL     (out_sel    )
             );
 
+    DBG_CNT_L_H #( .C_CNT_WH(12), .WE_WIDTH(16), .RE_WIDTH(16) )   m_DBG_CNT_L_H_REG ( .CLK(bufg_clk /*CLK*/), .RST_N(RST_N),
+                // from/to HOST_IF
+                .iWE_BIT(host_we_bit[47:32]), 
+                .iRE_BIT(host_re_bit[47:32]), 
+                .iDATA  (host_if_wd ),
+                .oRD    (dbg_cnt_rd ),
+                //
+                .iCLR(1'b0),
+                .iSIG(cmr_de)
+            );
 
     // DUMMY pin
     DFF #( .DATA_WIDTH(1) ) m_DUMMY0( .CLK(bufg_clk /*CLK*/), .RST_N(RST_N), .iD(DUMMY0), .oD() );
