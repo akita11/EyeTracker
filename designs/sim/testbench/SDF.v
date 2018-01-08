@@ -17,7 +17,7 @@
 module SDF (
 );
     initial begin
-        $sdf_annotate("./sdf/sdf_file.sdf", SIM_TOP.m_TOP,,"./log/sdf_annotation.log");
+        $sdf_annotate("./sdf/TOP_timesim.sdf", SIM_TOP.m_TOP,,"./log/sdf_annotation.log");
     end
 
 endmodule
