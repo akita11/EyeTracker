@@ -1,0 +1,4 @@
+#!/bin/bash
+
+export LD_LIBRARY_PATH=${NOVAS_HOME}/share/PLI/IUS/LINUX64:${LD_LIBRARY_PATH}
+

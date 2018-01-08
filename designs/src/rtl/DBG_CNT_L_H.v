@@ -57,7 +57,7 @@ module DBG_CNT_L_H #(
     wire    [C_CNT_WH -1: 0]                    lo_cnt3;
 
     //
-    assign  clr = (iWE_BIT[0] & iDATA[0]);
+    assign  clr_sig = (iWE_BIT[0] & iDATA[0]);
 
     //
     CYCLE_DELAY #( .DATA_WIDTH(1), .DELAY(2) ) m_SYNC_SIG( .CLK(CLK), .RST_N(RST_N), .iD(iSIG), .oD(syn_sig) );
