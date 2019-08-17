@@ -1,0 +1,361 @@
+## /* ----- Pad Location ----- */
+NET "CCLK" LOC = D11;
+NET "LVAL" LOC = D8;
+NET "FVAL" LOC = A6;
+NET "DVAL" LOC = B6;
+
+NET "DATA_L[0]" LOC = A18;
+NET "DATA_L[1]" LOC = A17;
+NET "DATA_L[2]" LOC = C17;
+NET "DATA_L[3]" LOC = A16;
+NET "DATA_L[4]" LOC = B16;
+NET "DATA_L[5]" LOC = C15;
+NET "DATA_L[6]" LOC = A5;
+NET "DATA_L[7]" LOC = A15;
+
+NET "DATA_R[7]" LOC = A11;
+NET "DATA_R[6]" LOC = D14;
+NET "DATA_R[5]" LOC = B10;
+NET "DATA_R[4]" LOC = A10;
+NET "DATA_R[3]" LOC = C11;
+NET "DATA_R[2]" LOC = C14;
+NET "DATA_R[1]" LOC = B14;
+NET "DATA_R[0]" LOC = A14;
+
+NET "VGA_R[0]" LOC = Y13;
+NET "VGA_R[1]" LOC = AB12;
+NET "VGA_R[2]" LOC = Y12;
+NET "VGA_R[3]" LOC = AA12;
+NET "VGA_R[4]" LOC = W11;
+NET "VGA_R[5]" LOC = V11;
+NET "VGA_R[6]" LOC = AA10;
+NET "VGA_R[7]" LOC = AB10;
+
+NET "VGA_G[0]" LOC = AB16;
+NET "VGA_G[1]" LOC = Y17;
+NET "VGA_G[2]" LOC = AB17;
+NET "VGA_G[3]" LOC = AA16;
+NET "VGA_G[4]" LOC = AB15;
+NET "VGA_G[5]" LOC = Y15;
+NET "VGA_G[6]" LOC = AB14;
+NET "VGA_G[7]" LOC = AA14;
+
+NET "VGA_B[0]" LOC = T22;
+NET "VGA_B[1]" LOC = R22;
+NET "VGA_B[2]" LOC = P21;
+NET "VGA_B[3]" LOC = P22;
+NET "VGA_B[4]" LOC = N20;
+NET "VGA_B[5]" LOC = N22;
+NET "VGA_B[6]" LOC = M22;
+NET "VGA_B[7]" LOC = M17;
+
+NET "VGA_CLK" LOC = R20;
+NET "VGA_HSYNC" LOC = U20;
+NET "VGA_VSYNC" LOC = T21;
+
+NET "UART_TXD" LOC = W20;
+NET "UART_RXD" LOC = AA18;
+NET "CLK" LOC = K20;
+NET "RST_N" LOC = K21;
+NET "JP[7]" LOC = N19;
+NET "JP[6]" LOC = Y19;
+NET "JP[5]" LOC = AB18;
+NET "JP[4]" LOC = AB19;
+NET "JP[3]" LOC = W22;
+NET "JP[2]" LOC = V22;
+NET "JP[1]" LOC = V21;
+NET "JP[0]" LOC = U22;
+
+## /* ----- IO Buffer ----- */
+NET "JP[7]" IOSTANDARD = LVCMOS33;
+NET "JP[6]" IOSTANDARD = LVCMOS33;
+NET "JP[5]" IOSTANDARD = LVCMOS33;
+NET "JP[4]" IOSTANDARD = LVCMOS33;
+NET "JP[3]" IOSTANDARD = LVCMOS33;
+NET "JP[2]" IOSTANDARD = LVCMOS33;
+NET "JP[1]" IOSTANDARD = LVCMOS33;
+NET "JP[0]" IOSTANDARD = LVCMOS33;
+NET "DATA_L[7]" IOSTANDARD = LVCMOS33;
+NET "DATA_L[6]" IOSTANDARD = LVCMOS33;
+NET "DATA_L[5]" IOSTANDARD = LVCMOS33;
+NET "DATA_L[4]" IOSTANDARD = LVCMOS33;
+NET "DATA_L[3]" IOSTANDARD = LVCMOS33;
+NET "DATA_L[2]" IOSTANDARD = LVCMOS33;
+NET "DATA_L[1]" IOSTANDARD = LVCMOS33;
+NET "DATA_L[0]" IOSTANDARD = LVCMOS33;
+NET "DATA_R[7]" IOSTANDARD = LVCMOS33;
+NET "DATA_R[6]" IOSTANDARD = LVCMOS33;
+NET "DATA_R[5]" IOSTANDARD = LVCMOS33;
+NET "DATA_R[4]" IOSTANDARD = LVCMOS33;
+NET "DATA_R[3]" IOSTANDARD = LVCMOS33;
+NET "DATA_R[2]" IOSTANDARD = LVCMOS33;
+NET "DATA_R[1]" IOSTANDARD = LVCMOS33;
+NET "DATA_R[0]" IOSTANDARD = LVCMOS33;
+NET "VGA_R[7]" IOSTANDARD = LVCMOS33;
+NET "VGA_R[7]" DRIVE = 8;
+NET "VGA_R[7]" SLEW = SLOW;
+NET "VGA_R[6]" IOSTANDARD = LVCMOS33;
+NET "VGA_R[6]" DRIVE = 8;
+NET "VGA_R[6]" SLEW = SLOW;
+NET "VGA_R[5]" IOSTANDARD = LVCMOS33;
+NET "VGA_R[5]" DRIVE = 8;
+NET "VGA_R[5]" SLEW = SLOW;
+NET "VGA_R[4]" IOSTANDARD = LVCMOS33;
+NET "VGA_R[4]" DRIVE = 8;
+NET "VGA_R[4]" SLEW = SLOW;
+NET "VGA_R[3]" IOSTANDARD = LVCMOS33;
+NET "VGA_R[3]" DRIVE = 8;
+NET "VGA_R[3]" SLEW = SLOW;
+NET "VGA_R[2]" IOSTANDARD = LVCMOS33;
+NET "VGA_R[2]" DRIVE = 8;
+NET "VGA_R[2]" SLEW = SLOW;
+NET "VGA_R[1]" IOSTANDARD = LVCMOS33;
+NET "VGA_R[1]" DRIVE = 8;
+NET "VGA_R[1]" SLEW = SLOW;
+NET "VGA_R[0]" IOSTANDARD = LVCMOS33;
+NET "VGA_R[0]" DRIVE = 8;
+NET "VGA_R[0]" SLEW = SLOW;
+NET "VGA_G[7]" IOSTANDARD = LVCMOS33;
+NET "VGA_G[7]" DRIVE = 8;
+NET "VGA_G[7]" SLEW = SLOW;
+NET "VGA_G[6]" IOSTANDARD = LVCMOS33;
+NET "VGA_G[6]" DRIVE = 8;
+NET "VGA_G[6]" SLEW = SLOW;
+NET "VGA_G[5]" IOSTANDARD = LVCMOS33;
+NET "VGA_G[5]" DRIVE = 8;
+NET "VGA_G[5]" SLEW = SLOW;
+NET "VGA_G[4]" IOSTANDARD = LVCMOS33;
+NET "VGA_G[4]" DRIVE = 8;
+NET "VGA_G[4]" SLEW = SLOW;
+NET "VGA_G[3]" IOSTANDARD = LVCMOS33;
+NET "VGA_G[3]" DRIVE = 8;
+NET "VGA_G[3]" SLEW = SLOW;
+NET "VGA_G[2]" IOSTANDARD = LVCMOS33;
+NET "VGA_G[2]" DRIVE = 8;
+NET "VGA_G[2]" SLEW = SLOW;
+NET "VGA_G[1]" IOSTANDARD = LVCMOS33;
+NET "VGA_G[1]" DRIVE = 8;
+NET "VGA_G[1]" SLEW = SLOW;
+NET "VGA_G[0]" IOSTANDARD = LVCMOS33;
+NET "VGA_G[0]" DRIVE = 8;
+NET "VGA_G[0]" SLEW = SLOW;
+NET "VGA_B[7]" IOSTANDARD = LVCMOS33;
+NET "VGA_B[7]" DRIVE = 8;
+NET "VGA_B[7]" SLEW = SLOW;
+NET "VGA_B[6]" IOSTANDARD = LVCMOS33;
+NET "VGA_B[6]" DRIVE = 8;
+NET "VGA_B[6]" SLEW = SLOW;
+NET "VGA_B[5]" IOSTANDARD = LVCMOS33;
+NET "VGA_B[5]" DRIVE = 8;
+NET "VGA_B[5]" SLEW = SLOW;
+NET "VGA_B[4]" IOSTANDARD = LVCMOS33;
+NET "VGA_B[4]" DRIVE = 8;
+NET "VGA_B[4]" SLEW = SLOW;
+NET "VGA_B[3]" IOSTANDARD = LVCMOS33;
+NET "VGA_B[3]" DRIVE = 8;
+NET "VGA_B[3]" SLEW = SLOW;
+NET "VGA_B[2]" IOSTANDARD = LVCMOS33;
+NET "VGA_B[2]" DRIVE = 8;
+NET "VGA_B[2]" SLEW = SLOW;
+NET "VGA_B[1]" IOSTANDARD = LVCMOS33;
+NET "VGA_B[1]" DRIVE = 8;
+NET "VGA_B[1]" SLEW = SLOW;
+NET "VGA_B[0]" IOSTANDARD = LVCMOS33;
+NET "VGA_B[0]" DRIVE = 8;
+NET "VGA_B[0]" SLEW = SLOW;
+NET "CLK" IOSTANDARD = LVCMOS33;
+NET "CLK" IBUF_LOW_PWR = "TRUE";
+NET "RST_N" IOSTANDARD = LVCMOS33;
+NET "UART_RXD" IOSTANDARD = LVCMOS33;
+NET "DUMMY0" IOSTANDARD = LVCMOS33;
+NET "DUMMY1" IOSTANDARD = LVCMOS33;
+NET "CCLK" IOSTANDARD = LVCMOS33;
+NET "FVAL" IOSTANDARD = LVCMOS33;
+NET "DVAL" IOSTANDARD = LVCMOS33;
+NET "LVAL" IOSTANDARD = LVCMOS33;
+NET "UART_TXD" IOSTANDARD = LVCMOS33;
+NET "UART_TXD" DRIVE = 8;
+NET "UART_TXD" SLEW = SLOW;
+NET "VGA_CLK" IOSTANDARD = LVCMOS33;
+NET "VGA_CLK" DRIVE = 8;
+NET "VGA_CLK" SLEW = SLOW;
+NET "VGA_VSYNC" IOSTANDARD = LVCMOS33;
+NET "VGA_VSYNC" DRIVE = 8;
+NET "VGA_VSYNC" SLEW = SLOW;
+NET "VGA_HSYNC" IOSTANDARD = LVCMOS33;
+NET "VGA_HSYNC" DRIVE = 8;
+NET "VGA_HSYNC" SLEW = SLOW;
+
+PIN "m_CLK25M/m_CLKGEN_MMCM/clkout1_buf.O" CLOCK_DEDICATED_ROUTE = TRUE;
+#PIN "m_CLK25M/m_CLKGEN_MMCM/clkout1_buf.O" CLOCK_DEDICATED_ROUTE = FALSE;
+#PIN "m_CLK25M/m_CLKGEN_MMCM/clkout2_buf.O" CLOCK_DEDICATED_ROUTE = TRUE;
+PIN "m_CLK25M/m_CLKGEN_MMCM/clkout2_buf.O" CLOCK_DEDICATED_ROUTE = FALSE;
+## /* ----- CLK (50MHz)----- */
+#create_clock -period 20.000 -name CLK -waveform {0.000 10.000} [get_ports CLK]
+#set_clock_uncertainty -setup 0.300 [get_clocks CLK]
+#set_clock_uncertainty -hold 0.100 [get_clocks CLK]
+NET "CLK" TNM_NET = "CLK";
+TIMESPEC "TS_CLK" = PERIOD "CLK" 20.000 ns HIGH 50.00%;
+
+## /* ----- CCLK (50MHz/40MHz) ----- */
+#create_clock -period 20.000 -name CCLK -waveform {0.000 10.000} [get_ports CCLK]
+##create_clock -name CCLK -period 25.000 -waveform "0 12.500" [get_ports CCLK]
+#set_clock_uncertainty -setup 0.300 [get_clocks CCLK]
+#set_clock_uncertainty -hold 0.100 [get_clocks CCLK]
+NET "CCLK" TNM_NET = "CCLK";
+TIMESPEC "TS_CCLK" = PERIOD "CCLK" 25.000 ns HIGH 50.00%;
+
+## /* ----- VCLK ----- */
+##create_clock -name VGA_CLK -period 40.000 -waveform "0 20.000" [get_pins m_CLK25M/m_CLKGEN_MMCM/inst/mmcm_adv_inst/CLKOUT0]
+##set_clock_uncertainty -setup 0.300 [get_clocks VGA_CLK]
+##set_clock_uncertainty -hold  0.100 [get_clocks VGA_CLK]
+##
+#create_generated_clock -name OUT_VGA_CLK -source [get_pins m_CLK25M/m_CLKGEN_MMCM/inst/mmcm_adv_inst/CLKOUT0] -divide_by 1 -add -master_clock clk_out1_CLKGEN_MMCM [get_ports VGA_CLK]
+#NET "OUT_VGA_CLK" TNM_NET = "OUT_VGA_CLK";
+#TIMESPEC "TS_OUT_VGA_CLK" = PERIOD "OUT_VGA_CLK" 40.000 ns HIGH 50.00%;
+
+## /* ----- UART_X16_CLK ----- */
+#create_generated_clock -name UART_X8_CLK -source [get_ports CLK] -divide_by 27 -add -master_clock CLK [get_pins m_CLK_UART_div_clk_reg/Q]
+#NET "UART_X8_CLK" TNM_NET = "UART_X8_CLK";
+#TIMESPEC "TS_UART_X8_CLK" = PERIOD "UART_X8_CLK" "TS_CLK" * 27 HIGH 50.00%;
+
+## /* ----- Clock Group Setting ----- */
+#set_clock_groups -asynchronous -group [get_clocks CLK] -group [get_clocks CCLK] -group [get_clocks OUT_VGA_CLK] -group [get_clocks UART_X8_CLK]
+
+# /* ----- set false path ----- */
+#
+#set_property PULLUP true [get_ports RST_N]
+#set_property PULLDOWN true [get_ports {DATA_L[7]}]
+#set_property PULLDOWN true [get_ports {DATA_L[6]}]
+#set_property PULLDOWN true [get_ports {DATA_L[5]}]
+#set_property PULLDOWN true [get_ports {DATA_L[4]}]
+#set_property PULLDOWN true [get_ports {DATA_L[3]}]
+#set_property PULLDOWN true [get_ports {DATA_L[2]}]
+#set_property PULLDOWN true [get_ports {DATA_L[1]}]
+#set_property PULLDOWN true [get_ports {DATA_L[0]}]
+#set_property PULLDOWN true [get_ports {DATA_R[7]}]
+#set_property PULLDOWN true [get_ports {DATA_R[6]}]
+#set_property PULLDOWN true [get_ports {DATA_R[5]}]
+#set_property PULLDOWN true [get_ports {DATA_R[4]}]
+#set_property PULLDOWN true [get_ports {DATA_R[3]}]
+#set_property PULLDOWN true [get_ports {DATA_R[2]}]
+#set_property PULLDOWN true [get_ports {DATA_R[1]}]
+#set_property PULLDOWN true [get_ports {DATA_R[0]}]
+#set_property PULLDOWN true [get_ports FVAL]
+#set_property PULLDOWN true [get_ports DVAL]
+#set_property PULLDOWN true [get_ports LVAL]
+#set_property PULLDOWN true [get_ports CCLK]
+#set_property PULLUP true [get_ports UART_RXD]
+#set_property PULLDOWN true [get_ports DUMMY0]
+#set_property PULLDOWN true [get_ports DUMMY1]
+#set_property PULLDOWN true [get_ports {JP[7]}]
+#set_property PULLDOWN true [get_ports {JP[6]}]
+#set_property PULLDOWN true [get_ports {JP[5]}]
+#set_property PULLDOWN true [get_ports {JP[4]}]
+#set_property PULLDOWN true [get_ports {JP[3]}]
+#set_property PULLDOWN true [get_ports {JP[2]}]
+#set_property PULLDOWN true [get_ports {JP[1]}]
+#set_property PULLDOWN true [get_ports {JP[0]}]
+NET RST_N PULLUP = TRUE;
+NET DATA_L[7] PULLDOWN = TRUE;
+NET DATA_L[6] PULLDOWN = TRUE;
+NET DATA_L[5] PULLDOWN = TRUE;
+NET DATA_L[4] PULLDOWN = TRUE;
+NET DATA_L[3] PULLDOWN = TRUE;
+NET DATA_L[2] PULLDOWN = TRUE;
+NET DATA_L[1] PULLDOWN = TRUE;
+NET DATA_L[0] PULLDOWN = TRUE;
+NET DATA_R[7] PULLDOWN = TRUE;
+NET DATA_R[6] PULLDOWN = TRUE;
+NET DATA_R[5] PULLDOWN = TRUE;
+NET DATA_R[4] PULLDOWN = TRUE;
+NET DATA_R[3] PULLDOWN = TRUE;
+NET DATA_R[2] PULLDOWN = TRUE;
+NET DATA_R[1] PULLDOWN = TRUE;
+NET DATA_R[0] PULLDOWN = TRUE;
+NET FVAL PULLDOWN = TRUE;
+NET DVAL PULLDOWN = TRUE;
+NET LVAL PULLDOWN = TRUE;
+NET CCLK PULLDOWN = TRUE;
+NET UART_RXD PULLUP = TRUE;
+#NET DUMMY0 PULLDOWN = TRUE;
+#NET DUMMY1 PULLDOWN = TRUE;
+NET JP[7] PULLDOWN = TRUE;
+NET JP[6] PULLDOWN = TRUE;
+NET JP[5] PULLDOWN = TRUE;
+NET JP[4] PULLDOWN = TRUE;
+NET JP[3] PULLDOWN = TRUE;
+NET JP[2] PULLDOWN = TRUE;
+NET JP[1] PULLDOWN = TRUE;
+NET JP[0] PULLDOWN = TRUE;
+
+#set_property SLEW SLOW [get_ports {{VGA_R[*]} {VGA_G[*]} {VGA_B[*]} VGA_HSYNC VGA_VSYNC VGA_CLK}]
+#set_property SLEW SLOW [get_ports UART_TXD]
+INST VGA_R[7] SLEW = SLOW;
+INST VGA_R[6] SLEW = SLOW;
+INST VGA_R[5] SLEW = SLOW;
+INST VGA_R[4] SLEW = SLOW;
+INST VGA_R[3] SLEW = SLOW;
+INST VGA_R[2] SLEW = SLOW;
+INST VGA_R[1] SLEW = SLOW;
+INST VGA_R[0] SLEW = SLOW;
+INST VGA_G[7] SLEW = SLOW;
+INST VGA_G[6] SLEW = SLOW;
+INST VGA_G[5] SLEW = SLOW;
+INST VGA_G[4] SLEW = SLOW;
+INST VGA_G[3] SLEW = SLOW;
+INST VGA_G[2] SLEW = SLOW;
+INST VGA_G[1] SLEW = SLOW;
+INST VGA_G[0] SLEW = SLOW;
+INST VGA_B[7] SLEW = SLOW;
+INST VGA_B[6] SLEW = SLOW;
+INST VGA_B[5] SLEW = SLOW;
+INST VGA_B[4] SLEW = SLOW;
+INST VGA_B[3] SLEW = SLOW;
+INST VGA_B[2] SLEW = SLOW;
+INST VGA_B[1] SLEW = SLOW;
+INST VGA_B[0] SLEW = SLOW;
+INST VGA_HSYNC SLEW = SLOW;
+INST VGA_VSYNC SLEW = SLOW;
+INST VGA_CLK SLEW = SLOW;
+INST UART_TXD SLEW = SLOW;
+
+#set_property DRIVE 8 [get_ports {{VGA_R[*]} {VGA_G[*]} {VGA_B[*]} VGA_HSYNC VGA_VSYNC VGA_CLK}]
+#set_property DRIVE 8 [get_ports UART_TXD]
+INST VGA_R[7] DRIVE = 8;
+INST VGA_R[6] DRIVE = 8;
+INST VGA_R[5] DRIVE = 8;
+INST VGA_R[4] DRIVE = 8;
+INST VGA_R[3] DRIVE = 8;
+INST VGA_R[2] DRIVE = 8;
+INST VGA_R[1] DRIVE = 8;
+INST VGA_R[0] DRIVE = 8;
+INST VGA_G[7] DRIVE = 8;
+INST VGA_G[6] DRIVE = 8;
+INST VGA_G[5] DRIVE = 8;
+INST VGA_G[4] DRIVE = 8;
+INST VGA_G[3] DRIVE = 8;
+INST VGA_G[2] DRIVE = 8;
+INST VGA_G[1] DRIVE = 8;
+INST VGA_G[0] DRIVE = 8;
+INST VGA_B[7] DRIVE = 8;
+INST VGA_B[6] DRIVE = 8;
+INST VGA_B[5] DRIVE = 8;
+INST VGA_B[4] DRIVE = 8;
+INST VGA_B[3] DRIVE = 8;
+INST VGA_B[2] DRIVE = 8;
+INST VGA_B[1] DRIVE = 8;
+INST VGA_B[0] DRIVE = 8;
+INST VGA_HSYNC DRIVE = 8;
+INST VGA_VSYNC DRIVE = 8;
+INST VGA_CLK DRIVE = 8;
+INST UART_TXD DRIVE = 8;
+
+#set_property CFGBVS VCCO [current_design]
+#set_property C_CLK_INPUT_FREQ_HZ 300000000 [get_debug_cores dbg_hub]
+#set_property C_ENABLE_CLK_DIVIDER false [get_debug_cores dbg_hub]
+#set_property C_USER_SCAN_CHAIN 1 [get_debug_cores dbg_hub]
+#connect_debug_port dbg_hub/clk [get_nets VGA_CLK_OBUF]
+
+#OFFSET = IN <x> BEFORE <clk>
+#OFFSET = OUT <x> BEFORE <clk>

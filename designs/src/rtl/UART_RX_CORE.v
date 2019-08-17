@@ -20,6 +20,8 @@ module UART_RX_CORE #(
     input   wire                                CLK,
     input   wire                                RST_N,
     //
+    input   wire                                iCLK_CE,
+    //
     input   wire                                iSEVEN_BIT,         // Low = 8bit,        High = 7bit
     input   wire                                iPARITY_EN,         // Low = Non Parity,  High = Parity Enable
     input   wire                                iODD_PARITY,        // Low = Even Parity, High = Odd Parity
@@ -45,9 +47,6 @@ module UART_RX_CORE #(
     localparam      STATE_WIDTH                 = 4;
     localparam      COUNTER_WIDTH               = 4;
     localparam      DATA_WIDTH                  = 8;
-
-    //
-    wire                                        start_trig;
 
     //
     reg     [STATE_WIDTH -1: 0]                 next_state, state;
@@ -210,15 +209,15 @@ module UART_RX_CORE #(
                                         next_data         <= data;
                                     end
                                 end else begin
-                                    next_state       <= IDLE_STATE;
+                                    next_state       <= state;
                                     //
                                     next_wait_count  <= wait_count;
                                     next_latch_count <= latch_count - 'h1;
                                     //
-                                    next_retry        <= 1'b0;
+                                    next_retry        <= retry;
                                     next_parity_error <= parity_error;
                                     //
-                                    next_de           <= 1'b0;
+                                    next_de           <= de;
                                     next_data         <= data;
                                 end
                             end
@@ -240,21 +239,38 @@ module UART_RX_CORE #(
     // 
     always @(posedge CLK or negedge RST_N) begin
         if (!RST_N) begin
-            state       <= IDLE_STATE;
+            state        <= IDLE_STATE;
             //
-            wait_count  <= 'h0;
-            latch_count <= 'h0;
+            wait_count   <= 'h0;
+            latch_count  <= 'h0;
             //
-            de          <= 1'b0;
-            data        <= 'h0;
+            retry        <= 1'b0;
+            parity_error <= 1'b0;
+            //
+            de           <= 1'b0;
+            data         <= 'h0;
+        end else if (iCLK_CE) begin
+            state        <= next_state;
+            //
+            wait_count   <= next_wait_count;
+            latch_count  <= next_latch_count;
+            //
+            retry        <= next_retry;
+            parity_error <= next_parity_error;
+            //
+            de           <= next_de;
+            data         <= next_data;
         end else begin
-            state       <= next_state;
+            state        <= state;
             //
-            wait_count  <= next_wait_count;
-            latch_count <= next_latch_count;
+            wait_count   <= wait_count;
+            latch_count  <= latch_count;
             //
-            de          <= next_de;
-            data        <= next_data;
+            retry        <= retry;
+            parity_error <= parity_error;
+            //
+            de           <= de;
+            data         <= data;
         end
     end
 

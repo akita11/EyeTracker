@@ -36,8 +36,10 @@ module TMG_CTRL #(
     output  wire                            oDE,
     output  wire                            oFIELD,
     //
-    output  wire    [PARAM_WIDTH -1: 0]     oHCOUNT,
-    output  wire    [PARAM_WIDTH -1: 0]     oVCOUNT
+    output  wire    [PARAM_WIDTH -1: 0]     oHTCOUNT,
+    output  wire    [PARAM_WIDTH -1: 0]     oVTCOUNT,
+    output  wire    [PARAM_WIDTH -1: 0]     oHDCOUNT,
+    output  wire    [PARAM_WIDTH -1: 0]     oVDCOUNT
 );
 
     reg                                     next_hsync, hsync;
@@ -46,8 +48,10 @@ module TMG_CTRL #(
     reg                                     next_vde, vde;
     reg                                     next_field, field;
 
-    reg     [PARAM_WIDTH -1: 0]             next_hcount, hcount;
-    reg     [PARAM_WIDTH -1: 0]             next_vcount, vcount;
+    reg     [PARAM_WIDTH -1: 0]             next_htcount, htcount;
+    reg     [PARAM_WIDTH -1: 0]             next_vtcount, vtcount;
+    reg     [PARAM_WIDTH -1: 0]             next_hdcount, hdcount;
+    reg     [PARAM_WIDTH -1: 0]             next_vdcount, vdcount;
 
     // 
     assign  oHSYNC = hsync;
@@ -55,94 +59,110 @@ module TMG_CTRL #(
     assign  oDE    = hde & vde;
     assign  oFIELD = field;
 
-    assign  oHCOUNT = hcount;
-    assign  oVCOUNT = vcount;
+    assign  oHTCOUNT = htcount;
+    assign  oVTCOUNT = vtcount;
+    assign  oHDCOUNT = hdcount;
+    assign  oVDCOUNT = vdcount;
     // 
     always @(posedge CLK or negedge RST_N) begin
         if (!RST_N == 1'b1) begin
-            hcount <= 'h0;
-            vcount <= 'h0;
+            htcount <= 'h0;
+            vtcount <= 'h0;
+            hdcount <= 'h0;
+            vdcount <= 'h0;
             // 
-            hsync  <= 1'b1;
-            hde    <= 1'b0;
+            hsync   <= 1'b1;
+            hde     <= 1'b0;
             // 
-            vsync  <= 1'b1;
-            vde    <= 1'b0;
+            vsync   <= 1'b1;
+            vde     <= 1'b0;
             // 
-            field  <= 1'b0;
+            field   <= 1'b0;
         end else begin
-            hcount <= next_hcount;
-            vcount <= next_vcount;
+            htcount <= next_htcount;
+            vtcount <= next_vtcount;
+            hdcount <= next_hdcount;
+            vdcount <= next_vdcount;
             // 
-            hsync  <= next_hsync;
-            hde    <= next_hde;
+            hsync   <= next_hsync;
+            hde     <= next_hde;
             // 
-            vsync  <= next_vsync;
-            vde    <= next_vde;
+            vsync   <= next_vsync;
+            vde     <= next_vde;
             // 
-            field  <= next_field;
+            field   <= next_field;
         end
     end
 
     // Count up hcount & vcount
     always @(*) begin
-        if (hcount == iHTOTAL - 'h1) begin
-            if (vcount == iVTOTAL - 'h1) begin
-                next_hcount <= 'h0;
-                next_vcount <= 'h0;
+        if (htcount == iHTOTAL - 'h1) begin
+            if (vtcount == iVTOTAL - 'h1) begin
+                next_htcount <= 'h0;
+                next_vtcount <= 'h0;
                 //
-                next_field  <= ~field;
+                next_field   <= ~field;
             end else begin
-                next_hcount <= 'h0;
-                next_vcount <= vcount + 'h1;
+                next_htcount <= 'h0;
+                next_vtcount <= vtcount + 'h1;
                 //
-                next_field  <= field;
+                next_field   <= field;
             end
         end else begin
-            next_hcount <= hcount + 'h1;
-            next_vcount <= vcount;
+            next_htcount <= htcount + 'h1;
+            next_vtcount <= vtcount;
             //
-            next_field  <= field;
+            next_field   <= field;
         end
     end
 
     // Generate hsync & hde
     always @(*) begin
-        if (hcount == (iHS_WIDTH - 'h1)) begin
-            next_hsync <= 1'b0;
-            next_hde   <= 1'b0;
-        end else if (hcount == (iHS_WIDTH + iHS_BP - 'h1)) begin
-            next_hsync <= 1'b0;
-            next_hde   <= 1'b1;
-        end else if (hcount == (iHS_WIDTH + iHS_BP + iHACT - 'h1)) begin
-            next_hsync <= 1'b0;
-            next_hde   <= 1'b0;
-        end else if (hcount == (iHTOTAL - 'h1)) begin
-            next_hsync <= 1'b1;
-            next_hde   <= 1'b0;
+        if (htcount == (iHS_WIDTH - 'h1)) begin
+            next_hdcount <= 'h0;
+            next_hsync   <= 1'b0;
+            next_hde     <= 1'b0;
+        end else if (htcount == (iHS_WIDTH + iHS_BP - 'h1)) begin
+            next_hdcount <= hdcount;
+            next_hsync   <= 1'b0;
+            next_hde     <= 1'b1;
+        end else if (htcount == (iHS_WIDTH + iHS_BP + iHACT - 'h1)) begin
+            next_hdcount <= hdcount;
+            next_hsync   <= 1'b0;
+            next_hde     <= 1'b0;
+        end else if (htcount == (iHTOTAL - 'h1)) begin
+            next_hdcount <= 'h0;
+            next_hsync   <= 1'b1;
+            next_hde     <= 1'b0;
         end else begin
-            next_hsync <= hsync;
-            next_hde   <= hde;
+            next_hdcount <= ((hde==1'b1) && (vde==1'b1)) ? hdcount + 'h1: hdcount;
+            next_hsync   <= hsync;
+            next_hde     <= hde;
         end
     end
 
     // Generate vsync & vde
     always @(*) begin
-        if (next_vcount == (iVS_WIDTH - 'h1)) begin
-            next_vsync <= 1'b0;
-            next_vde   <= 1'b0;
-        end else if (next_vcount == (iVS_WIDTH + iVS_BP - 'h1)) begin
-            next_vsync <= 1'b0;
-            next_vde   <= 1'b1;
-        end else if (next_vcount == (iVS_WIDTH + iVS_BP + iVACT - 'h1)) begin
-            next_vsync <= 1'b0;
-            next_vde   <= 1'b0;
-        end else if (next_vcount == (iVTOTAL - 'h1)) begin
-            next_vsync <= 1'b1;
-            next_vde   <= 1'b0;
+        if (next_vtcount == (iVS_WIDTH - 'h1)) begin
+            next_vdcount <= 'h0;
+            next_vsync   <= 1'b0;
+            next_vde     <= 1'b0;
+        end else if (next_vtcount == (iVS_WIDTH + iVS_BP - 'h1)) begin
+            next_vdcount <= vdcount;
+            next_vsync   <= 1'b0;
+            next_vde     <= 1'b1;
+        end else if (next_vtcount == (iVS_WIDTH + iVS_BP + iVACT - 'h1)) begin
+            next_vdcount <= vdcount;
+            next_vsync   <= 1'b0;
+            next_vde     <= 1'b0;
+        end else if (next_vtcount == (iVTOTAL - 'h1)) begin
+            next_vdcount <= 'h0;
+            next_vsync   <= 1'b1;
+            next_vde     <= 1'b0;
         end else begin
-            next_vsync <= vsync;
-            next_vde   <= vde;
+            next_vdcount <= ((vde==1'b1) && (htcount == (iHTOTAL - 'h1))) ? vdcount + 'h1: vdcount;
+            next_vsync   <= vsync;
+            next_vde     <= vde;
         end
     end
 

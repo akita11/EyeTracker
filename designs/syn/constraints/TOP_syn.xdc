@@ -36,8 +36,11 @@ set_clock_uncertainty -hold 0.100 [get_clocks CCLK]
 #
 create_generated_clock -name OUT_VGA_CLK -source [get_pins m_CLK25M/m_CLKGEN_MMCM/inst/mmcm_adv_inst/CLKOUT0] -divide_by 1 -add -master_clock clk_out1_CLKGEN_MMCM [get_ports VGA_CLK]
 
+# /* ----- UART_X16_CLK ----- */
+create_generated_clock -name UART_X8_CLK -source [get_ports CLK] -divide_by 27 -add -master_clock CLK [get_pins m_CLK_UART_div_clk_reg/Q]
+
 # /* ----- Clock Group Setting ----- */
-set_clock_groups -asynchronous -group [get_clocks CLK] -group [get_clocks CCLK] -group [get_clocks OUT_VGA_CLK]
+set_clock_groups -asynchronous -group [get_clocks CLK] -group [get_clocks CCLK] -group [get_clocks OUT_VGA_CLK] -group [get_clocks UART_X8_CLK]
 
 # /* ----- set false path ----- */
 #
@@ -70,7 +73,7 @@ set_property IOSTANDARD LVCMOS33 [get_ports {{VGA_R[*]} {VGA_G[*]} {VGA_B[*]} VG
 set_property IOSTANDARD LVCMOS33 [get_ports CLK]
 set_property IOSTANDARD LVCMOS33 [get_ports RST_N]
 set_property IOSTANDARD LVCMOS33 [get_ports {{JP[*]} UART_RXD UART_TXD}]
-set_property IOSTANDARD LVCMOS33 [get_ports VGAOUT_MODE]
+#set_property IOSTANDARD LVCMOS33 [get_ports VGAOUT_MODE]
 set_property IOSTANDARD LVCMOS18 [get_ports DUMMY0]
 set_property IOSTANDARD LVCMOS18 [get_ports DUMMY1]
 set_property SLEW SLOW [get_ports {{VGA_R[*]} {VGA_G[*]} {VGA_B[*]} VGA_HSYNC VGA_VSYNC VGA_CLK}]
@@ -86,7 +89,7 @@ set_property PULLDOWN true [get_ports {JP[3]}]
 set_property PULLDOWN true [get_ports {JP[2]}]
 set_property PULLDOWN true [get_ports {JP[1]}]
 set_property PULLDOWN true [get_ports {JP[0]}]
-set_property C_CLK_INPUT_FREQ_HZ 300000000 [get_debug_cores dbg_hub]
-set_property C_ENABLE_CLK_DIVIDER false [get_debug_cores dbg_hub]
-set_property C_USER_SCAN_CHAIN 1 [get_debug_cores dbg_hub]
-connect_debug_port dbg_hub/clk [get_nets VGA_CLK_OBUF]
+#set_property C_CLK_INPUT_FREQ_HZ 300000000 [get_debug_cores dbg_hub]
+#set_property C_ENABLE_CLK_DIVIDER false [get_debug_cores dbg_hub]
+#set_property C_USER_SCAN_CHAIN 1 [get_debug_cores dbg_hub]
+#connect_debug_port dbg_hub/clk [get_nets VGA_CLK_OBUF]

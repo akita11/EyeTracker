@@ -21,74 +21,81 @@ module CALC_GRAVITY_Y #(
     parameter   PIXEL_WIDTH = 8
 ) (
     // 
-    input   wire                            CCLK,
-    input   wire                            RST_N,
+    input   wire                                        CCLK,
+    input   wire                                        RST_N,
     //
-    input   wire                            iVSYNC,
+    input   wire                                        iVSYNC,
     //
-    input   wire    [ADDR_WIDTH -1: 0]      iHSIZE,
-    input   wire    [ADDR_WIDTH -1: 0]      iVSIZE,
+    input   wire    [ADDR_WIDTH -1: 0]                  iHSIZE,
+    input   wire    [ADDR_WIDTH -1: 0]                  iVSIZE,
     //
-    input   wire                            iDATA_EN,
-    input   wire    [MDATA_WIDTH -1: 0]     iMEMIN,
-    output  wire    [ADDR_WIDTH -1: 0]      oADDR,
+    input   wire                                        iDATA_EN,
+    input   wire    [MDATA_WIDTH -1: 0]                 iMEMIN,
+    output  wire    [ADDR_WIDTH -1: 0]                  oADDR,
     //
-    output  wire                            oSELECT_EN,
+    output  wire                                        oSELECT_EN,
     //
-    input   wire                            iBUSY,
+    input   wire                                        iBUSY,
     //
-    output  wire                            oSTART_TRIG,
+    output  wire                                        oSTART_S_TRIG,
+    output  wire                                        oSTART_Q_TRIG,
     //
-    output  wire    [SUM_S_WIDTH -1: 0]     oSUM_S,
-    output  wire    [SUM_SX_WIDTH -1: 0]    oSUM_SX,
-    output  wire    [SUM_SY_WIDTH -1: 0]    oSUM_SY,
+    output  wire    [SUM_S_WIDTH  -1: 0]                oSUM_S,
+    output  wire    [SUM_SX_WIDTH -1: 0]                oSUM_SX,
+    output  wire    [SUM_SY_WIDTH -1: 0]                oSUM_SY,
+    output  wire    [SUM_S_WIDTH  -1: 0]                oFRACTIONAL_SX,
+    output  wire    [SUM_S_WIDTH  -1: 0]                oFRACTIONAL_SY,
+    output  wire    [SUM_SX_WIDTH -1: 0]                oQUOTIENT_SX,
+    output  wire    [SUM_SY_WIDTH -1: 0]                oQUOTIENT_SY,
     // Debug
-    output  wire    [STATE_WIDTH -1: 0]     oSTATE
+    output  wire    [STATE_WIDTH -1: 0]                 oSTATE
 );
 
     //
-    localparam      SUM_S_WIDTH             = 20;
-    localparam      SUM_SX_WIDTH            = 28;
-    localparam      SUM_SY_WIDTH            = 28;
+    localparam      SUM_S_WIDTH                         = 20;
+    localparam      SUM_SX_WIDTH                        = 28;
+    localparam      SUM_SY_WIDTH                        = 28;
 
     //
-    localparam      STATE_WIDTH             = 4;
+    localparam      STATE_WIDTH                         = 4;
     // 
-    localparam      IDLE_STATE              = 4'b0000,
-                    CALC_Y_DIR              = 4'b0001,
-                    CALC_X_DIR              = 4'b0010,
-                    CALC_GRAV               = 4'b0011,
-                    PRE_WAIT                = 4'b0100,
-                    WAIT_OUTPUT             = 4'b0101;
+    localparam      IDLE_STATE                          = 4'b0000,
+                    CALC_Y_DIR                          = 4'b0001,
+                    CALC_X_DIR                          = 4'b0010,
+                    CALC_GRAV                           = 4'b0011,
+                    PRE_WAIT                            = 4'b0100,
+                    WAIT_OUTPUT                         = 4'b0101;
 
     //
-    wire    [$clog2(MDATA_WIDTH): 0]        count_val;
+    wire    [$clog2(MDATA_WIDTH): 0]                    count_val;
 
-    wire    [SUM_S_WIDTH -1: 0]             pe [0:MDATA_WIDTH - 1];
-
-    wire    [48 -1: 0]                      div_sum_sx_sum_s;
-    wire    [48 -1: 0]                      div_sum_sy_sum_s;
+    wire    [SUM_S_WIDTH -1: 0]                         pe [0:MDATA_WIDTH - 1];
 
     // 
-    reg     [STATE_WIDTH -1: 0]             next_state, state;
-    reg     [$clog2(MDATA_WIDTH) + 3: 0]    next_counter, counter;
-    reg                                     next_clear, clear;
-    reg                                     next_select_en, select_en;
-    reg     [ADDR_WIDTH -1: 0]              next_addr, addr;
-    reg                                     next_s_trig, s_trig;
-    reg     [SUM_S_WIDTH -1 :0]             next_sum_s, sum_s;
-    reg     [SUM_SX_WIDTH -1 :0]            next_sum_sx, sum_sx;
-    reg     [SUM_SY_WIDTH -1 :0]            next_sum_sy, sum_sy;
+    reg     [STATE_WIDTH -1: 0]                         next_state, state;
+    reg     [$clog2(MDATA_WIDTH) + 3: 0]                next_counter, counter;
+    reg                                                 next_clear, clear;
+    reg                                                 next_select_en, select_en;
+    reg     [ADDR_WIDTH -1: 0]                          next_addr, addr;
+    reg                                                 next_s_trig, s_trig;
+    reg     [SUM_S_WIDTH -1 :0]                         next_sum_s, sum_s;
+    reg     [SUM_SX_WIDTH -1 :0]                        next_sum_sx, sum_sx;
+    reg     [SUM_SY_WIDTH -1 :0]                        next_sum_sy, sum_sy;
 
     //
-    assign  oSELECT_EN = select_en;
-    assign  oADDR = addr;
+    wire    [SUM_S_WIDTH + SUM_SX_WIDTH - 1: 0]         div_sum_sx_sum_s;
+    wire    [SUM_S_WIDTH + SUM_SY_WIDTH - 1: 0]         div_sum_sy_sum_s;
 
-    assign  oSTART_TRIG = s_trig;
+    //
+    assign  oSELECT_EN     = select_en;
+    assign  oADDR          = addr;
 
-    assign  oSUM_S  = sum_s;
-    assign  oSUM_SX = sum_sx;
-    assign  oSUM_SY = sum_sy;
+    assign  oSTART_S_TRIG  = s_trig_dly;
+
+    //
+    assign  oSUM_S         = sum_s;
+    assign  oSUM_SX        = sum_sx;
+    assign  oSUM_SY        = sum_sy;
 
     // for Debug
     assign  oSTATE  = state;
@@ -97,15 +104,19 @@ module CALC_GRAVITY_Y #(
     DET_EDGE m_DET_VSYNC_EDGE( .CLK(CCLK), .RST_N(RST_N), .iS(iVSYNC), .oRISE(rise_vsync), .oFALL(fall_vsync) );
     DET_EDGE m_DET_BUSY_EDGE ( .CLK(CCLK), .RST_N(RST_N), .iS(iBUSY ), .oRISE(rise_busy ), .oFALL(fall_busy ) );
 
+    //
+    CYCLE_DELAY #( .DATA_WIDTH(1), .DELAY(1) )  m_TRIG_DLY( .CLK(CCLK), .RST_N(RST_N), .iD(s_trig), .oD(s_trig_dly) );
+
     // 
     COUNT_HIGH_BIT #( .BIT_WIDTH(MDATA_WIDTH) ) m_COUNT_HIGH_BIT    ( .iBIT(iMEMIN), .oCOUNT(count_val) );
 
     // 
     generate
-        genvar                                      i;
+        genvar                                          i;
         //
         for (i=0; i< MDATA_WIDTH; i=i+1) begin: inst_loop
-            SUM_UNIT #( .FACTOR_WIDTH($clog2(MDATA_WIDTH)), .IDATA_WIDTH(1), .ODATA_WIDTH(SUM_S_WIDTH) ) m_SUM_UNIT(
+//            SUM_UNIT #( .FACTOR_WIDTH($clog2(MDATA_WIDTH)), .IDATA_WIDTH(1), .ODATA_WIDTH(SUM_S_WIDTH) ) m_SUM_UNIT(
+            SUM_UNIT #( .FACTOR_WIDTH(10), .IDATA_WIDTH(1), .ODATA_WIDTH(SUM_S_WIDTH) ) m_SUM_UNIT(
                 .CLK(CCLK), .RST_N(RST_N), 
                 //
                 .iCLR(clear), .iDATA_EN(iDATA_EN), .iFACTOR(i), .iD(iMEMIN[i]), 
@@ -355,26 +366,71 @@ module CALC_GRAVITY_Y #(
         end
     end
 
-/*
-    DIV_28_20_SX    m_DIV_28_20_SX  (
-            .aclk(CCLK), .aclken(1'b1), .aresetn(RST_N),
-            .s_axis_divisor_tvalid(1'b1), .s_axis_divisor_tready(),
-            .s_axis_divisor_tdata({4'h0, sum_s}),
-            .s_axis_dividend_tvalid(1'b1), .s_axis_dividend_tready(),
-            .s_axis_dividend_tdata({4'h0, sum_sx}),
-            .m_axis_dout_tvalid(),
-            .m_axis_dout_tdata(div_sum_sx_sum_s)
+    //
+    DFF_REG #( .DATA_WIDTH(20), .INIT_VAL(20'h0) ) m_DIVIDED_SX_FSX ( .CLK(CCLK), .RST_N(RST_N), 
+                                                                      .iWE(divid_sx_load_en), .iD(div_sum_sx_sum_s[19: 0]), .oD(oFRACTIONAL_SX[19: 0]) );
+    DFF_REG #( .DATA_WIDTH(28), .INIT_VAL(28'h0) ) m_DIVIDED_SX_QSX ( .CLK(CCLK), .RST_N(RST_N), 
+                                                                      .iWE(divid_sx_load_en), .iD(div_sum_sx_sum_s[47:20]), .oD(oQUOTIENT_SX  [27: 0]) );
+
+    //
+    DFF_REG #( .DATA_WIDTH(20), .INIT_VAL(20'h0) ) m_DIVIDED_SY_FSX ( .CLK(CCLK), .RST_N(RST_N), 
+                                                                      .iWE(divid_sy_load_en), .iD(div_sum_sy_sum_s[19: 0]), .oD(oFRACTIONAL_SY[19: 0]) );
+    DFF_REG #( .DATA_WIDTH(28), .INIT_VAL(28'h0) ) m_DIVIDED_SY_QSX ( .CLK(CCLK), .RST_N(RST_N), 
+                                                                      .iWE(divid_sy_load_en), .iD(div_sum_sy_sum_s[47:20]), .oD(oQUOTIENT_SY  [27: 0]) );
+
+    //
+    CYCLE_DELAY #( .DATA_WIDTH(1), .DELAY(2) ) m_START_Q_TRIG_DLY ( .CLK(CCLK), .RST_N(RST_N), 
+                                             .iD(divid_sx_load_en | divid_sy_load_en), .oD(oSTART_Q_TRIG) );
+
+    //
+    MATH_DIV_CTRL   m_MATH_DIV_SX_CTRL ( .CLK(CCLK), .RST_N(RST_N), 
+                                         //
+                                         .iTRIG(s_trig),
+                                         //
+                                         .iDIVIDEND_TREADY(1'b1),
+                                         .iDIVISOR_TREADY (1'b1),
+                                         .iDOUT_TVALID(dout_sx_tvalid),
+                                         //
+                                         .oDIVIDEND_TVALID(dividend_sx_tvalid), .oDIVISOR_TVALID(divisor_sx_tvalid),
+                                         //
+                                         .oDIVID_LOAD_EN(divid_sx_load_en)
             );
 
-    DIV_28_20_SY    m_DIV_28_20_SY  (
-            .aclk(CCLK), .aclken(1'b1), .aresetn(RST_N),
-            .s_axis_divisor_tvalid(1'b1), .s_axis_divisor_tready(),
-            .s_axis_divisor_tdata({4'h0, sum_s}),
-            .s_axis_dividend_tvalid(1'b1), .s_axis_dividend_tready(),
-            .s_axis_dividend_tdata({4'h0, sum_sy}),
-            .m_axis_dout_tvalid(),
-            .m_axis_dout_tdata(div_sum_sx_sum_s)
+    //
+    MATH_DIV_CTRL   m_MATH_DIV_SY_CTRL ( .CLK(CCLK), .RST_N(RST_N), 
+                                         //
+                                         .iTRIG(s_trig),
+                                         //
+                                         .iDIVIDEND_TREADY(1'b1),
+                                         .iDIVISOR_TREADY (1'b1),
+                                         .iDOUT_TVALID(dout_sy_tvalid),
+                                         //
+                                         .oDIVIDEND_TVALID(dividend_sy_tvalid), .oDIVISOR_TVALID(divisor_sy_tvalid),
+                                         //
+                                         .oDIVID_LOAD_EN(divid_sy_load_en)
             );
-*/
+
+    //
+    DIV_28_20   m_DIV_28_20_SX  (
+            .aclk(CCLK), .aclken(1'b1), .aresetn(RST_N),
+            .s_axis_divisor_tvalid (divisor_sx_tvalid), 
+            .s_axis_divisor_tdata  ({4'h0, sum_s}),
+            .s_axis_dividend_tvalid(dividend_sx_tvalid), 
+            .s_axis_dividend_tdata ({4'h0, sum_sx}),
+            .m_axis_dout_tvalid    (dout_sx_tvalid),
+            .m_axis_dout_tdata     (div_sum_sx_sum_s),
+            .m_axis_dout_tuser     (detect_divided_by_zero_sx)
+            );
+
+    DIV_28_20   m_DIV_28_20_SY  (
+            .aclk(CCLK), .aclken(1'b1), .aresetn(RST_N),
+            .s_axis_divisor_tvalid (divisor_sy_tvalid), 
+            .s_axis_divisor_tdata  ({4'h0, sum_s}),
+            .s_axis_dividend_tvalid(dividend_sy_tvalid), 
+            .s_axis_dividend_tdata ({4'h0, sum_sy}),
+            .m_axis_dout_tvalid    (dout_sy_tvalid),
+            .m_axis_dout_tdata     (div_sum_sy_sum_s),
+            .m_axis_dout_tuser     (detect_divided_by_zero_sy)
+            );
 
 endmodule
